@@ -22,6 +22,7 @@ export interface User {
   id: string;
   phone: string;
   email?: string;
+  password?: string;
   role: UserRole;
   name: string;
   status: 'active' | 'inactive';

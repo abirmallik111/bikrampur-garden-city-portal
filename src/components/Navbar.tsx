@@ -4,6 +4,7 @@ import {
   Vote,
   FileCheck2,
   Building,
+  Building2,
   HeartHandshake,
   Users,
   ShieldAlert,
@@ -88,105 +89,93 @@ export const Navbar: React.FC = () => {
       {/* Main Brand & Nav Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo & Society Brand (Professional Polish emblem) */}
+          {/* Logo & Society Brand (Matching screenshot clean modern layout) */}
           <div
             id="brand-logo-btn"
             onClick={() => navigateTo('landing')}
-            className="flex items-center gap-3 cursor-pointer group select-none"
+            className="flex items-center gap-2.5 cursor-pointer group select-none"
           >
-            <div className="w-10 h-10 bg-slate-900 group-hover:bg-slate-800 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-xs transition-colors shrink-0">
-              <span>B</span>
+            <div className="w-8 h-8 rounded-lg bg-[#064e3b] text-[#64f9bc] flex items-center justify-center font-bold text-sm shadow-xs transition-colors shrink-0">
+              <Building2 className="w-4 h-4 text-white" />
             </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="text-slate-900 font-bold text-base sm:text-lg leading-tight tracking-tight">
-                  Bikrampur Garden City
-                </span>
-                <span className="hidden sm:inline-block text-[10px] bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded border border-slate-200">
-                  Dholaipar
-                </span>
-              </div>
-              <span className="text-slate-500 text-[11px] tracking-wider uppercase font-semibold">
-                Society & Election Portal
+            <div className="flex items-center gap-1.5">
+              <span className="text-[#131b2e] font-extrabold text-base tracking-tight">
+                Bikrampur Garden City
+              </span>
+              <span className="hidden sm:inline-block text-[10px] bg-[#eaedff] text-[#064e3b] font-bold px-2 py-0.5 rounded-full">
+                Dholaipar
               </span>
             </div>
           </div>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center space-x-1 text-sm font-medium">
+          {/* Desktop Nav Links (Centered clean typography) */}
+          <nav className="hidden lg:flex items-center space-x-6 text-sm font-semibold">
             <button
               id="nav-home-btn"
               onClick={() => navigateTo('landing')}
-              className={`px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+              className={`transition-colors cursor-pointer py-1 ${
                 currentView === 'landing'
-                  ? 'bg-slate-100 text-slate-900 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'text-[#064e3b] font-bold border-b-2 border-[#064e3b]'
+                  : 'text-[#404944] hover:text-[#131b2e]'
               }`}
             >
-              হোম (Home)
+              Home
             </button>
 
             <button
               id="nav-election-btn"
               onClick={() => navigateTo('elections')}
-              className={`px-3 py-2 rounded-lg transition-colors flex items-center space-x-1.5 cursor-pointer ${
+              className={`transition-colors flex items-center space-x-1.5 cursor-pointer py-1 ${
                 currentView === 'elections' || currentView === 'election-vote'
-                  ? 'bg-emerald-50 text-emerald-900 font-semibold border border-emerald-200'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'text-[#064e3b] font-bold border-b-2 border-[#064e3b]'
+                  : 'text-[#404944] hover:text-[#131b2e]'
               }`}
             >
-              <Vote className="w-4 h-4 text-emerald-600" />
-              <span>নির্বাচন ২০২৬ (Election)</span>
+              <span>Election</span>
               {activeElection && (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="w-2 h-2 rounded-full bg-[#34d399] animate-pulse"></span>
               )}
             </button>
 
             <button
               id="nav-rentals-btn"
               onClick={() => navigateTo('rentals')}
-              className={`px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+              className={`transition-colors cursor-pointer py-1 ${
                 currentView === 'rentals'
-                  ? 'bg-slate-100 text-slate-900 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'text-[#064e3b] font-bold border-b-2 border-[#064e3b]'
+                  : 'text-[#404944] hover:text-[#131b2e]'
               }`}
             >
-              ভাড়া বিজ্ঞাপন (Rentals)
+              Rentals
             </button>
 
             <button
               id="nav-directory-btn"
               onClick={() => navigateTo('directory')}
-              className={`px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+              className={`transition-colors cursor-pointer py-1 ${
                 currentView === 'directory'
-                  ? 'bg-slate-100 text-slate-900 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'text-[#064e3b] font-bold border-b-2 border-[#064e3b]'
+                  : 'text-[#404944] hover:text-[#131b2e]'
               }`}
             >
-              ডিরেক্টরি ও কমিটি
+              Directory
             </button>
           </nav>
 
           {/* Right Status / Auth CTAs */}
           <div className="hidden lg:flex items-center space-x-3">
-            {/* System Online Badge from Professional Polish */}
-            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-              <span className="text-xs font-bold">System Online</span>
-            </div>
-
             {currentUser ? (
               <div className="flex items-center gap-3 border-l border-slate-200 pl-3">
                 {currentUser.role === 'super_admin' || currentUser.role === 'admin' ? (
                   <button
                     id="admin-dashboard-btn"
                     onClick={() => navigateTo('admin')}
-                    className="flex items-center space-x-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                    className="flex items-center space-x-1.5 bg-[#064e3b] hover:bg-[#003527] text-white px-4 py-2 rounded-full text-xs font-bold shadow-xs transition-colors cursor-pointer"
                   >
-                    <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+                    <ShieldAlert className="w-3.5 h-3.5 text-[#64f9bc]" />
                     <span>এডমিন প্যানেল</span>
                     {pendingAppsCount > 0 && (
-                      <span className="bg-amber-400 text-slate-950 text-[10px] px-1.5 py-0.2 rounded-full font-bold">
+                      <span className="bg-[#64f9bc] text-[#003527] text-[10px] px-1.5 py-0.2 rounded-full font-bold">
                         {pendingAppsCount}
                       </span>
                     )}
@@ -195,14 +184,13 @@ export const Navbar: React.FC = () => {
                   <button
                     id="voter-dashboard-btn"
                     onClick={() => navigateTo('dashboard')}
-                    className="flex items-center gap-2.5 bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                    className="flex items-center gap-2.5 bg-[#064e3b] hover:bg-[#003527] text-white px-4 py-2 rounded-full text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                   >
-                    <div className="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-slate-200 text-[10px] font-bold">
+                    <div className="w-5 h-5 rounded-full bg-[#003527] text-[#64f9bc] flex items-center justify-center text-[10px] font-bold">
                       {getUserInitials()}
                     </div>
                     <div className="text-left leading-tight">
                       <div className="font-bold text-white">{currentUser.name.split(' ')[0]}</div>
-                      <div className="text-[10px] text-slate-400">{currentUser.voterId || 'Resident'}</div>
                     </div>
                   </button>
                 )}
@@ -210,7 +198,7 @@ export const Navbar: React.FC = () => {
                 <button
                   id="logout-btn"
                   onClick={logout}
-                  className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                  className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors cursor-pointer"
                   title="লগআউট (Logout)"
                 >
                   <LogOut className="w-4 h-4" />
@@ -220,10 +208,10 @@ export const Navbar: React.FC = () => {
               <button
                 id="login-btn"
                 onClick={() => navigateTo('login')}
-                className="flex items-center space-x-1.5 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                className="flex items-center space-x-2 bg-[#064e3b] hover:bg-[#003527] text-white px-5 py-2.5 rounded-full text-xs font-bold shadow-sm transition-all cursor-pointer"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>সদস্য লগইন (Login)</span>
+                <span>Member Login</span>
               </button>
             )}
           </div>

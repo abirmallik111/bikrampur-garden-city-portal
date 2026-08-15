@@ -54,36 +54,42 @@ export async function uploadFileToStorage(
  */
 export async function fetchAllFromCloud() {
   try {
-    const [
-      { data: apps },
-      { data: voters },
-      { data: elections },
-      { data: committee },
-      { data: announcements },
-      { data: complaints },
-      { data: rentals },
-      { data: votes }
-    ] = await Promise.all([
-      supabase.from('voter_applications').select('*'),
-      supabase.from('voters').select('*'),
-      supabase.from('elections').select('*'),
-      supabase.from('committee_members').select('*'),
-      supabase.from('announcements').select('*'),
-      supabase.from('complaints').select('*'),
-      supabase.from('rental_listings').select('*'),
-      supabase.from('votes').select('*')
-    ]);
+    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500));
+    const fetchPromise = (async () => {
+      const [
+        { data: apps },
+        { data: voters },
+        { data: elections },
+        { data: committee },
+        { data: announcements },
+        { data: complaints },
+        { data: rentals },
+        { data: votes }
+      ] = await Promise.all([
+        supabase.from('voter_applications').select('*'),
+        supabase.from('voters').select('*'),
+        supabase.from('elections').select('*'),
+        supabase.from('committee_members').select('*'),
+        supabase.from('announcements').select('*'),
+        supabase.from('complaints').select('*'),
+        supabase.from('rental_listings').select('*'),
+        supabase.from('votes').select('*')
+      ]);
 
-    return {
-      applications: (apps as VoterApplication[]) || null,
-      voters: (voters as Voter[]) || null,
-      elections: (elections as Election[]) || null,
-      committee: (committee as CommitteeMember[]) || null,
-      announcements: (announcements as Announcement[]) || null,
-      complaints: (complaints as Complaint[]) || null,
-      rentals: (rentals as RentalListing[]) || null,
-      votes: (votes as Vote[]) || null
-    };
+      return {
+        applications: (apps as VoterApplication[]) || null,
+        voters: (voters as Voter[]) || null,
+        elections: (elections as Election[]) || null,
+        committee: (committee as CommitteeMember[]) || null,
+        announcements: (announcements as Announcement[]) || null,
+        complaints: (complaints as Complaint[]) || null,
+        rentals: (rentals as RentalListing[]) || null,
+        votes: (votes as Vote[]) || null
+      };
+    })();
+
+    const result = await Promise.race([fetchPromise, timeoutPromise]);
+    return result;
   } catch (err) {
     console.warn('Could not fetch from Supabase Cloud, using local storage:', err);
     return null;

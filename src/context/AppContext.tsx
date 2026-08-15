@@ -184,7 +184,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Preloader & UX State
   const [isPageLoading, setIsPageLoading] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
@@ -212,72 +212,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Automated Email Notification Overlay
   const [activeEmailNotification, setActiveEmailNotification] = useState<EmailNotification | null>(null);
 
+  // Safe JSON localStorage parser helper
+  const safeGetItem = <T,>(key: string, fallback: T): T => {
+    try {
+      const saved = localStorage.getItem(key);
+      if (!saved) return fallback;
+      const parsed = JSON.parse(saved);
+      return parsed !== undefined && parsed !== null ? parsed : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
   // Core Data Collections
-  const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_users`);
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
-  });
-
-  const [applications, setApplications] = useState<VoterApplication[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_applications`);
-    return saved ? JSON.parse(saved) : INITIAL_APPLICATIONS;
-  });
-
-  const [voters, setVoters] = useState<Voter[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_voters`);
-    return saved ? JSON.parse(saved) : INITIAL_VOTERS;
-  });
-
-  const [elections, setElections] = useState<Election[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_elections`);
-    return saved ? JSON.parse(saved) : INITIAL_ELECTIONS;
-  });
-
-  const [votes, setVotes] = useState<Vote[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_votes`);
-    return saved ? JSON.parse(saved) : INITIAL_VOTES;
-  });
-
-  const [complaints, setComplaints] = useState<Complaint[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_complaints`);
-    return saved ? JSON.parse(saved) : INITIAL_COMPLAINTS;
-  });
-
-  const [rentals, setRentals] = useState<RentalListing[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_rentals`);
-    return saved ? JSON.parse(saved) : INITIAL_RENTALS;
-  });
-
-  const [mosqueProjects, setMosqueProjects] = useState<MosqueProject[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_mosqueProjects`);
-    return saved ? JSON.parse(saved) : INITIAL_MOSQUE_PROJECTS;
-  });
-
-  const [donations, setDonations] = useState<Donation[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_donations`);
-    return saved ? JSON.parse(saved) : INITIAL_DONATIONS;
-  });
-
-  const [committee, setCommittee] = useState<CommitteeMember[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_committee`);
-    return saved ? JSON.parse(saved) : INITIAL_COMMITTEE;
-  });
-
-  const [announcements, setAnnouncements] = useState<Announcement[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_announcements`);
-    return saved ? JSON.parse(saved) : INITIAL_ANNOUNCEMENTS;
-  });
-
-  const [emailLogs, setEmailLogs] = useState<EmailNotification[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_emailLogs`);
-    return saved ? JSON.parse(saved) : INITIAL_EMAIL_LOGS;
-  });
+  const [users, setUsers] = useState<User[]>(() => safeGetItem(`${STORAGE_KEY}_users`, INITIAL_USERS));
+  const [applications, setApplications] = useState<VoterApplication[]>(() => safeGetItem(`${STORAGE_KEY}_applications`, INITIAL_APPLICATIONS));
+  const [voters, setVoters] = useState<Voter[]>(() => safeGetItem(`${STORAGE_KEY}_voters`, INITIAL_VOTERS));
+  const [elections, setElections] = useState<Election[]>(() => safeGetItem(`${STORAGE_KEY}_elections`, INITIAL_ELECTIONS));
+  const [votes, setVotes] = useState<Vote[]>(() => safeGetItem(`${STORAGE_KEY}_votes`, INITIAL_VOTES));
+  const [complaints, setComplaints] = useState<Complaint[]>(() => safeGetItem(`${STORAGE_KEY}_complaints`, INITIAL_COMPLAINTS));
+  const [rentals, setRentals] = useState<RentalListing[]>(() => safeGetItem(`${STORAGE_KEY}_rentals`, INITIAL_RENTALS));
+  const [mosqueProjects, setMosqueProjects] = useState<MosqueProject[]>(() => safeGetItem(`${STORAGE_KEY}_mosqueProjects`, INITIAL_MOSQUE_PROJECTS));
+  const [donations, setDonations] = useState<Donation[]>(() => safeGetItem(`${STORAGE_KEY}_donations`, INITIAL_DONATIONS));
+  const [committee, setCommittee] = useState<CommitteeMember[]>(() => safeGetItem(`${STORAGE_KEY}_committee`, INITIAL_COMMITTEE));
+  const [announcements, setAnnouncements] = useState<Announcement[]>(() => safeGetItem(`${STORAGE_KEY}_announcements`, INITIAL_ANNOUNCEMENTS));
+  const [emailLogs, setEmailLogs] = useState<EmailNotification[]>(() => safeGetItem(`${STORAGE_KEY}_emailLogs`, INITIAL_EMAIL_LOGS));
 
   // Auth User
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_currentUser`);
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [currentUser, setCurrentUser] = useState<User | null>(() => safeGetItem(`${STORAGE_KEY}_currentUser`, null));
 
   // Derived current voter
   const currentVoter = React.useMemo(() => {
@@ -482,14 +444,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const loginAsAdmin = (email: string, pass: string) => {
     const cleanEmail = email.trim().toLowerCase();
-    const adminUser = users.find(u => u.email?.toLowerCase() === cleanEmail && (u.role === 'admin' || u.role === 'super_admin'));
+    const cleanPass = pass.trim();
+
+    // 1. Direct check for user-requested admin credentials
+    if (cleanEmail === 'abirmallik11@gmail.com' && cleanPass === '76922247') {
+      const user: User = {
+        id: 'usr-admin-abir',
+        name: 'Abir Mallik (Super Admin)',
+        phone: '01700000000',
+        email: 'abirmallik11@gmail.com',
+        role: 'super_admin',
+        status: 'active',
+        createdAt: new Date().toISOString()
+      };
+      setCurrentUser(user);
+      setCurrentView('admin');
+      return { success: true, message: 'স্বাগতম Abir Mallik! এডমিন প্যানেলে সফলভাবে লগইন হয়েছে।' };
+    }
+
+    // 2. Check in users list with password
+    const adminUser = users.find(u =>
+      u.email?.toLowerCase() === cleanEmail &&
+      (u.role === 'admin' || u.role === 'super_admin') &&
+      (!u.password || u.password === cleanPass)
+    );
     if (adminUser) {
       setCurrentUser(adminUser);
       setCurrentView('admin');
       return { success: true, message: `এডমিন হিসেবে লগইন সফল হয়েছে: ${adminUser.name}` };
     }
-    // Default fallback admin check
-    if (cleanEmail === 'admin@bikrampurgardencity.com' || cleanEmail === 'admin') {
+
+    // 3. Fallback default admin
+    if ((cleanEmail === 'admin@bikrampurgardencity.com' || cleanEmail === 'admin') && (cleanPass === 'admin' || cleanPass === '76922247' || cleanPass === '123456')) {
       const fallbackAdmin: User = {
         id: 'usr-admin-1',
         name: 'Engr. Rafiqul Islam (Admin)',
@@ -503,7 +489,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setCurrentView('admin');
       return { success: true, message: 'এডমিন ড্যাশবোর্ডে স্বাগতম!' };
     }
-    return { success: false, message: 'ভুল ইমেইল বা পাসওয়ার্ড। ডেমো লগইন: admin@bikrampurgardencity.com' };
+
+    return { success: false, message: 'ভুল ইমেইল বা পাসওয়ার্ড। অনুগ্রহ করে সঠিক তথ্য দিন।' };
   };
 
   const logout = () => {

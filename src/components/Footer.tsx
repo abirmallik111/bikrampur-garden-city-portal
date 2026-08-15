@@ -1,105 +1,92 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Building2, MapPin, Phone, Mail, ShieldAlert, Heart, ExternalLink, HelpCircle } from 'lucide-react';
+import { Building2, MapPin, Phone, Mail, ShieldAlert } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const { setCurrentView } = useApp();
 
   return (
-    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
-      {/* Top Banner with Society Vision */}
-      <div className="border-b border-slate-800 bg-slate-950/60 py-6 px-4 sm:px-6 lg:px-8">
+    <footer className="bg-[#131b2e] text-slate-300">
+      {/* Top Banner with Society Vision - Matching Screenshot */}
+      <div className="border-b border-slate-800/80 bg-[#0d1322] py-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/30">
-              <Building2 className="w-6 h-6" />
+            <div className="p-2 bg-[#064e3b] text-[#64f9bc] rounded-xl border border-[#064e3b]/80">
+              <Building2 className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-white font-bold text-base">Bikrampur Garden City Society Portal</h3>
+              <h3 className="text-white font-bold text-sm sm:text-base">Bikrampur Garden City Society Portal</h3>
               <p className="text-xs text-slate-400">
-                "A Digital Step Towards an Organized Society" — একটি ডিজিটাল ও সুসংগঠিত আবাসিক সমাজ বিনির্মাণে
+                "A Digital Step Towards an Organized Society" — একটি ডিজিটাল ও স্বচ্ছ সুন্দর আবাসিক সমাজ বিনির্মাণ
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3 text-xs">
-            <span className="text-slate-400">Society Code: BGC-RES-442</span>
-            <span className="text-slate-600">•</span>
-            <span className="bg-emerald-950 text-emerald-400 px-3 py-1 rounded-full border border-emerald-800/80 font-medium">
-              40+ Buildings • 4-5 Apartments
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
+            <span className="text-slate-400 font-mono text-[11px]">Society Code: BGC-RES-442</span>
+            <span className="text-slate-600 hidden sm:inline">•</span>
+            <span className="bg-[#064e3b] text-[#64f9bc] px-3 py-1 rounded-full border border-[#0b513d] font-bold text-[11px]">
+              20+ Buildings • Apartments
             </span>
           </div>
         </div>
       </div>
 
       {/* Main Footer Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-xs">
           {/* Col 1: Address & Office */}
-          <div className="space-y-4">
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider">সোসাইটি কার্যালয় (Office)</h4>
-            <div className="space-y-2.5 text-xs text-slate-400">
+          <div className="space-y-3">
+            <h4 className="text-white font-bold uppercase tracking-wider text-xs">সোসাইটি কার্যালয় (Office)</h4>
+            <div className="space-y-2 text-slate-400">
               <div className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                <span>
-                  ৪৪২ ধোলাইপাড়, ঢাকা-মাওয়া হাইওয়ে, ঢাকা-১২০৪
-                </span>
+                <MapPin className="w-3.5 h-3.5 text-[#34d399] shrink-0 mt-0.5" />
+                <span>৪৪২ ধোলাইপাড়, ঢাকা-মাওয়া হাইওয়ে, ঢাকা-১২০৪</span>
               </div>
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>হেল্পলাইন: +880 1711-000001 / 01711-000002</span>
+                <Phone className="w-3.5 h-3.5 text-[#34d399] shrink-0" />
+                <span>হেল্পলাইন: +880 1711-000001</span>
               </div>
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-amber-400 shrink-0" />
+                <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span>ইমেইল: info@bikrampurgardencity.com</span>
               </div>
             </div>
-            <p className="text-[11px] text-slate-500 pt-2 border-t border-slate-800">
-              অফিস সময়: প্রতিদিন সকাল ১০:০০ - রাত ৯:০০ (শুক্রবার জুমার বিরতি)
-            </p>
           </div>
 
-          {/* Col 2: Citizen & Voter Services */}
+          {/* Col 2: Citizen & Member Services */}
           <div className="space-y-3">
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider">নাগরিক ও ভোটার সেবা</h4>
-            <ul className="space-y-2 text-xs">
+            <h4 className="text-white font-bold uppercase tracking-wider text-xs">নাগরিক ও সদস্য সেবা</h4>
+            <ul className="space-y-2 text-slate-400">
               <li>
                 <button
                   onClick={() => setCurrentView('register')}
-                  className="hover:text-blue-400 transition-colors flex items-center gap-1.5"
+                  className="hover:text-white transition-colors"
                 >
-                  <span>📝 নতুন ভোটার রেজিস্ট্রেশন আবেদন</span>
+                  📝 নতুন সদস্যপদ নিবন্ধন আবেদন
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => setCurrentView('status')}
-                  className="hover:text-blue-400 transition-colors flex items-center gap-1.5"
+                  className="hover:text-white transition-colors"
                 >
-                  <span>🔍 ভোটার আবেদনের বর্তমান অবস্থা ট্র্যাকিং</span>
+                  🔍 আবেদনের বর্তমান অবস্থা ট্র্যাকিং
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => setCurrentView('elections')}
-                  className="hover:text-blue-400 transition-colors flex items-center gap-1.5"
+                  className="hover:text-white transition-colors"
                 >
-                  <span>🗳️ নির্বাচন ২০২৬ ভোটকেন্দ্র ও প্রার্থী তালিকা</span>
+                  🗳️ নির্বাচন ২০২৬ ও ভোটার কেন্দ্র
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => setCurrentView('login')}
-                  className="hover:text-blue-400 transition-colors flex items-center gap-1.5"
+                  className="hover:text-white transition-colors"
                 >
-                  <span>📱 ভোটার মেম্বার লগইন (Phone + OTP)</span>
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setCurrentView('announcements')}
-                  className="hover:text-blue-400 transition-colors flex items-center gap-1.5"
-                >
-                  <span>📢 সোসাইটির জরুরি নোটিশ ও বিজ্ঞপ্তি</span>
+                  📱 সদস্য লগইন (Member Access)
                 </button>
               </li>
             </ul>
@@ -107,52 +94,42 @@ export const Footer: React.FC = () => {
 
           {/* Col 3: Community Facilities */}
           <div className="space-y-3">
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider">সোসাইটি সুযোগ-সুবিধা</h4>
-            <ul className="space-y-2 text-xs">
-              <li>
-                <button
-                  onClick={() => setCurrentView('mosque')}
-                  className="hover:text-emerald-400 transition-colors flex items-center gap-1.5"
-                >
-                  <span>🕌 কেন্দ্রীয় জামে মসজিদ ও উন্নয়ন তহবিল</span>
-                </button>
-              </li>
+            <h4 className="text-white font-bold uppercase tracking-wider text-xs">সোসাইটি সুযোগ-সুবিধা</h4>
+            <ul className="space-y-2 text-slate-400">
               <li>
                 <button
                   onClick={() => setCurrentView('rentals')}
-                  className="hover:text-blue-400 transition-colors flex items-center gap-1.5"
+                  className="hover:text-white transition-colors"
                 >
-                  <span>🏢 রেসিডেন্সিয়াল ফ্ল্যাট ও বাড়ি ভাড়া পোর্টাল</span>
+                  🏢 রেসিডেন্সিয়াল ফ্ল্যাট ও বাড়ি ভাড়া পোর্টাল
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => setCurrentView('committee')}
-                  className="hover:text-blue-400 transition-colors flex items-center gap-1.5"
+                  onClick={() => setCurrentView('directory')}
+                  className="hover:text-white transition-colors"
                 >
-                  <span>👥 ২০২৪-২০২৬ কার্যনির্বাহী পরিষদ</span>
+                  👥 কার্যনির্বাহী পরিষদ ও ডিরেক্টরি
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => {
-                    setCurrentView('register');
-                  }}
-                  className="hover:text-blue-400 transition-colors flex items-center gap-1.5 text-slate-400"
+                  onClick={() => setCurrentView('notices')}
+                  className="hover:text-white transition-colors"
                 >
-                  <span>📄 বিদ্যুৎ ও গ্যাস বিল যাচাই নির্দেশিকা</span>
+                  📋 নোটিশ বোর্ড ও জরুরি বিজ্ঞপ্তি
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Col 4: Emergency Contacts (Dholaipar Area) */}
+          {/* Col 4: Emergency Contacts */}
           <div className="space-y-3">
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider">জরুরি সেবা (Dholaipar)</h4>
-            <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700 space-y-2 text-xs">
+            <h4 className="text-white font-bold uppercase tracking-wider text-xs">জরুরি সেবা (Emergency)</h4>
+            <div className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/80 space-y-1.5 text-[11px]">
               <div className="flex justify-between items-center text-slate-300">
                 <span>জাতীয় জরুরি সেবা:</span>
-                <span className="font-mono text-emerald-400 font-bold">999</span>
+                <span className="font-mono text-[#34d399] font-bold">999</span>
               </div>
               <div className="flex justify-between items-center text-slate-300">
                 <span>ধোলাইপাড় ফায়ার সার্ভিস:</span>
@@ -162,39 +139,45 @@ export const Footer: React.FC = () => {
                 <span>যাত্রাবাড়ী থানা পুলিশ:</span>
                 <span className="font-mono text-blue-400 font-bold">01713-373145</span>
               </div>
-              <div className="flex justify-between items-center text-slate-300">
-                <span>ওয়াসা পানি হটলাইন:</span>
-                <span className="font-mono text-sky-400 font-bold">16162</span>
-              </div>
-              <div className="flex justify-between items-center text-slate-300">
-                <span>ডেসকো বিদ্যুৎ কন্ট্রোল:</span>
-                <span className="font-mono text-indigo-400 font-bold">16120</span>
-              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Bar with Subtle Admin Login */}
-        <div className="mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <div>
-            © 2026 Bikrampur Garden City Residential Society. All rights reserved.
+      {/* Bottom Clean Bar - Matching Screenshot */}
+      <div className="bg-white text-slate-600 border-t border-slate-200 py-4 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs gap-3">
+          <div className="flex items-center gap-2 font-bold text-[#131b2e]">
+            <div className="w-5 h-5 rounded-md bg-[#064e3b] text-[#64f9bc] flex items-center justify-center text-[10px]">
+              <Building2 className="w-3 h-3 text-white" />
+            </div>
+            <span>Bikrampur Garden City</span>
           </div>
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setCurrentView('committee')}
-              className="hover:text-slate-300 transition-colors"
-            >
-              সোসাইটি গঠনতন্ত্র ও উপবিধি
+
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-slate-500 font-medium">
+            <button onClick={() => setCurrentView('directory')} className="hover:text-slate-900 transition-colors">
+              Privacy Policy
             </button>
-            <span>•</span>
+            <button onClick={() => setCurrentView('directory')} className="hover:text-slate-900 transition-colors">
+              Terms of Service
+            </button>
+            <button onClick={() => setCurrentView('directory')} className="hover:text-slate-900 transition-colors">
+              Contact Support
+            </button>
+            <button onClick={() => setCurrentView('directory')} className="hover:text-slate-900 transition-colors">
+              Society Bylaws
+            </button>
             <button
-              id="footer-admin-link"
               onClick={() => setCurrentView('admin')}
-              className="text-slate-400 hover:text-amber-400 transition-colors flex items-center gap-1 font-medium"
+              className="text-slate-400 hover:text-amber-600 transition-colors flex items-center gap-1 font-semibold"
             >
-              <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-              <span>এডমিন লগইন (Admin Access)</span>
+              <ShieldAlert className="w-3 h-3 text-amber-500" />
+              <span>Admin</span>
             </button>
+          </div>
+
+          <div className="text-slate-400 text-[11px]">
+            © 2026 Bikrampur Garden City Society. All rights reserved.
           </div>
         </div>
       </div>
