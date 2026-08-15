@@ -40,12 +40,18 @@ export const ApplicationStatusPage: React.FC = () => {
 
   const matchedVoter = matchedApp ? voters.find(v => v.application_id === matchedApp.id || v.phone === matchedApp.phone) : null;
 
+  const [isSearching, setIsSearching] = useState(false);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setSearched(true);
-    if (matchedApp) {
-      setSelectedAppId(matchedApp.application_id);
-    }
+    setIsSearching(true);
+    setTimeout(() => {
+      setSearched(true);
+      if (matchedApp) {
+        setSelectedAppId(matchedApp.application_id);
+      }
+      setIsSearching(false);
+    }, 200);
   };
 
   return (
@@ -82,35 +88,17 @@ export const ApplicationStatusPage: React.FC = () => {
           <button
             id="status-search-submit-btn"
             type="submit"
-            className="absolute right-2 px-5 py-2 bg-[#1e3a5f] hover:bg-[#152943] text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
+            disabled={isSearching}
+            className="absolute right-2 px-5 py-2 bg-[#1e3a5f] hover:bg-[#152943] text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
           >
-            যাচাই করুন
-          </button>
-        </div>
-
-        {/* Quick Demo Pre-select pills */}
-        <div className="flex flex-wrap items-center justify-center gap-1.5 pt-3 text-xs text-slate-500">
-          <span>দ্রুত চেক করুন:</span>
-          <button
-            type="button"
-            onClick={() => { setQuery('BGC-APP-2026-001'); setSearched(true); }}
-            className="text-[11px] bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200 hover:bg-emerald-100 font-mono cursor-pointer"
-          >
-            BGC-APP-2026-001 (Approved)
-          </button>
-          <button
-            type="button"
-            onClick={() => { setQuery('BGC-APP-2026-004'); setSearched(true); }}
-            className="text-[11px] bg-amber-50 text-amber-800 px-2 py-0.5 rounded border border-amber-200 hover:bg-amber-100 font-mono cursor-pointer"
-          >
-            BGC-APP-2026-004 (Pending)
-          </button>
-          <button
-            type="button"
-            onClick={() => { setQuery('BGC-APP-2026-005'); setSearched(true); }}
-            className="text-[11px] bg-blue-50 text-blue-800 px-2 py-0.5 rounded border border-blue-200 hover:bg-blue-100 font-mono cursor-pointer"
-          >
-            BGC-APP-2026-005 (More Info)
+            {isSearching ? (
+              <>
+                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <span>খোঁজা হচ্ছে...</span>
+              </>
+            ) : (
+              <span>যাচাই করুন</span>
+            )}
           </button>
         </div>
       </form>

@@ -22,7 +22,7 @@ export const Footer: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-3 text-xs">
-            <span className="text-slate-400">Society Code: RAJUK-RES-442</span>
+            <span className="text-slate-400">Society Code: BGC-RES-442</span>
             <span className="text-slate-600">•</span>
             <span className="bg-emerald-950 text-emerald-400 px-3 py-1 rounded-full border border-emerald-800/80 font-medium">
               40+ Buildings • 4-5 Apartments
@@ -41,7 +41,7 @@ export const Footer: React.FC = () => {
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                 <span>
-                  ৪৪২ ধোলাইপাড়, ঢাকা-মাওয়া হাইওয়ে, ঢাকা-১২০৪ (রাজউক অনুমোদিত আবাসিক প্রকল্প)
+                  ৪৪২ ধোলাইপাড়, ঢাকা-মাওয়া হাইওয়ে, ঢাকা-১২০৪
                 </span>
               </div>
               <div className="flex items-center gap-2">

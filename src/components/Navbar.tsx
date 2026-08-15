@@ -59,7 +59,7 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-white">
-              বিক্রমপুর গার্ডেন সিটি (রাজউক অনুমোদিত আবাসিক সোসাইটি)
+              বিক্রমপুর গার্ডেন সিটি (আবাসিক সোসাইটি)
             </span>
             <span className="text-slate-500">•</span>
             <span className="text-slate-400">৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া হাইওয়ে</span>
@@ -71,7 +71,7 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Live election alert & Persona quick switch */}
+        {/* Live election alert */}
         <div className="flex items-center space-x-3">
           {activeElection && (
             <button
@@ -82,88 +82,6 @@ export const Navbar: React.FC = () => {
               <span>কার্যনির্বাহী পরিষদ নির্বাচন ২০২৬ চলমান</span>
             </button>
           )}
-
-          {/* Persona Switcher dropdown */}
-          <div className="relative">
-            <button
-              id="persona-switcher-btn"
-              onClick={() => setPersonaMenuOpen(!personaMenuOpen)}
-              className="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-0.5 rounded-md border border-slate-700 transition-colors text-xs font-medium cursor-pointer"
-            >
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              <span>
-                {currentUser
-                  ? currentUser.role === 'super_admin' || currentUser.role === 'admin'
-                    ? `এডমিন: ${currentUser.name.split(' ')[0]}`
-                    : `ভোটার: ${currentUser.name.split(' ')[0]}`
-                  : 'ডেমো পারসোনা (Switcher)'}
-              </span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </button>
-
-            {personaMenuOpen && (
-              <div
-                className="absolute right-0 mt-1.5 w-64 bg-white text-slate-800 rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
-                onClick={() => setPersonaMenuOpen(false)}
-              >
-                <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                  সুইচ ডেমো রোল (Demo Switcher)
-                </div>
-                <button
-                  id="persona-superadmin"
-                  onClick={() => setDemoPersona('super-admin')}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 flex items-center justify-between text-slate-700"
-                >
-                  <div>
-                    <div className="font-semibold text-slate-900">🛡️ সুপার এডমিন (Super Admin)</div>
-                    <div className="text-[10px] text-slate-500">Md. Rafiqul Islam • EC Head</div>
-                  </div>
-                  <span className="text-[10px] bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded">Admin</span>
-                </button>
-                <button
-                  id="persona-voter-owner"
-                  onClick={() => setDemoPersona('voter-owner')}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-emerald-50/60 flex items-center justify-between text-slate-700"
-                >
-                  <div>
-                    <div className="font-semibold text-emerald-950">🗳️ ভোটার - ফ্ল্যাট মালিক (Owner)</div>
-                    <div className="text-[10px] text-emerald-700">Tariqul Islam • Plot A-12</div>
-                  </div>
-                  <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">Voter</span>
-                </button>
-                <button
-                  id="persona-voter-tenant"
-                  onClick={() => setDemoPersona('voter-tenant')}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 flex items-center justify-between text-slate-700"
-                >
-                  <div>
-                    <div className="font-semibold text-slate-900">🏠 ভোটার - ভাড়াটিয়া (Tenant)</div>
-                    <div className="text-[10px] text-slate-500">Tanvir Ahmed • Plot B-45</div>
-                  </div>
-                  <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded">Tenant</span>
-                </button>
-                <button
-                  id="persona-applicant"
-                  onClick={() => setDemoPersona('applicant')}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-amber-50/60 flex items-center justify-between text-slate-700"
-                >
-                  <div>
-                    <div className="font-semibold text-amber-950">📄 আবেদনকারী (Pending Application)</div>
-                    <div className="text-[10px] text-amber-700">Ariful Haque • Verification</div>
-                  </div>
-                  <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded">Pending</span>
-                </button>
-                <button
-                  id="persona-visitor"
-                  onClick={() => setDemoPersona('visitor')}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 flex items-center justify-between text-slate-700 border-t border-slate-100"
-                >
-                  <div className="font-semibold text-slate-600">🌐 সাধারণ দর্শনার্থী (Public Visitor)</div>
-                  <span className="text-[10px] text-slate-400">Guest</span>
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -185,7 +103,7 @@ export const Navbar: React.FC = () => {
                   Bikrampur Garden City
                 </span>
                 <span className="hidden sm:inline-block text-[10px] bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded border border-slate-200">
-                  RAJUK
+                  Dholaipar
                 </span>
               </div>
               <span className="text-slate-500 text-[11px] tracking-wider uppercase font-semibold">
@@ -206,18 +124,6 @@ export const Navbar: React.FC = () => {
               }`}
             >
               হোম (Home)
-            </button>
-
-            <button
-              id="nav-register-btn"
-              onClick={() => navigateTo('register')}
-              className={`px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-                currentView === 'register'
-                  ? 'bg-slate-100 text-slate-900 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-            >
-              ভোটার নিবন্ধন (Register)
             </button>
 
             <button
@@ -249,18 +155,6 @@ export const Navbar: React.FC = () => {
             </button>
 
             <button
-              id="nav-mosque-btn"
-              onClick={() => navigateTo('mosque')}
-              className={`px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-                currentView === 'mosque'
-                  ? 'bg-slate-100 text-slate-900 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-            >
-              মসজিদ ফান্ড (Mosque)
-            </button>
-
-            <button
               id="nav-directory-btn"
               onClick={() => navigateTo('directory')}
               className={`px-3 py-2 rounded-lg transition-colors cursor-pointer ${
@@ -280,15 +174,6 @@ export const Navbar: React.FC = () => {
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
               <span className="text-xs font-bold">System Online</span>
             </div>
-
-            <button
-              id="nav-status-btn"
-              onClick={() => navigateTo('status')}
-              className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-1.5 border border-slate-200 cursor-pointer"
-            >
-              <Search className="w-3.5 h-3.5 text-slate-400" />
-              <span>আবেদন অনুসন্ধান</span>
-            </button>
 
             {currentUser ? (
               <div className="flex items-center gap-3 border-l border-slate-200 pl-3">
@@ -367,36 +252,12 @@ export const Navbar: React.FC = () => {
       {/* Mobile Dropdown */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top-2 duration-200">
-          <div className="flex items-center justify-between py-2 border-b border-slate-100">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-tight">ডেমো পারসোনা:</span>
-            <div className="flex gap-1">
-              <button
-                onClick={() => { setDemoPersona('voter-owner'); setMobileMenuOpen(false); }}
-                className="text-[11px] bg-emerald-50 text-emerald-800 font-medium px-2 py-1 rounded"
-              >
-                Voter
-              </button>
-              <button
-                onClick={() => { setDemoPersona('super-admin'); setMobileMenuOpen(false); }}
-                className="text-[11px] bg-slate-100 text-slate-800 font-medium px-2 py-1 rounded"
-              >
-                Admin
-              </button>
-            </div>
-          </div>
-
           <div className="grid grid-cols-2 gap-2 text-xs">
             <button
               onClick={() => navigateTo('landing')}
               className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 text-slate-800 font-medium text-left"
             >
               <span>হোম</span>
-            </button>
-            <button
-              onClick={() => navigateTo('register')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 text-slate-800 font-medium text-left"
-            >
-              <span>ভোটার নিবন্ধন</span>
             </button>
             <button
               onClick={() => navigateTo('elections')}
@@ -412,12 +273,6 @@ export const Navbar: React.FC = () => {
               <span>ফ্ল্যাট ভাড়া</span>
             </button>
             <button
-              onClick={() => navigateTo('mosque')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 text-slate-800 font-medium text-left"
-            >
-              <span>মসজিদ ফান্ড</span>
-            </button>
-            <button
               onClick={() => navigateTo('directory')}
               className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 text-slate-800 font-medium text-left col-span-2"
             >
@@ -427,12 +282,6 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
-            <button
-              onClick={() => navigateTo('status')}
-              className="w-full text-center py-2 text-xs bg-slate-100 rounded-lg text-slate-700 font-medium"
-            >
-              🔍 আবেদন ট্র্যাকিং (Check Status)
-            </button>
             {currentUser ? (
               <button
                 onClick={() => {

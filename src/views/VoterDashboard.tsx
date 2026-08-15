@@ -45,7 +45,8 @@ export const VoterDashboard: React.FC = () => {
     mosqueProjects,
     donations,
     makeDonation,
-    announcements
+    announcements,
+    showToast
   } = useApp();
 
   // Redirect if not logged in
@@ -81,7 +82,7 @@ export const VoterDashboard: React.FC = () => {
   const [complaintTitle, setComplaintTitle] = useState('');
   const [complaintDesc, setComplaintDesc] = useState('');
   const [complaintCat, setComplaintCat] = useState<ComplaintCategory>('maintenance');
-  const [complaintSuccess, setComplaintSuccess] = useState<string | null>(null);
+  const [isComplaintSubmitting, setIsComplaintSubmitting] = useState(false);
 
   // New Rental State
   const [rentalPropertyType, setRentalPropertyType] = useState<PropertyType>('apartment');
@@ -101,8 +102,7 @@ export const VoterDashboard: React.FC = () => {
     'CCTV Security',
     'Titas Gas Line'
   ]);
-  const [rentalSuccess, setRentalSuccess] = useState<string | null>(null);
-  const [rentalError, setRentalError] = useState<string | null>(null);
+  const [isRentalSubmitting, setIsRentalSubmitting] = useState(false);
 
   // New Donation State
   const [donationProjId, setDonationProjId] = useState(mosqueProjects[0]?.id || '');
@@ -113,52 +113,59 @@ export const VoterDashboard: React.FC = () => {
 
   const handleComplaintSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!complaintTitle.trim() || !complaintDesc.trim()) return;
-    const res = submitComplaint({
-      title: complaintTitle,
-      description: complaintDesc,
-      category: complaintCat
-    });
-    if (res.success) {
-      setComplaintSuccess(res.message);
-      setComplaintTitle('');
-      setComplaintDesc('');
-      setTimeout(() => setComplaintSuccess(null), 5000);
+    if (!complaintTitle.trim() || !complaintDesc.trim()) {
+      showToast('অভিযোগের শিরোনাম ও বিবরণ লিখুন।', 'warning');
+      return;
     }
+    setIsComplaintSubmitting(true);
+    setTimeout(() => {
+      const res = submitComplaint({
+        title: complaintTitle,
+        description: complaintDesc,
+        category: complaintCat
+      });
+      setIsComplaintSubmitting(false);
+      if (res.success) {
+        showToast(res.message, 'success');
+        setComplaintTitle('');
+        setComplaintDesc('');
+      } else {
+        showToast(res.message || 'অভিযোগ দাখিল হয়নি।', 'error');
+      }
+    }, 400);
   };
 
   const handleRentalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setRentalError(null);
-    setRentalSuccess(null);
-
-    const res = createRentalListing({
-      property_type: rentalPropertyType,
-      plot_number: currentVoter.plot_number,
-      building_number: currentVoter.building_number,
-      floor: rentalFloor,
-      apartment_number: rentalUnit,
-      rent_amount: Number(rentalAmount),
-      bedrooms: Number(rentalBedrooms),
-      bathrooms: Number(rentalBathrooms),
-      size_sqft: Number(rentalSize),
-      furnished: rentalFurnished,
-      facilities: rentalFacilities,
-      description: rentalDesc || `${rentalBedrooms} Bed Flat at ${currentVoter.plot_number}`,
-      contact_preference: rentalContactPref,
-      photos: [
-        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80'
-      ],
-      available_from: rentalAvailableFrom
-    });
-
-    if (res.success) {
-      setRentalSuccess(res.message);
-      setTimeout(() => setRentalSuccess(null), 5000);
-    } else {
-      setRentalError(res.message);
-    }
+    setIsRentalSubmitting(true);
+    setTimeout(() => {
+      const res = createRentalListing({
+        property_type: rentalPropertyType,
+        plot_number: currentVoter.plot_number,
+        building_number: currentVoter.building_number,
+        floor: rentalFloor,
+        apartment_number: rentalUnit,
+        rent_amount: Number(rentalAmount),
+        bedrooms: Number(rentalBedrooms),
+        bathrooms: Number(rentalBathrooms),
+        size_sqft: Number(rentalSize),
+        furnished: rentalFurnished,
+        facilities: rentalFacilities,
+        description: rentalDesc || `${rentalBedrooms} Bed Flat at ${currentVoter.plot_number}`,
+        contact_preference: rentalContactPref,
+        photos: [
+          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80',
+          'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80'
+        ],
+        available_from: rentalAvailableFrom
+      });
+      setIsRentalSubmitting(false);
+      if (res.success) {
+        showToast(res.message, 'success');
+      } else {
+        showToast(res.message || 'বিজ্ঞাপন প্রকাশ হয়নি।', 'error');
+      }
+    }, 450);
   };
 
   const handleDonationSubmit = (e: React.FormEvent) => {
@@ -325,7 +332,7 @@ export const VoterDashboard: React.FC = () => {
             { id: 'elections', label: '🗳️ নির্বাচন ও ভোট (Elections)', icon: Vote },
             { id: 'complaints', label: `⚠️ অভিযোগ প্রতিকার (${myComplaints.length})`, icon: MessageSquare },
             { id: 'rentals', label: `🏢 আমার ভাড়া বিজ্ঞাপন (${myRentals.length})`, icon: Building },
-            { id: 'donations', label: `🕌 মসজিদ দান ও রসিদ (${myDonations.length})`, icon: HeartHandshake },
+            { id: 'donations', label: `🕌 মসজিদ ফান্ড (শীঘ্রই)`, icon: HeartHandshake },
             { id: 'profile', label: '👤 ডিজিটাল মেম্বার কার্ড (Digital ID)', icon: User }
           ].map(tab => (
             <button
@@ -392,43 +399,14 @@ export const VoterDashboard: React.FC = () => {
                 )}
               </div>
 
-              {/* Recent Donations */}
-              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                  <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                    <HeartHandshake className="w-4 h-4 text-teal-600" />
-                    <span>মসজিদে আমার দান ও রসিদ (Recent Donations)</span>
-                  </h3>
-                  <button
-                    onClick={() => setDashboardTab('donations')}
-                    className="text-xs text-teal-700 font-bold hover:underline"
-                  >
-                    দান করুন +
-                  </button>
+              {/* Mosque Coming Soon */}
+              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs space-y-4 text-center">
+                <div className="w-12 h-12 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto">
+                  <HeartHandshake className="w-6 h-6" />
                 </div>
-
-                {myDonations.length === 0 ? (
-                  <p className="text-xs text-slate-400 py-3 text-center">আপনার কোনো অনুদান নথিভুক্ত নেই।</p>
-                ) : (
-                  <div className="space-y-3">
-                    {myDonations.map(don => (
-                      <div key={don.id} className="p-3.5 bg-teal-50/50 rounded-xl border border-teal-100 text-xs flex items-center justify-between">
-                        <div>
-                          <div className="font-bold text-slate-900">{don.project_title}</div>
-                          <div className="text-[11px] text-slate-500 font-mono">
-                            রসিদ: {don.receipt_no} • {new Date(don.created_at).toLocaleDateString('bn-BD')}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold text-teal-800 text-sm">৳{don.amount.toLocaleString('en-BD')}</div>
-                          <span className="text-[10px] bg-teal-100 text-teal-800 px-1.5 py-0.5 rounded font-semibold capitalize">
-                            {don.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <h3 className="font-bold text-slate-900 text-sm">মসজিদ উন্নয়ন তহবিল শীঘ্রই চালু হবে</h3>
+                <p className="text-xs text-slate-500">অনলাইন ডোনেশন সিস্টেমের কাজ চলছে।</p>
+                <div className="inline-block bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-bold">Coming Soon</div>
               </div>
             </div>
 
@@ -442,7 +420,7 @@ export const VoterDashboard: React.FC = () => {
                     </div>
                     <div>
                       <div className="text-xs font-bold tracking-wider uppercase">Bikrampur Garden City</div>
-                      <div className="text-[10px] text-slate-400">RAJUK Approved Residential Society</div>
+                      <div className="text-[10px] text-slate-400">Residential Society • Dholaipar</div>
                     </div>
                   </div>
                   <span className="text-[10px] bg-emerald-400 text-slate-950 font-bold px-2 py-0.5 rounded">
@@ -653,9 +631,14 @@ export const VoterDashboard: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#1e3a5f] hover:bg-[#152943] text-white font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
+                  disabled={isComplaintSubmitting}
+                  className="w-full py-3 bg-[#1e3a5f] hover:bg-[#152943] text-white font-bold rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
                 >
-                  অভিযোগ জমা দিন (Submit Complaint)
+                  {isComplaintSubmitting ? (
+                    <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>দাখিল হচ্ছে...</span></>
+                  ) : (
+                    <span>অভিযোগ জমা দিন (Submit Complaint)</span>
+                  )}
                 </button>
               </form>
             </div>
@@ -846,9 +829,14 @@ export const VoterDashboard: React.FC = () => {
 
                     <button
                       type="submit"
-                      className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
+                      disabled={isRentalSubmitting}
+                      className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
                     >
-                      বিজ্ঞাপন প্রকাশ করুন (Publish Rental Ad)
+                      {isRentalSubmitting ? (
+                        <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>প্রকাশিত হচ্ছে...</span></>
+                      ) : (
+                        <span>বিজ্ঞাপন প্রকাশ করুন (Publish Rental Ad)</span>
+                      )}
                     </button>
                   </form>
                 </div>
@@ -910,226 +898,217 @@ export const VoterDashboard: React.FC = () => {
 
         {/* TAB 5: MOSQUE DONATIONS */}
         {dashboardTab === 'donations' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Make Donation Form */}
-            <div className="lg:col-span-6 bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs space-y-4">
-              <div className="pb-3 border-b border-slate-100">
-                <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                  <HeartHandshake className="w-4 h-4 text-teal-600" />
-                  <span>কেন্দ্রীয় জামে মসজিদ ফান্ডে দান করুন (Donate)</span>
-                </h3>
-                <p className="text-xs text-slate-500">অনলাইন পেমেন্ট সিমুলেশন অথবা ক্যাশ প্রতিশ্রুতির মাধ্যমে অংশ নিন</p>
-              </div>
-
-              {donationReceipt && (
-                <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-2xl text-emerald-950 space-y-2 text-xs">
-                  <div className="font-bold text-sm flex items-center gap-1.5 text-emerald-900">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>আল্লাহ আপনার দান কবুল করুন!</span>
-                  </div>
-                  <p>আপনার অনুদান রসিদ নম্বর: <strong className="font-mono text-emerald-900">{donationReceipt}</strong></p>
-                  <p className="text-[11px] text-emerald-800">রসিদের কপি নিচে সংরক্ষিত হয়েছে।</p>
-                </div>
-              )}
-
-              <form onSubmit={handleDonationSubmit} className="space-y-4 text-xs">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">উন্নয়ন প্রকল্প নির্বাচন করুন:</label>
-                  <select
-                    value={donationProjId}
-                    onChange={e => setDonationProjId(e.target.value)}
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium"
-                  >
-                    {mosqueProjects.map(p => (
-                      <option key={p.id} value={p.id}>
-                        {p.title} (লক্ষ্য: ৳{p.target_amount.toLocaleString('en-BD')})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">অনুদানের পরিমাণ (BDT):</label>
-                  <div className="grid grid-cols-4 gap-2 mb-2">
-                    {[1000, 2500, 5000, 10000].map(amt => (
-                      <button
-                        key={amt}
-                        type="button"
-                        onClick={() => setDonationAmount(amt)}
-                        className={`py-1.5 rounded-lg border text-xs font-bold transition-colors ${
-                          donationAmount === amt
-                            ? 'bg-teal-700 text-white border-teal-700'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        ৳{amt}
-                      </button>
-                    ))}
-                  </div>
-                  <input
-                    type="number"
-                    value={donationAmount}
-                    onChange={e => setDonationAmount(Number(e.target.value))}
-                    className="w-full p-2.5 border border-slate-300 rounded-xl font-bold text-base"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">পেমেন্ট মেথড:</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <label className={`p-3 rounded-xl border flex items-center gap-2 cursor-pointer ${
-                      donationMethod === 'online' ? 'bg-teal-50 border-teal-600 text-teal-900 font-bold' : 'border-slate-200'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="payMethod"
-                        checked={donationMethod === 'online'}
-                        onChange={() => setDonationMethod('online')}
-                      />
-                      <span>বিকাশ / নগদ / কার্ড (ইনস্ট্যান্ট রসিদ)</span>
-                    </label>
-                    <label className={`p-3 rounded-xl border flex items-center gap-2 cursor-pointer ${
-                      donationMethod === 'cash' ? 'bg-teal-50 border-teal-600 text-teal-900 font-bold' : 'border-slate-200'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="payMethod"
-                        checked={donationMethod === 'cash'}
-                        onChange={() => setDonationMethod('cash')}
-                      />
-                      <span>ক্যাশ (সোসাইটি অফিসে জমা)</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">বিশেষ নিয়ত বা মন্তব্য (ঐচ্ছিক):</label>
-                  <input
-                    type="text"
-                    value={donationNotes}
-                    onChange={e => setDonationNotes(e.target.value)}
-                    placeholder="যেমন: মরহুম পিতা/মাতার মাগফিরাত কামনায়"
-                    className="w-full p-2.5 border border-slate-300 rounded-xl"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
-                >
-                  দান নিশ্চিত করুন (Confirm Donation)
-                </button>
-              </form>
+          <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-2xs text-center space-y-4 max-w-2xl mx-auto">
+            <div className="w-16 h-16 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto">
+              <HeartHandshake className="w-8 h-8" />
             </div>
-
-            {/* My Donations History and Slips */}
-            <div className="lg:col-span-6 bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs space-y-4">
-              <div className="pb-3 border-b border-slate-100">
-                <h3 className="font-bold text-slate-900 text-sm">আমার অনুদান হিসেব ও অফিসিয়াল রসিদ</h3>
-              </div>
-
-              {myDonations.length === 0 ? (
-                <p className="text-xs text-slate-400 py-8 text-center">এখনো কোনো অনুদান নথিভুক্ত করা হয়নি।</p>
-              ) : (
-                <div className="space-y-3">
-                  {myDonations.map(don => (
-                    <div key={don.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 text-xs">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-bold text-slate-900 text-sm">{don.project_title}</div>
-                          <div className="text-[11px] text-slate-500 font-mono">
-                            রসিদ নং: {don.receipt_no}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold text-teal-800 text-base">৳{don.amount.toLocaleString('en-BD')}</div>
-                          <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded capitalize">
-                            {don.status}
-                          </span>
-                        </div>
-                      </div>
-
-                      {don.notes && (
-                        <div className="text-[11px] text-slate-600 bg-white p-2 rounded border border-slate-100 italic">
-                          "{don.notes}"
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-200 text-slate-500">
-                        <span>তারিখ: {new Date(don.created_at).toLocaleDateString('bn-BD')}</span>
-                        <button
-                          onClick={() => alert(`Official Receipt:\nReceipt No: ${don.receipt_no}\nDonor: ${don.donor_name}\nAmount: BDT ${don.amount}\nProject: ${don.project_title}\nStatus: ${don.status}\nBikrampur Garden City Central Mosque Fund.`)}
-                          className="text-teal-700 font-bold flex items-center gap-1 hover:underline"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>রসিদ স্লিপ ডাউনলোড</span>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <h2 className="text-xl font-bold text-slate-900">মসজিদ উন্নয়ন তহবিল শীঘ্রই চালু হবে</h2>
+            <p className="text-sm text-slate-500">
+              মসজিদের অনলাইন ডোনেশন ও রসিদ সিস্টেমের কারিগরি উন্নয়ন চলমান রয়েছে। 
+              শীঘ্রই আপনারা এই ড্যাশবোর্ড থেকে நேரடியாக অনুদান প্রদান এবং ডিজিটাল রসিদ সংগ্রহ করতে পারবেন।
+            </p>
+            <div className="inline-block bg-amber-100 text-amber-800 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+              Coming Soon
             </div>
           </div>
         )}
 
         {/* TAB 6: DIGITAL PROFILE & ID CARD */}
+        {/* TAB: PROFILE & DIGITAL VOTER ID CARD */}
         {dashboardTab === 'profile' && (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6 text-center">
-              <h3 className="text-lg font-bold text-slate-900">
-                সোসাইটি ডিজিটাল ভোটার পরিচয়পত্র (Member Card)
-              </h3>
-              <p className="text-xs text-slate-500">
-                এই কার্ডটি আপনার সোসাইটি সদস্যপদ ও নির্বাচনে ভোটাধিকারের আনুষ্ঠানিক পরিচয় বহন করে।
-              </p>
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm space-y-8 text-center">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200 text-xs font-bold mb-2">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>ভেরিফাইড ডিজিটাল পরিচয়পত্র (Official Smart Card)</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+                  সোসাইটি সদস্য ও ভোটার পরিচয়পত্র
+                </h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                  এই কার্ডটি আপনার সোসাইটি সদস্যপদ ও নির্বাচনে ভোটাধিকারের আনুষ্ঠানিক পরিচয় বহন করে। সরাসরি প্রিন্ট বা PDF হিসেবে সংরক্ষণ করুন।
+                </p>
+              </div>
 
-              {/* Printable Card Area */}
-              <div className="max-w-md mx-auto bg-gradient-to-br from-[#1e3a5f] to-slate-900 text-white rounded-3xl p-6 shadow-xl border-2 border-amber-400/40 text-left space-y-4">
-                <div className="flex justify-between items-center pb-3 border-b border-white/20">
-                  <div>
-                    <h4 className="font-bold text-sm text-white">Bikrampur Garden City</h4>
-                    <span className="text-[10px] text-blue-200">RAJUK Approved Residential Society</span>
+              {/* Printable Card Area - Double Sided */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto text-left">
+                {/* FRONT SIDE */}
+                <div className="bg-gradient-to-br from-[#1e3a5f] via-[#162e4c] to-slate-900 text-white rounded-3xl p-6 shadow-xl border-2 border-amber-400/50 space-y-4 relative overflow-hidden flex flex-col justify-between">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                  <div className="flex justify-between items-start pb-3 border-b border-white/15 relative z-10">
+                    <div>
+                      <h4 className="font-extrabold text-sm text-white tracking-wide">Bikrampur Garden City</h4>
+                      <span className="text-[10px] text-blue-200">Residential Society • Dholaipar</span>
+                    </div>
+                    <span className="text-[9px] bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded uppercase tracking-wider shadow-2xs">
+                      MEMBER 2026
+                    </span>
                   </div>
-                  <span className="text-[10px] bg-amber-400 text-slate-950 font-extrabold px-2.5 py-0.5 rounded">
-                    ELECTION 2026
-                  </span>
+
+                  <div className="flex gap-4 items-center relative z-10">
+                    <div className="w-20 h-24 rounded-2xl bg-slate-800 border-2 border-white/40 overflow-hidden shrink-0 shadow-md">
+                      <img
+                        src={currentVoter.bill_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                        alt="Voter Portrait"
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+
+                    <div className="space-y-1 text-xs">
+                      <div className="font-mono text-emerald-300 font-black text-sm tracking-wider">{currentVoter.voter_id}</div>
+                      <div className="font-bold text-sm text-white">{currentVoter.name_en}</div>
+                      <div className="text-slate-200 text-xs font-medium">{currentVoter.name_bn}</div>
+                      <div className="text-[10px] text-slate-300 capitalize pt-0.5">
+                        {currentVoter.resident_type.replace('_', ' ')}
+                      </div>
+                      <div className="text-[11px] text-amber-300 font-bold">
+                        প্লট: {currentVoter.plot_number} {currentVoter.apartment_number ? `(${currentVoter.apartment_number})` : ''}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/15 flex justify-between items-center text-[10px] text-slate-300 relative z-10">
+                    <span>442 Dholaipar, Dhaka</span>
+                    <span className="font-mono text-emerald-300 font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-700/50">
+                      ✓ ACTIVE VOTER
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex gap-4 items-center">
-                  <div className="w-20 h-24 rounded-xl bg-slate-800 border border-white/30 overflow-hidden shrink-0">
-                    <img
-                      src={currentVoter.bill_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
-                      alt="Voter Portrait"
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
+                {/* BACK SIDE */}
+                <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-xl border-2 border-slate-700 space-y-3.5 text-xs flex flex-col justify-between">
+                  <div className="pb-2 border-b border-slate-800 flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Identity Terms & QR</span>
+                    <QrCode className="w-5 h-5 text-slate-300" />
                   </div>
 
-                  <div className="space-y-1 text-xs">
-                    <div className="font-mono text-emerald-300 font-bold text-base">{currentVoter.voter_id}</div>
-                    <div className="font-bold text-sm text-white">{currentVoter.name_en}</div>
-                    <div className="text-slate-300">{currentVoter.name_bn}</div>
-                    <div className="text-[11px] text-slate-300 capitalize pt-1">
-                      {currentVoter.resident_type.replace('_', ' ')} • {currentVoter.plot_number}
+                  <div className="space-y-2 text-[11px] text-slate-300">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">পিতার নাম:</span>
+                      <span className="font-semibold text-white">{currentVoter.father_name || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">মোবাইল:</span>
+                      <span className="font-mono font-semibold text-white">{currentVoter.phone}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">জাতীয় পরিচয়পত্র (NID):</span>
+                      <span className="font-mono font-semibold text-white">{currentVoter.nid_number || 'যাচাইকৃত'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">অনুমোদনের তারিখ:</span>
+                      <span className="text-slate-200">{new Date(currentVoter.approved_at || currentVoter.created_at).toLocaleDateString('bn-BD')}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-800 flex justify-between items-end text-[9px] text-slate-400">
+                    <div>
+                      <div className="font-serif italic text-amber-300 text-[11px]">Chief Election Commissioner</div>
+                      <div>অনুমোদিত কর্মকর্তা স্বাক্ষর</div>
+                    </div>
+                    <div className="w-10 h-10 rounded-full border border-amber-400/40 flex items-center justify-center text-[7px] text-amber-300 font-bold text-center leading-tight">
+                      SEAL<br />BGC
                     </div>
                   </div>
                 </div>
-
-                <div className="pt-2 border-t border-white/10 flex justify-between items-center text-[10px] text-slate-300">
-                  <span>Address: 442 Dholaipar, Dhaka</span>
-                  <span className="font-mono text-amber-300 font-bold">Status: ACTIVE</span>
-                </div>
               </div>
 
-              <div className="flex justify-center gap-3 pt-2">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap justify-center gap-3 pt-4 border-t border-slate-100">
                 <button
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    const printWindow = window.open('', '_blank');
+                    if (!printWindow) return;
+                    printWindow.document.write(`
+                      <!DOCTYPE html>
+                      <html>
+                        <head>
+                          <title>BGC Member ID Card - ${currentVoter.voter_id}</title>
+                          <style>
+                            body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+                            .card-wrapper { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+                            .card { width: 330px; height: 210px; border-radius: 16px; padding: 18px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.15); page-break-inside: avoid; }
+                            .card-front { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); color: white; border: 2px solid #f59e0b; }
+                            .card-back { background: #0f172a; color: #f8fafc; border: 2px solid #334155; }
+                            .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 6px; }
+                            .header h4 { margin: 0; font-size: 13px; font-weight: 800; }
+                            .header span { font-size: 9px; color: #93c5fd; }
+                            .badge { background: #f59e0b; color: #000; font-weight: 900; font-size: 8px; padding: 2px 6px; border-radius: 4px; }
+                            .body { display: flex; gap: 12px; align-items: center; }
+                            .photo { width: 65px; height: 80px; border-radius: 8px; border: 2px solid white; object-fit: cover; background: #334155; }
+                            .info { font-size: 10px; line-height: 1.35; }
+                            .voter-id { font-family: monospace; font-size: 12px; font-weight: bold; color: #6ee7b7; letter-spacing: 0.5px; }
+                            .name-en { font-size: 12px; font-weight: bold; color: white; }
+                            .name-bn { color: #cbd5e1; font-size: 10px; }
+                            .footer { display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 6px; font-size: 8px; color: #94a3b8; }
+                            .seal { width: 36px; height: 36px; border: 1px solid #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 6px; color: #f59e0b; font-weight: bold; text-align: center; }
+                            @media print { body { background: white; padding: 0; } }
+                          </style>
+                        </head>
+                        <body>
+                          <div class="card-wrapper">
+                            <!-- FRONT -->
+                            <div class="card card-front">
+                              <div class="header">
+                                <div>
+                                  <h4>Bikrampur Garden City</h4>
+                                  <span>Residential Society • Dholaipar</span>
+                                </div>
+                                <span class="badge">ELECTION 2026</span>
+                              </div>
+                              <div class="body">
+                                <img class="photo" src="${currentVoter.bill_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}" />
+                                <div class="info">
+                                  <div class="voter-id">${currentVoter.voter_id}</div>
+                                  <div class="name-en">${currentVoter.name_en}</div>
+                                  <div class="name-bn">${currentVoter.name_bn}</div>
+                                  <div style="color: #cbd5e1; text-transform: capitalize;">${currentVoter.resident_type.replace('_', ' ')}</div>
+                                  <div style="color: #fde047; font-weight: bold;">প্লট: ${currentVoter.plot_number} ${currentVoter.apartment_number ? `(${currentVoter.apartment_number})` : ''}</div>
+                                </div>
+                              </div>
+                              <div class="footer">
+                                <span>442 Dholaipar, Dhaka</span>
+                                <span style="color: #6ee7b7; font-weight: bold;">✓ ACTIVE VOTER</span>
+                              </div>
+                            </div>
+
+                            <!-- BACK -->
+                            <div class="card card-back">
+                              <div class="header">
+                                <span style="font-size: 8px; color: #94a3b8; text-transform: uppercase;">Official Verification Details</span>
+                                <span style="font-size: 8px; font-weight: bold; color: #cbd5e1;">BGC-VERIFIED</span>
+                              </div>
+                              <div style="font-size: 9px; line-height: 1.6; color: #cbd5e1;">
+                                <div><strong>পিতার নাম:</strong> ${currentVoter.father_name || 'N/A'}</div>
+                                <div><strong>মোবাইল:</strong> ${currentVoter.phone}</div>
+                                <div><strong>এনআইডি:</strong> ${currentVoter.nid_number || 'যাচাইকৃত'}</div>
+                                <div><strong>ইস্যু তারিখ:</strong> ${new Date(currentVoter.approved_at || currentVoter.created_at).toLocaleDateString('bn-BD')}</div>
+                              </div>
+                              <div class="footer" style="align-items: flex-end;">
+                                <div>
+                                  <div style="font-style: italic; color: #fde047; font-size: 9px;">Chief Election Commissioner</div>
+                                  <div>অনুমোদিত কর্মকর্তা স্বাক্ষর</div>
+                                </div>
+                                <div class="seal">SEAL<br/>BGC</div>
+                              </div>
+                            </div>
+                          </div>
+                        </body>
+                      </html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    setTimeout(() => {
+                      printWindow.print();
+                    }, 250);
+                  }}
                   className="px-6 py-2.5 bg-[#1e3a5f] hover:bg-[#152943] text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-xs transition-colors cursor-pointer"
                 >
                   <Printer className="w-4 h-4" />
-                  <span>আইডি কার্ড প্রিন্ট করুন</span>
+                  <span>আইডি কার্ড প্রিন্ট / PDF সংরক্ষণ করুন</span>
                 </button>
               </div>
             </div>

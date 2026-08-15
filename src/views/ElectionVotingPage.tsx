@@ -21,7 +21,8 @@ export const ElectionVotingPage: React.FC = () => {
     currentVoter,
     castVote,
     hasVoterVotedInElection,
-    setCurrentView
+    setCurrentView,
+    showToast
   } = useApp();
 
   const currentElection = elections.find(e => e.id === selectedElectionId) || elections[0];
@@ -144,6 +145,7 @@ export const ElectionVotingPage: React.FC = () => {
       setIsSubmitting(false);
       setShowConfirmModal(false);
       setVoteSuccess(true);
+      showToast('ভোট সফলভাবে গৃহীত হয়েছে। ধন্যবাদ!', 'success');
     }, 600);
   };
 

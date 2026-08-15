@@ -33,10 +33,8 @@ export const VoterRegisterPage: React.FC = () => {
   const [buildingNumber, setBuildingNumber] = useState('');
   const [floor, setFloor] = useState('');
   const [apartmentNumber, setApartmentNumber] = useState('');
-  const [billType, setBillType] = useState('DESCO Electricity Bill');
-  const [billPhotoUrl, setBillPhotoUrl] = useState(
-    'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80'
-  );
+  const [billType, setBillType] = useState('');
+  const [billPhotoUrl, setBillPhotoUrl] = useState('');
   const [note, setNote] = useState('');
   const [declaration, setDeclaration] = useState(false);
 
@@ -45,30 +43,6 @@ export const VoterRegisterPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedAppId, setSubmittedAppId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-
-  // Quick Sample Document presets for easy testing
-  const sampleBills = [
-    {
-      name: 'ডেসকো বিদ্যুৎ বিল (DESCO Bill)',
-      url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
-      type: 'Electricity (DESCO)'
-    },
-    {
-      name: 'ওয়াসা পানি বিল (Dhaka WASA Bill)',
-      url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
-      type: 'Water (Dhaka WASA)'
-    },
-    {
-      name: 'বাড়ি/ফ্ল্যাট মালিকানা দলিল (Deed Paper)',
-      url: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=800&q=80',
-      type: 'Land Deed / Registry'
-    },
-    {
-      name: 'ভাড়া চুক্তিপত্র (Rental Agreement)',
-      url: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80',
-      type: 'Tenant Agreement'
-    }
-  ];
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -467,13 +441,13 @@ export const VoterRegisterPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Bill Preview & Sample Presets */}
+            {/* Bill Preview & Upload Box */}
             <div className="lg:col-span-6 space-y-3">
               <label className="block text-xs font-semibold text-slate-700">
-                ফাইল আপলোড করুন অথবা নমুনা থেকে নির্বাচন করুন:
+                ইউটিলিটি বিলের ছবি বা ফাইল আপলোড করুন: <span className="text-rose-500">*</span>
               </label>
               
-              <div className="flex items-center gap-2 p-2.5 bg-white border border-slate-300 rounded-xl">
+              <div className="flex flex-col gap-2 p-4 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl hover:bg-slate-100/60 transition-colors">
                 <input
                   type="file"
                   accept="image/*,.pdf"
@@ -488,29 +462,9 @@ export const VoterRegisterPage: React.FC = () => {
                       }
                     }
                   }}
-                  className="text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                  className="text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#1e3a5f] file:text-white hover:file:bg-[#152943] cursor-pointer"
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                {sampleBills.map(sample => (
-                  <button
-                    key={sample.name}
-                    type="button"
-                    onClick={() => {
-                      setBillPhotoUrl(sample.url);
-                      setBillType(sample.type);
-                    }}
-                    className={`p-2.5 text-left rounded-xl border text-xs transition-all cursor-pointer ${
-                      billPhotoUrl === sample.url
-                        ? 'border-blue-600 bg-blue-50/80 text-blue-900 font-semibold shadow-xs'
-                        : 'border-slate-200 hover:border-slate-300 bg-slate-50 text-slate-700'
-                    }`}
-                  >
-                    <div className="truncate">{sample.name}</div>
-                    <div className="text-[10px] text-slate-400">{sample.type}</div>
-                  </button>
-                ))}
+                <span className="text-[11px] text-slate-500">বিদ্যুৎ, গ্যাস, পানি বিল অথবা বাড়ি ভাড়ার চুক্তিপত্রের কপি</span>
               </div>
 
               <div>
@@ -521,8 +475,8 @@ export const VoterRegisterPage: React.FC = () => {
                   type="text"
                   value={billType}
                   onChange={e => setBillType(e.target.value)}
-                  placeholder="e.g. DESCO Electric Bill"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs"
+                  placeholder="যেমন: ডেসকো বিদ্যুৎ বিল / ওয়াসা পানি বিল"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs"
                 />
               </div>
             </div>

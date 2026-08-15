@@ -1,32 +1,28 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import {
-  Phone,
   KeyRound,
   ShieldCheck,
   ArrowRight,
-  Sparkles,
   AlertCircle,
   Mail,
   Lock,
   Building2,
-  CheckCircle2,
-  HelpCircle
+  CheckCircle2
 } from 'lucide-react';
 
 export const VoterLoginPage: React.FC = () => {
-  const { requestLoginOTP, loginAsVoterWithOTP, loginAsAdmin, setCurrentView, setSelectedAppId } = useApp();
+  const { requestLoginOTP, loginAsVoterWithOTP, loginAsAdmin, setCurrentView } = useApp();
 
   const [loginMethod, setLoginMethod] = useState<'otp' | 'password'>('otp');
-  const [identifier, setIdentifier] = useState('01712345678');
+  const [identifier, setIdentifier] = useState('');
   const [targetEmail, setTargetEmail] = useState<string | null>(null);
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
-  const [serverOtp, setServerOtp] = useState<string | null>(null);
 
-  // Email login state
-  const [email, setEmail] = useState('admin@bikrampurgardencity.com');
-  const [password, setPassword] = useState('admin123');
+  // Admin login state
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,12 +42,10 @@ export const VoterLoginPage: React.FC = () => {
       if (res.success) {
         setOtpSent(true);
         setTargetEmail(res.targetEmail || null);
-        setServerOtp(res.otp || '849201');
-        setOtp(res.otp || '849201'); // Auto-fill for friendly demo experience
       } else {
         setError(res.message);
       }
-    }, 500);
+    }, 400);
   };
 
   const handleVerifyOTP = (e: React.FormEvent) => {
@@ -75,6 +69,11 @@ export const VoterLoginPage: React.FC = () => {
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!email.trim() || !password.trim()) {
+      setError('এডমিন ইমেইল ও পাসওয়ার্ড প্রদান করুন');
+      return;
+    }
+
     setLoading(true);
     setTimeout(() => {
       const res = loginAsAdmin(email, password);
@@ -112,7 +111,7 @@ export const VoterLoginPage: React.FC = () => {
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            ✉️ ইমেইল ওটিপি (Email OTP)
+            ✉️ ভোটার লগইন (Email OTP)
           </button>
           <button
             type="button"
@@ -123,7 +122,7 @@ export const VoterLoginPage: React.FC = () => {
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            🔑 এডমিন পাসওয়ার্ড (Password)
+            🔑 এডমিন লগইন (Password)
           </button>
         </div>
 
@@ -132,17 +131,6 @@ export const VoterLoginPage: React.FC = () => {
             <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <div>{error}</div>
-              {error.includes('আবেদন') && (
-                <button
-                  onClick={() => {
-                    setSelectedAppId('BGC-APP-2026-004');
-                    setCurrentView('status');
-                  }}
-                  className="font-bold text-rose-900 underline block pt-0.5"
-                >
-                  আবেদনের অবস্থা দেখতে এখানে ক্লিক করুন →
-                </button>
-              )}
             </div>
           </div>
         )}
@@ -153,7 +141,7 @@ export const VoterLoginPage: React.FC = () => {
             <form onSubmit={handleSendOTP} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  নিবন্ধিত মোবাইল নম্বর বা ইমেইল ঠিকানা (Phone or Email)
+                  নিবন্ধিত মোবাইল নম্বর বা ইমেইল ঠিকানা
                 </label>
                 <div className="relative">
                   <input
@@ -168,7 +156,7 @@ export const VoterLoginPage: React.FC = () => {
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5 text-blue-600" />
-                  <span>লগইন ওটিপি কোডটি আপনার নিবন্ধিত ইমেইলে স্বয়ংক্রিয়ভাবে পাঠানো হবে।</span>
+                  <span>লগইন ওটিপি কোডটি আপনার নিবন্ধিত ইমেইলে পাঠানো হবে।</span>
                 </p>
               </div>
 
@@ -183,7 +171,7 @@ export const VoterLoginPage: React.FC = () => {
                 ) : (
                   <>
                     <Mail className="w-4 h-4" />
-                    <span>ইমেইলে ওটিপি কোড পাঠান (Send OTP via Email)</span>
+                    <span>ইমেইলে ওটিপি কোড পাঠান</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -202,7 +190,7 @@ export const VoterLoginPage: React.FC = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setOtpSent(false)}
+                  onClick={() => { setOtpSent(false); setOtp(''); }}
                   className="text-xs text-sky-800 font-bold underline cursor-pointer"
                 >
                   পরিবর্তন
@@ -211,7 +199,7 @@ export const VoterLoginPage: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  ৬ ডিজিটের ওটিপি কোড (Enter 6-digit OTP from Email)
+                  ৬ ডিজিটের ওটিপি কোড লিখুন
                 </label>
                 <div className="relative">
                   <input
@@ -220,23 +208,11 @@ export const VoterLoginPage: React.FC = () => {
                     maxLength={6}
                     value={otp}
                     onChange={e => setOtp(e.target.value)}
-                    placeholder="849201"
+                    placeholder="123456"
                     className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl border border-slate-300 text-base font-mono tracking-widest font-bold text-center focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:bg-white"
                   />
                   <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                 </div>
-                {serverOtp && (
-                  <div className="text-[11px] text-emerald-800 bg-emerald-50 p-2 rounded-lg mt-1.5 flex items-center justify-between border border-emerald-200">
-                    <span>সিমুলেটেড ইমেইল ওটিপি: <strong className="font-mono text-emerald-950 text-xs">{serverOtp}</strong></span>
-                    <button
-                      type="button"
-                      onClick={() => setOtp(serverOtp)}
-                      className="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded font-bold hover:bg-emerald-700 cursor-pointer"
-                    >
-                      Fill
-                    </button>
-                  </div>
-                )}
               </div>
 
               <button
@@ -250,7 +226,7 @@ export const VoterLoginPage: React.FC = () => {
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>লগইন নিশ্চিত করুন (Verify & Login)</span>
+                    <span>লগইন সম্পন্ন করুন</span>
                   </>
                 )}
               </button>
@@ -261,7 +237,7 @@ export const VoterLoginPage: React.FC = () => {
           <form onSubmit={handleAdminLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                ইমেইল ঠিকানা (Email)
+                এডমিন ইমেইল ঠিকানা
               </label>
               <div className="relative">
                 <input
@@ -278,7 +254,7 @@ export const VoterLoginPage: React.FC = () => {
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                পাসওয়ার্ড (Password)
+                পাসওয়ার্ড
               </label>
               <div className="relative">
                 <input
@@ -304,48 +280,12 @@ export const VoterLoginPage: React.FC = () => {
               ) : (
                 <>
                   <ShieldCheck className="w-4 h-4 text-amber-300" />
-                  <span>এডমিন লগইন (Access Admin)</span>
+                  <span>এডমিন প্যানেলে প্রবেশ করুন</span>
                 </>
               )}
             </button>
           </form>
         )}
-
-        {/* Quick Demo Test Logins */}
-        <div className="pt-4 border-t border-slate-100 space-y-2">
-          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">
-            দ্রুত ডেমো অ্যাকাউন্ট পরীক্ষা (Quick Test Users):
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <button
-              type="button"
-              onClick={() => {
-                setLoginMethod('otp');
-                setIdentifier('01712345678');
-                setOtpSent(false);
-                setError(null);
-              }}
-              className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-colors cursor-pointer"
-            >
-              <div className="font-bold text-slate-800">ফ্ল্যাট মালিক (Owner)</div>
-              <div className="text-[10px] text-slate-500 font-mono">01712345678 / rafiq@gmail.com</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setLoginMethod('otp');
-                setIdentifier('01912998877');
-                setOtpSent(false);
-                setError(null);
-              }}
-              className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-colors cursor-pointer"
-            >
-              <div className="font-bold text-slate-800">ভাড়াটিয়া (Tenant)</div>
-              <div className="text-[10px] text-slate-500 font-mono">01912998877 / tareq@gmail.com</div>
-            </button>
-          </div>
-        </div>
 
         {/* Footer Link */}
         <div className="text-center pt-2 text-xs text-slate-500">

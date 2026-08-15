@@ -213,9 +213,11 @@ export interface CommitteeMember {
   email?: string;
   sort_order: number;
   is_current: boolean;
-  tenure: string; // e.g. "2024-2026"
+  tenure: string; // e.g. "আহ্বায়ক কমিটি ২০২৬" / "২০২৪-২০২৬" / "২০২৬-২০২৮"
   since: string;
   plot_number: string;
+  committee_type?: 'convening' | 'executive' | 'advisory'; // আহ্বায়ক কমিটি, কার্যনির্বাহী পরিষদ, উপদেষ্টা পরিষদ
+  blood_group?: string;
 }
 
 export interface Announcement {
@@ -224,10 +226,11 @@ export interface Announcement {
   title_bn?: string;
   content: string;
   is_public: boolean;
-  category: 'election' | 'general' | 'maintenance' | 'event' | 'mosque';
+  category: 'election' | 'general' | 'maintenance' | 'event' | 'notice';
   published_by: string;
   published_at: string;
   important?: boolean;
+  attachment_url?: string;
 }
 
 export type EmailNotificationType =

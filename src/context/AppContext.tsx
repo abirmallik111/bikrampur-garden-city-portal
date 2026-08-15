@@ -36,6 +36,14 @@ import {
   INITIAL_EMAIL_LOGS,
   INITIAL_SMS_LOGS
 } from '../data/initialData';
+import {
+  fetchAllFromCloud,
+  cloudInsert,
+  cloudUpsert,
+  cloudUpdate,
+  cloudDelete
+} from '../lib/supabase';
+import { ToastMessage } from '../components/Toast';
 
 export type ViewRoute =
   | 'landing'
@@ -49,9 +57,9 @@ export type ViewRoute =
   | 'election-results'
   | 'rentals'
   | 'rental-detail'
-  | 'mosque'
   | 'committee'
   | 'directory'
+  | 'notices'
   | 'announcements';
 
 interface AppContextType {
@@ -89,6 +97,7 @@ interface AppContextType {
   mosqueProjects: MosqueProject[];
   donations: Donation[];
   committee: CommitteeMember[];
+  committeeMembers: CommitteeMember[]; // Convenience alias
   announcements: Announcement[];
   emailLogs: EmailNotification[];
   smsLogs: EmailNotification[]; // Backward compatibility alias
@@ -148,22 +157,57 @@ interface AppContextType {
   updateCommitteeMember: (id: string, memberData: Partial<CommitteeMember>) => void;
   deleteCommitteeMember: (id: string) => void;
 
+  // UX & Preloader System
+  isPageLoading: boolean;
+  setIsPageLoading: (loading: boolean) => void;
+  isInitialLoading: boolean;
+  toasts: ToastMessage[];
+  showToast: (message: string, type?: 'success' | 'error' | 'info' | 'warning') => void;
+  dismissToast: (id: string) => void;
+
   // Utility
   resetDemoData: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'bgc_society_portal_v1';
+const STORAGE_KEY = 'bgc_society_portal_v4';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation State
-  const [currentView, setCurrentView] = useState<ViewRoute>('landing');
-  const [selectedElectionId, setSelectedElectionId] = useState<string | null>('el-2026');
+  const [currentView, setCurrentViewRaw] = useState<ViewRoute>('landing');
+  const [selectedElectionId, setSelectedElectionId] = useState<string | null>(null);
   const [selectedRentalId, setSelectedRentalId] = useState<string | null>(null);
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [dashboardTab, setDashboardTab] = useState<string>('overview');
   const [adminTab, setAdminTab] = useState<string>('dashboard');
+
+  // Preloader & UX State
+  const [isPageLoading, setIsPageLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
+    const id = `toast-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const newToast: ToastMessage = { id, message, type };
+    setToasts(prev => [...prev.slice(-3), newToast]); // Keep maximum 4 toasts
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4500);
+  };
+
+  const dismissToast = (id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  };
+
+  const setCurrentView = (view: ViewRoute) => {
+    setIsPageLoading(true);
+    setCurrentViewRaw(view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      setIsPageLoading(false);
+    }, 220);
+  };
 
   // Automated Email Notification Overlay
   const [activeEmailNotification, setActiveEmailNotification] = useState<EmailNotification | null>(null);
@@ -240,6 +284,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!currentUser || currentUser.role !== 'voter') return null;
     return voters.find(v => v.phone === currentUser.phone || v.email === currentUser.email || v.user_id === currentUser.id || v.voter_id === currentUser.voterId) || null;
   }, [currentUser, voters]);
+
+  // Cloud Sync: Load from Supabase on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function loadCloudData() {
+      try {
+        const cloud = await fetchAllFromCloud();
+        if (cloud && isMounted) {
+          if (cloud.applications && cloud.applications.length > 0) setApplications(cloud.applications);
+          if (cloud.voters && cloud.voters.length > 0) setVoters(cloud.voters);
+          if (cloud.elections && cloud.elections.length > 0) setElections(cloud.elections);
+          if (cloud.committee && cloud.committee.length > 0) setCommittee(cloud.committee);
+          if (cloud.announcements && cloud.announcements.length > 0) setAnnouncements(cloud.announcements);
+          if (cloud.complaints && cloud.complaints.length > 0) setComplaints(cloud.complaints);
+          if (cloud.rentals && cloud.rentals.length > 0) setRentals(cloud.rentals);
+          if (cloud.votes && cloud.votes.length > 0) setVotes(cloud.votes);
+        }
+      } catch (err) {
+        console.warn('Initial Supabase fetch failed, continuing with local storage:', err);
+      } finally {
+        if (isMounted) {
+          setTimeout(() => setIsInitialLoading(false), 450);
+        }
+      }
+    }
+    loadCloudData();
+    return () => { isMounted = false; };
+  }, []);
 
   // Persist state changes to localStorage
   useEffect(() => {
@@ -335,8 +407,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const recipientName = voter ? voter.name_en : existingApp?.name_en || 'Society Member';
     const recipientPhone = voter?.phone || existingApp?.phone;
 
-    // Generate 6 digit OTP
-    const generatedOTP = '849201'; // deterministic friendly demo OTP
+    // Generate 6 digit OTP dynamically
+    const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+    sessionStorage.setItem(`bgc_otp_${input}`, generatedOTP);
 
     dispatchEmail({
       to_email: targetEmail,
@@ -344,7 +417,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       recipient_phone: recipientPhone,
       from_email: 'auth@bikrampurgardencity.com',
       from_name: 'Bikrampur Garden City Authentication System',
-      subject: `[Bikrampur Garden City] আপনার এককালীন ওটিপি কোড (OTP): ${generatedOTP}`,
+      subject: `[Bikrampur Garden City] আপনার লগইন ওটিপি কোড (OTP): ${generatedOTP}`,
       preview_text: `ভোটার ড্যাশবোর্ডে লগইনের জন্য আপনার ৬ ডিজিটের ওটিপি কোড হলো: ${generatedOTP}। এটি ৫ মিনিট কার্যকর থাকবে...`,
       html_body: `<div style="font-family: sans-serif; padding: 20px; color: #1e293b;">
         <h2 style="color: #0f172a; margin-bottom: 8px;">সম্মানিত ${recipientName},</h2>
@@ -368,14 +441,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       success: true,
       otp: generatedOTP,
       targetEmail,
-      message: `আপনার নিবন্ধিত ইমেইল (${targetEmail})-এ ৬ ডিজিটের ওটিপি কোড পাঠানো হয়েছে। ডেমো ওটিপি: ${generatedOTP}`
+      message: `আপনার নিবন্ধিত ইমেইল (${targetEmail})-এ ৬ ডিজিটের ওটিপি কোড পাঠানো হয়েছে।`
     };
   };
 
   const loginAsVoterWithOTP = (phoneOrEmail: string, otp: string) => {
     const input = phoneOrEmail.trim().toLowerCase();
-    if (otp !== '849201' && otp !== '123456') {
-      return { success: false, message: 'ভুল ওটিপি (Invalid OTP)। সঠিক কোড দিন (ডেমো ওটিপি: 849201)' };
+    const storedOtp = sessionStorage.getItem(`bgc_otp_${input}`);
+    
+    if (otp !== storedOtp && otp !== '123456') {
+      return { success: false, message: 'ভুল ওটিপি (Invalid OTP)। অনুগ্রহ করে ইমেইলে প্রাপ্ত সঠিক কোডটি দিন।' };
     }
 
     const voter = voters.find(
@@ -502,6 +577,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setApplications(prev => [newApp, ...prev]);
+    cloudInsert('voter_applications', newApp);
 
     // Send automated email confirmation to citizen
     const targetEmail = data.email || `${data.phone}@bikrampurgardencity.com`;
@@ -563,6 +639,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return a;
     });
     setApplications(updatedApps);
+    cloudUpdate('voter_applications', targetApp.id, {
+      status: 'approved',
+      admin_remark: remark || 'Application approved by Society Committee.',
+      reviewed_by: currentUser?.id || 'admin',
+      reviewed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
 
     // Create User Account
     const newUser: User = {
@@ -602,6 +685,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updated_at: new Date().toISOString()
     };
     setVoters(prev => [newVoter, ...prev]);
+    cloudInsert('voters', newVoter);
 
     // Send automated Approval Email with Voter ID
     const targetEmail = targetApp.email || `${targetApp.phone}@bikrampurgardencity.com`;
@@ -657,6 +741,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return a;
     });
     setApplications(updatedApps);
+    cloudUpdate('voter_applications', targetApp.id, {
+      status: 'rejected',
+      admin_remark: reason,
+      reviewed_by: currentUser?.id || 'admin',
+      reviewed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
 
     const targetEmail = targetApp.email || `${targetApp.phone}@bikrampurgardencity.com`;
     dispatchEmail({
@@ -705,6 +796,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return a;
     });
     setApplications(updatedApps);
+    cloudUpdate('voter_applications', targetApp.id, {
+      status: 'more_info',
+      admin_remark: note,
+      reviewed_by: currentUser?.id || 'admin',
+      reviewed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
 
     const targetEmail = targetApp.email || `${targetApp.phone}@bikrampurgardencity.com`;
     dispatchEmail({
@@ -861,12 +959,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       candidates: electionData.candidates || []
     };
     setElections(prev => [newElection, ...prev]);
+    cloudUpsert('elections', newElection);
   };
 
   const updateElectionStatus = (electionId: string, status: ElectionStatus) => {
     setElections(prev =>
       prev.map(e => (e.id === electionId ? { ...e, status } : e))
     );
+    cloudUpdate('elections', electionId, { status });
   };
 
   const addCandidateToElection = (electionId: string, candidateData: Omit<Candidate, 'id' | 'election_id' | 'vote_count' | 'created_at'>) => {
@@ -880,10 +980,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setElections(prev =>
       prev.map(e => {
         if (e.id === electionId) {
-          return {
+          const updated = {
             ...e,
             candidates: [...e.candidates, newCandidate]
           };
+          cloudUpsert('elections', updated);
+          return updated;
         }
         return e;
       })
@@ -894,10 +996,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setElections(prev =>
       prev.map(e => {
         if (e.id === electionId) {
-          return {
+          const updated = {
             ...e,
             candidates: e.candidates.filter(c => c.id !== candidateId)
           };
+          cloudUpsert('elections', updated);
+          return updated;
         }
         return e;
       })
@@ -929,6 +1033,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updated_at: new Date().toISOString()
     };
     setComplaints(prev => [newComplaint, ...prev]);
+    cloudInsert('complaints', newComplaint);
     return { success: true, message: 'আপনার অভিযোগটি সফলভাবে নথিভুক্ত হয়েছে। কার্যনির্বাহী কমিটি দ্রুত ব্যবস্থা গ্রহণ করবে।' };
   };
 
@@ -936,13 +1041,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setComplaints(prev =>
       prev.map(c => {
         if (c.id === complaintId) {
-          return {
+          const updated = {
             ...c,
             status,
             admin_response: response !== undefined ? response : c.admin_response,
             assigned_to: currentUser?.name || c.assigned_to,
             updated_at: new Date().toISOString()
           };
+          cloudUpdate('complaints', complaintId, {
+            status,
+            admin_response: response !== undefined ? response : c.admin_response,
+            assigned_to: currentUser?.name || c.assigned_to,
+            updated_at: new Date().toISOString()
+          });
+          return updated;
         }
         return c;
       })
@@ -971,6 +1083,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setRentals(prev => [newListing, ...prev]);
+    cloudInsert('rental_listings', newListing);
     return { success: true, message: 'আপনার ভাড়ার বিজ্ঞাপনটি সফলভাবে প্রকাশিত হয়েছে!' };
   };
 
@@ -978,10 +1091,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setRentals(prev =>
       prev.map(r => (r.id === rentalId ? { ...r, status, updated_at: new Date().toISOString() } : r))
     );
+    cloudUpdate('rental_listings', rentalId, { status, updated_at: new Date().toISOString() });
   };
 
   const deleteRentalListing = (rentalId: string) => {
     setRentals(prev => prev.filter(r => r.id !== rentalId));
+    cloudDelete('rental_listings', rentalId);
   };
 
   // Mosque & Donation Methods
@@ -1102,10 +1217,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       published_at: new Date().toISOString()
     };
     setAnnouncements(prev => [newAnc, ...prev]);
+    cloudInsert('announcements', newAnc);
   };
 
   const deleteAnnouncement = (id: string) => {
     setAnnouncements(prev => prev.filter(a => a.id !== id));
+    cloudDelete('announcements', id);
   };
 
   // Committee
@@ -1115,16 +1232,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: `com-${Date.now()}`
     };
     setCommittee(prev => [...prev, newMem]);
+    cloudInsert('committee_members', newMem);
   };
 
   const updateCommitteeMember = (id: string, memberData: Partial<CommitteeMember>) => {
     setCommittee(prev =>
       prev.map(m => (m.id === id ? { ...m, ...memberData } : m))
     );
+    cloudUpdate('committee_members', id, memberData);
   };
 
   const deleteCommitteeMember = (id: string) => {
     setCommittee(prev => prev.filter(m => m.id !== id));
+    cloudDelete('committee_members', id);
   };
 
   const resetDemoData = () => {
@@ -1179,6 +1299,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         mosqueProjects,
         donations,
         committee,
+        committeeMembers: committee,
         announcements,
         emailLogs,
         smsLogs: emailLogs,
@@ -1219,6 +1340,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addCommitteeMember,
         updateCommitteeMember,
         deleteCommitteeMember,
+
+        isPageLoading,
+        setIsPageLoading,
+        isInitialLoading,
+        toasts,
+        showToast,
+        dismissToast,
 
         resetDemoData
       }}

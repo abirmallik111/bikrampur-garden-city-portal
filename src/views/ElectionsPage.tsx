@@ -38,6 +38,26 @@ export const ElectionsPage: React.FC = () => {
     ? currentElection.candidates.reduce((sum, c) => sum + (c.vote_count || 0), 0)
     : 0;
 
+  if (!currentElection) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center space-y-4">
+        <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
+          <Vote className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-800">বর্তমানে কোনো নির্বাচন সক্রিয় নেই</h2>
+        <p className="text-xs text-slate-500 max-w-md mx-auto">
+          নির্বাচন কমিশন কর্তৃক নতুন নির্বাচনের তফসিল ঘোষণা করা হলে এখানে প্রার্থী তালিকা ও ডিজিটাল ব্যালট প্রদর্শিত হবে।
+        </p>
+        <button
+          onClick={() => setCurrentView('landing')}
+          className="px-5 py-2.5 bg-[#1e3a5f] text-white text-xs font-bold rounded-xl shadow-xs"
+        >
+          হোমপেজে ফিরে যান
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* Header Banner - Professional Polish */}
@@ -47,7 +67,7 @@ export const ElectionsPage: React.FC = () => {
             <div className="inline-flex items-center gap-2 bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-3.5 py-1 rounded-full text-xs font-semibold">
               <Vote className="w-4 h-4" />
               <span>
-                {isVotingLive ? 'ভোটগ্রহণ চলমান (Voting is Live!)' : 'নির্বাচন ২০২৬ কেন্দ্র'}
+                {isVotingLive ? 'ভোটগ্রহণ চলমান (Voting is Live!)' : 'নির্বাচন কেন্দ্র'}
               </span>
             </div>
 

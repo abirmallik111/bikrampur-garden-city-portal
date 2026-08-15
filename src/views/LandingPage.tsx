@@ -30,7 +30,6 @@ export const LandingPage: React.FC = () => {
     elections,
     announcements,
     rentals,
-    mosqueProjects,
     setSelectedRentalId
   } = useApp();
 
@@ -38,7 +37,6 @@ export const LandingPage: React.FC = () => {
   const upcomingElection = elections.find(e => e.status === 'upcoming' || e.status === 'candidate_reg');
   const topAnnouncements = announcements.slice(0, 3);
   const featuredRentals = rentals.filter(r => r.status === 'active').slice(0, 3);
-  const activeMosque = mosqueProjects.find(m => m.status === 'active') || mosqueProjects[0];
 
   return (
     <div className="space-y-10 pb-16">
@@ -50,7 +48,7 @@ export const LandingPage: React.FC = () => {
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-950/80 text-emerald-400 rounded-full border border-emerald-800/80 text-xs font-semibold">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                <span>RAJUK Approved Residential Society • Dholaipar, Dhaka</span>
+                <span>Official Residential Society Portal • Dholaipar, Dhaka</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
@@ -110,59 +108,84 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Card: Professional Polish Election Highlight Box */}
+            {/* Right Card: Society Info / Election Highlight Box */}
             <div className="lg:col-span-5">
-              <div className="bg-slate-800/90 border border-slate-700 rounded-2xl p-6 shadow-xl text-white space-y-5">
-                <div className="flex items-center justify-between pb-4 border-b border-slate-700">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-emerald-500/20 text-emerald-400 rounded-lg flex items-center justify-center">
-                      <Vote className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-                        Election Phase Active
+              {elections.length > 0 && elections.some(e => e.status === 'voting') ? (
+                <div className="bg-slate-800/90 border border-slate-700 rounded-2xl p-6 shadow-xl text-white space-y-5">
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-700">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 bg-emerald-500/20 text-emerald-400 rounded-lg flex items-center justify-center">
+                        <Vote className="w-5 h-5" />
                       </div>
-                      <div className="text-sm font-bold text-white">কার্যনির্বাহী পরিষদ নির্বাচন ২০২৬</div>
+                      <div>
+                        <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                          Election Phase Active
+                        </div>
+                        <div className="text-sm font-bold text-white">{elections[0].title_bn || elections[0].title}</div>
+                      </div>
                     </div>
+                    <span className="text-[10px] bg-emerald-500 text-slate-950 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                      Voting Live
+                    </span>
                   </div>
-                  <span className="text-[10px] bg-emerald-500 text-slate-950 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                    Voting Live
-                  </span>
+
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {elections[0].description}
+                  </p>
+
+                  <button
+                    id="preview-cast-vote-btn"
+                    onClick={() => setCurrentView('elections')}
+                    className="w-full py-3 bg-emerald-400 hover:bg-emerald-300 text-emerald-950 font-bold rounded-xl text-center text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Vote className="w-4 h-4 text-emerald-950" />
+                    <span>ডিজিটাল ব্যালটে ভোট দিন (Cast Vote)</span>
+                  </button>
                 </div>
-
-                <div className="space-y-3">
-                  <div className="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-1.5">
-                    <div className="text-xs text-slate-400 flex justify-between">
-                      <span>সভাপতি পদ (Presidential Contest):</span>
-                      <span className="font-semibold text-emerald-400 font-mono">২ জন প্রার্থী</span>
+              ) : (
+                <div className="bg-slate-800/90 border border-slate-700 rounded-2xl p-6 shadow-xl text-white space-y-5">
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-700">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 bg-blue-500/20 text-blue-400 rounded-lg flex items-center justify-center">
+                        <Building2 className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
+                          Digital Citizen Portal
+                        </div>
+                        <div className="text-sm font-bold text-white">সোসাইটি নাগরিক সেবা কেন্দ্র</div>
+                      </div>
                     </div>
-                    <div className="text-xs font-medium text-slate-200 flex items-center justify-between">
-                      <span>• মোঃ রফিকুল ইসলাম (ছাতা)</span>
-                      <span>• হাজী মোঃ সেলিম (ঘড়ি)</span>
+                    <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/40 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                      Active
+                    </span>
+                  </div>
+
+                  <div className="space-y-2.5 text-xs text-slate-300">
+                    <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
+                      <span>• ভোটার নিবন্ধন আবেদন</span>
+                      <span className="text-emerald-400 font-bold">উন্মুক্ত</span>
+                    </div>
+                    <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
+                      <span>• বাড়ি ভাড়া টু-লেট বোর্ড</span>
+                      <span className="text-blue-400 font-bold">সক্রিয়</span>
+                    </div>
+                    <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
+                      <span>• নোটিশ বোর্ড</span>
+                      <span className="text-teal-400 font-bold">লাইভ</span>
                     </div>
                   </div>
 
-                  <div className="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-1.5">
-                    <div className="text-xs text-slate-400 flex justify-between">
-                      <span>সাধারণ সম্পাদক পদ (General Secretary):</span>
-                      <span className="font-semibold text-blue-400 font-mono">২ জন প্রার্থী</span>
-                    </div>
-                    <div className="text-xs font-medium text-slate-200 flex items-center justify-between">
-                      <span>• এডভোকেট মোঃ কামরুজ্জামান (গোলাপ)</span>
-                      <span>• মোঃ তরিকুল হাসান (বই)</span>
-                    </div>
-                  </div>
+                  <button
+                    id="preview-register-btn"
+                    onClick={() => setCurrentView('register')}
+                    className="w-full py-3 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold rounded-xl text-center text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <FileCheck2 className="w-4 h-4 text-slate-950" />
+                    <span>ভোটার হিসেবে আবেদন করুন</span>
+                  </button>
                 </div>
-
-                <button
-                  id="preview-cast-vote-btn"
-                  onClick={() => setCurrentView('elections')}
-                  className="w-full py-3 bg-emerald-400 hover:bg-emerald-300 text-emerald-950 font-bold rounded-xl text-center text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Vote className="w-4 h-4 text-emerald-950" />
-                  <span>ডিজিটাল ব্যালটে ভোট দিন (Cast Vote)</span>
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -184,17 +207,19 @@ export const LandingPage: React.FC = () => {
               অনুমোদিত ভোটার (Verified Voters)
             </div>
             <div className="text-3xl sm:text-4xl font-bold text-slate-900">{voters.length}</div>
-            <div className="mt-2 text-xs text-emerald-600 font-semibold flex items-center gap-1">
-              <span>+12 এই সপ্তাহে অনুমোদিত</span>
-            </div>
+            <div className="mt-2 text-xs text-slate-400 font-medium">নিবন্ধিত ভোটার সংখ্যা</div>
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <div className="text-slate-500 text-xs sm:text-sm font-medium mb-1 uppercase tracking-tight">
               নির্বাচন ভোটগ্রহণ (Election Status)
             </div>
-            <div className="text-3xl sm:text-4xl font-bold text-slate-900">LIVE</div>
-            <div className="mt-2 text-xs text-rose-500 font-semibold">শেষ সময়: আজ রাত ১০:০০</div>
+            <div className="text-3xl sm:text-4xl font-bold text-slate-900">
+              {elections.some(e => e.status === 'voting') ? 'LIVE' : 'UPCOMING'}
+            </div>
+            <div className="mt-2 text-xs text-slate-400 font-medium">
+              {elections.some(e => e.status === 'voting') ? 'ভোটগ্রহণ চলমান' : 'তফসিল অপেক্ষমাণ'}
+            </div>
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
@@ -202,7 +227,7 @@ export const LandingPage: React.FC = () => {
               কার্যনির্বাহী কমিটি (EC Council)
             </div>
             <div className="text-3xl sm:text-4xl font-bold text-slate-900">{committee.length}</div>
-            <div className="mt-2 text-xs text-slate-400 font-medium">নির্বাচিত সদস্য সংখ্যা</div>
+            <div className="mt-2 text-xs text-slate-400 font-medium">পরিচালনা পরিষদ সদস্য</div>
           </div>
         </div>
       </section>
@@ -291,26 +316,21 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 4: Mosque Development */}
-          <div
-            id="quick-link-mosque"
-            onClick={() => setCurrentView('mosque')}
-            className="group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-slate-400 transition-all cursor-pointer space-y-4 flex flex-col justify-between"
-          >
+          {/* Card 4: Mosque Development Coming Soon */}
+          <div className="group bg-amber-50 p-6 rounded-2xl border border-amber-200 shadow-sm opacity-70 space-y-4 flex flex-col justify-between">
             <div className="space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-teal-800 text-white flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-amber-200 text-amber-800 flex items-center justify-center">
                 <HeartHandshake className="w-5 h-5" />
               </div>
               <h3 className="text-base font-bold text-slate-900">
-                কেন্দ্রীয় জামে মসজিদ ফান্ড
+                মসজিদ উন্নয়ন তহবিল (Mosque Fund)
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                মসজিদ মিনার নির্মাণ ও সেন্ট্রাল এসি স্থাপন প্রকল্পে মুক্তহস্তে দান করুন এবং ডিজিটাল রসিদ সংগ্রহ করুন।
+                শীঘ্রই আসছে। কেন্দ্রীয় জামে মসজিদ উন্নয়নে অনলাইন অনুদান সেবা চালু হবে।
               </p>
             </div>
-            <div className="flex items-center text-xs font-bold text-teal-800 gap-1 pt-2 border-t border-slate-100">
-              <span>উন্নয়ন প্রকল্পে দান করুন</span>
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <div className="flex items-center text-xs font-bold text-amber-700 gap-1 pt-2 border-t border-amber-200/50">
+              <span className="bg-amber-200/50 px-2 py-1 rounded-full border border-amber-300">Coming Soon</span>
             </div>
           </div>
 
@@ -372,6 +392,14 @@ export const LandingPage: React.FC = () => {
                 <div className="w-1 h-4 bg-slate-900 rounded"></div>
                 <span>সাম্প্রতিক নোটিশ ও বিজ্ঞপ্তি (Announcements)</span>
               </h2>
+              {announcements.length > 3 && (
+                <button
+                  onClick={() => setCurrentView('notices')}
+                  className="text-xs sm:text-sm font-semibold text-slate-900 hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  সকল নোটিশ দেখুন <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 divide-y divide-slate-100 overflow-hidden">
@@ -416,35 +444,38 @@ export const LandingPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Portal Activity Logs Card matching Professional Polish */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex-1 shadow-sm space-y-4">
+            {/* Notices Widget */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 flex-1 shadow-sm space-y-4 flex flex-col">
               <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                 <div className="w-1 h-4 bg-slate-900 rounded"></div>
-                পোর্টাল লাইভ লগ (Portal Logs)
+                সাম্প্রতিক নোটিশ (Notice Board)
               </h3>
-              <div className="space-y-3.5 text-xs">
-                <div className="flex gap-3">
-                  <div className="w-2 h-2 mt-1.5 rounded-full bg-emerald-500 shrink-0"></div>
-                  <div>
-                    <div className="font-semibold text-slate-900">ভোটগ্রহণ কার্যক্রম শুরু হয়েছে</div>
-                    <div className="text-[10px] text-slate-400">সকাল ৮:০০ ঘটিকা</div>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="w-2 h-2 mt-1.5 rounded-full bg-blue-500 shrink-0"></div>
-                  <div>
-                    <div className="font-semibold text-slate-900">প্লট B-45 ভোটার নিবন্ধন যাচাইকৃত</div>
-                    <div className="text-[10px] text-slate-400">২ ঘণ্টা আগে</div>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="w-2 h-2 mt-1.5 rounded-full bg-amber-500 shrink-0"></div>
-                  <div>
-                    <div className="font-semibold text-slate-900">নতুন টু-লেট ফ্ল্যাট বিজ্ঞাপন প্রকাশিত</div>
-                    <div className="text-[10px] text-slate-400">৪ ঘণ্টা আগে</div>
-                  </div>
-                </div>
+              <div className="space-y-3.5 text-xs flex-1">
+                {topAnnouncements.length === 0 ? (
+                  <div className="text-slate-500 text-center py-4">কোনো নোটিশ নেই</div>
+                ) : (
+                  topAnnouncements.map(anc => (
+                    <div key={anc.id} className="flex gap-3">
+                      <div className={`w-2 h-2 mt-1.5 rounded-full shrink-0 ${anc.important ? 'bg-amber-500' : 'bg-blue-500'}`}></div>
+                      <div>
+                        <div className="font-semibold text-slate-900 flex items-center gap-2">
+                          <span className="line-clamp-1">{anc.title}</span>
+                          {anc.important && <AlertCircle className="w-3 h-3 text-amber-500 shrink-0" />}
+                        </div>
+                        <div className="text-[10px] text-slate-400">
+                          {new Date(anc.published_at).toLocaleDateString('bn-BD')}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
+              <button
+                onClick={() => setCurrentView('notices')}
+                className="w-full py-2 mt-auto bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-medium rounded-lg text-xs transition-colors cursor-pointer"
+              >
+                সকল নোটিশ দেখুন
+              </button>
             </div>
           </div>
         </div>
