@@ -1,0 +1,6 @@
+{
+  "name": "Bikrampur Garden City Portal",
+  "description": "Comprehensive Society Management, Voter Registration & Election Portal for Bikrampur Garden City, Dholaipar, Dhaka.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
