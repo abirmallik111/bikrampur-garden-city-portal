@@ -59,7 +59,7 @@ export const LandingPage: React.FC = () => {
               </h1>
 
               <p className="text-sm sm:text-base text-slate-300 font-normal leading-relaxed max-w-2xl">
-                সোসাইটির সমন্বিত নাগরিক সেবা — ডিজিটাল ভোটার রেজিস্ট্রেশন, ইউটিলিটি বিল যাচাই, কার্যনির্বাহী পরিষদ নির্বাচন ২০২৬, ফ্ল্যাট ভাড়া ও মসজিদ উন্নয়ন তহবিল।
+                সোসাইটির সমন্বিত নাগরিক সেবা — সদস্যপদ নিবন্ধন, ইউটিলিটি বিল যাচাই, কার্যনির্বাহী পরিষদ নির্বাচন ২০২৬, ফ্ল্যাট ভাড়া ও মসজিদ উন্নয়ন তহবিল।
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -69,7 +69,7 @@ export const LandingPage: React.FC = () => {
                   className="flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-emerald-950 font-bold px-6 py-3.5 rounded-xl shadow-xs transition-colors text-sm cursor-pointer"
                 >
                   <FileCheck2 className="w-4 h-4 text-emerald-950" />
-                  <span>ভোটার নিবন্ধন করুন (Register)</span>
+                  <span>সদস্যপদ আবেদন করুন</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
@@ -95,7 +95,7 @@ export const LandingPage: React.FC = () => {
               <div className="pt-4 grid grid-cols-3 gap-3 max-w-lg border-t border-slate-800 text-xs text-slate-400">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>১ ভোটার ১ ভোট নিশ্চিত</span>
+                  <span>১ সদস্য ১ ভোট নিশ্চিত</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
@@ -163,7 +163,7 @@ export const LandingPage: React.FC = () => {
 
                   <div className="space-y-2.5 text-xs text-slate-300">
                     <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
-                      <span>• ভোটার নিবন্ধন আবেদন</span>
+                      <span>• সদস্যপদ আবেদন</span>
                       <span className="text-emerald-400 font-bold">উন্মুক্ত</span>
                     </div>
                     <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
@@ -182,7 +182,7 @@ export const LandingPage: React.FC = () => {
                     className="w-full py-3 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold rounded-xl text-center text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <FileCheck2 className="w-4 h-4 text-slate-950" />
-                    <span>ভোটার হিসেবে আবেদন করুন</span>
+                    <span>সদস্য হিসেবে আবেদন করুন</span>
                   </button>
                 </div>
               )}
@@ -204,10 +204,10 @@ export const LandingPage: React.FC = () => {
 
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <div className="text-slate-500 text-xs sm:text-sm font-medium mb-1 uppercase tracking-tight">
-              অনুমোদিত ভোটার (Verified Voters)
+              অনুমোদিত সদস্য (Verified Members)
             </div>
             <div className="text-3xl sm:text-4xl font-bold text-slate-900">{voters.length}</div>
-            <div className="mt-2 text-xs text-slate-400 font-medium">নিবন্ধিত ভোটার সংখ্যা</div>
+            <div className="mt-2 text-xs text-slate-400 font-medium">নিবন্ধিত সদস্য সংখ্যা</div>
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
@@ -253,10 +253,10 @@ export const LandingPage: React.FC = () => {
                 <FileCheck2 className="w-5 h-5" />
               </div>
               <h3 className="text-base font-bold text-slate-900 group-hover:text-slate-700">
-                ভোটার রেজিস্ট্রেশন ফরম
+                সদস্যপদ নিবন্ধন ফরম
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                প্লট, ভবন, ফ্ল্যাট মালিক বা ভাড়াটিয়া হিসেবে বিদ্যুৎ/গ্যাস বিল আপলোড করে ভোটার হিসেবে আবেদন করুন।
+                প্লট, ভবন, ফ্ল্যাট মালিক বা ভাড়াটিয়া হিসেবে বিদ্যুৎ/গ্যাস বিল আপলোড করে সদস্য হিসেবে আবেদন করুন।
               </p>
             </div>
             <div className="flex items-center text-xs font-bold text-slate-900 gap-1 pt-2 border-t border-slate-100">
@@ -371,7 +371,7 @@ export const LandingPage: React.FC = () => {
                 আবেদনের অগ্রগতি ট্র্যাকিং
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                আপনার Application ID (যেমন: BGC-APP-2026-001) দিয়ে ভোটার আবেদনের বর্তমান স্ট্যাটাস যাচাই করুন।
+                আপনার Application ID (যেমন: BGC-APP-2026-001) দিয়ে সদস্যপদ আবেদনের বর্তমান স্ট্যাটাস যাচাই করুন।
               </p>
             </div>
             <div className="flex items-center text-xs font-bold text-slate-900 gap-1 pt-2 border-t border-slate-100">
@@ -428,10 +428,10 @@ export const LandingPage: React.FC = () => {
           <div className="lg:col-span-4 flex flex-col gap-6">
             <div className="bg-emerald-900 rounded-2xl p-6 text-white shadow-lg shadow-emerald-900/10 space-y-4">
               <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded">
-                Voter Verification
+                Member Verification
               </span>
               <h3 className="font-bold text-lg leading-tight">
-                ভোটার তালিকায় নাম অন্তর্ভুক্ত করুন
+                সদস্য তালিকায় নাম অন্তর্ভুক্ত করুন
               </h3>
               <p className="text-emerald-100 text-xs sm:text-sm leading-relaxed">
                 আগামী কার্যনির্বাহী পরিষদ নির্বাচনে ভোটাধিকার প্রয়োগ করতে আপনার ফ্ল্যাট বা প্লটের বিদ্যুৎ বিল ও এনআইডি কপি দিয়ে এখনই নিবন্ধন সম্পন্ন করুন।

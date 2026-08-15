@@ -193,20 +193,20 @@ export const VoterDashboard: React.FC = () => {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-3 py-1 rounded-full text-xs font-semibold">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>অনুমোদিত ভোটার সদস্য (Verified Member)</span>
+              <span>অনুমোদিত সোসাইটি সদস্য (Verified Member)</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
               Welcome, {currentVoter.name_en}!
             </h1>
             <p className="text-xs sm:text-sm text-slate-300">
-              {currentVoter.name_bn} — বিক্রমপুর গার্ডেন সিটির সম্মানিত ভোটার মেম্বার ড্যাশবোর্ডে আপনাকে স্বাগতম।
+              {currentVoter.name_bn} — বিক্রমপুর গার্ডেন সিটির সম্মানিত সদস্য ড্যাশবোর্ডে আপনাকে স্বাগতম।
             </p>
           </div>
 
-          {/* Quick Voter ID Badge */}
+          {/* Quick Member ID Badge */}
           <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700 text-center sm:text-right shrink-0">
             <span className="text-[11px] uppercase tracking-wider text-slate-400 block font-semibold">
-              Permanent Voter ID
+              Permanent Member ID
             </span>
             <span className="font-mono text-2xl font-black text-emerald-400 tracking-wider">
               {currentVoter.voter_id}
@@ -223,10 +223,10 @@ export const VoterDashboard: React.FC = () => {
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
           <div className="text-xs font-semibold text-slate-500 flex items-center gap-1.5 uppercase tracking-tight">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>ভোটার আইডি (Voter ID)</span>
+            <span>সদস্য আইডি (Member ID)</span>
           </div>
           <div className="font-mono text-xl font-bold text-slate-900">{currentVoter.voter_id}</div>
-          <div className="text-[11px] text-emerald-700 font-semibold">সক্রিয় ভোটার কার্ড</div>
+          <div className="text-[11px] text-emerald-700 font-semibold">সক্রিয় সদস্য কার্ড</div>
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
@@ -238,7 +238,7 @@ export const VoterDashboard: React.FC = () => {
             {currentVoter.resident_type.replace('_', ' ')}
           </div>
           <div className="text-[11px] text-slate-500">
-            {isOwner ? 'ভোট ও বিজ্ঞাপন অনুমতিপ্রাপ্ত' : 'ভোটাধিকারপ্রাপ্ত সদস্য'}
+            {isOwner ? 'সোসাইটি সুবিধাপ্রাপ্ত সদস্য' : 'সদস্যপদপ্রাপ্ত নিবাসী'}
           </div>
         </div>
 
@@ -290,7 +290,7 @@ export const VoterDashboard: React.FC = () => {
               <p className={`text-xs sm:text-sm leading-relaxed max-w-2xl ${hasVotedActive ? 'text-emerald-800' : 'text-slate-300'}`}>
                 {hasVotedActive
                   ? 'আপনার মূল্যবান ভোট সফলভাবে সংরক্ষিত হয়েছে। ধন্যবাদ নাগরিক দায়িত্ব পালনের জন্য।'
-                  : 'আপনি এই সোসাইটির নিবন্ধিত ভোটার। ডিজিটাল ব্যালটে সভাপতি, সাধারণ সম্পাদক, কোষাধ্যক্ষ ও অন্যান্য পদে আপনার পছন্দের প্রার্থীকে ভোট দিন।'}
+                  : 'আপনি এই সোসাইটির নিবন্ধিত সদস্য। ডিজিটাল ব্যালটে সভাপতি, সাধারণ সম্পাদক, কোষাধ্যক্ষ ও অন্যান্য পদে আপনার পছন্দের প্রার্থীকে ভোট দিন।'}
               </p>
             </div>
 
@@ -328,10 +328,11 @@ export const VoterDashboard: React.FC = () => {
         {/* Navigation Tabs */}
         <div className="flex overflow-x-auto pb-2 gap-2 border-b border-slate-200 text-xs font-semibold">
           {[
-            { id: 'overview', label: '📊 সারসংক্ষেপ ও ভোটার কার্ড (Overview)', icon: Layers },
-            { id: 'elections', label: '🗳️ নির্বাচন ও ভোট (Elections)', icon: Vote },
+            { id: 'overview', label: '📊 সারসংক্ষেপ ও সদস্য কার্ড (Overview)', icon: Layers },
+            { id: 'notices', label: '🔔 নোটিশ বোর্ড (Notices)', icon: FileText },
             { id: 'complaints', label: `⚠️ অভিযোগ প্রতিকার (${myComplaints.length})`, icon: MessageSquare },
             { id: 'rentals', label: `🏢 আমার ভাড়া বিজ্ঞাপন (${myRentals.length})`, icon: Building },
+            { id: 'elections', label: '🗳️ নির্বাচন ও ভোট (Elections)', icon: Vote },
             { id: 'donations', label: `🕌 মসজিদ ফান্ড (শীঘ্রই)`, icon: HeartHandshake },
             { id: 'profile', label: '👤 ডিজিটাল মেম্বার কার্ড (Digital ID)', icon: User }
           ].map(tab => (
@@ -424,7 +425,7 @@ export const VoterDashboard: React.FC = () => {
                     </div>
                   </div>
                   <span className="text-[10px] bg-emerald-400 text-slate-950 font-bold px-2 py-0.5 rounded">
-                    VOTER CARD
+                    MEMBER CARD
                   </span>
                 </div>
 
@@ -439,7 +440,7 @@ export const VoterDashboard: React.FC = () => {
                   </div>
 
                   <div className="space-y-1 text-xs">
-                    <div className="text-[11px] text-slate-400 uppercase font-semibold">Voter Name</div>
+                    <div className="text-[11px] text-slate-400 uppercase font-semibold">Member Name</div>
                     <div className="font-bold text-base text-white">{currentVoter.name_en}</div>
                     <div className="text-slate-300 text-xs">{currentVoter.name_bn}</div>
                     <div className="font-mono text-emerald-300 text-sm font-bold pt-1">
@@ -484,9 +485,81 @@ export const VoterDashboard: React.FC = () => {
                 className="w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
               >
                 <Printer className="w-4 h-4 text-slate-500" />
-                <span>ভোটার আইডি কার্ড প্রিন্ট / সেভ করুন</span>
+                <span>সদস্য আইডি কার্ড প্রিন্ট / সেভ করুন</span>
               </button>
             </div>
+          </div>
+        )}
+
+        {/* TAB: NOTICES */}
+        {dashboardTab === 'notices' && (
+          <div className="space-y-4">
+            <div className="pb-4 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">নোটিশ বোর্ড (Notice Board)</h2>
+                <p className="text-xs text-slate-500 mt-0.5">সোসাইটি পরিচালনা কমিটি কর্তৃক প্রকাশিত নোটিশসমূহ</p>
+              </div>
+              <span className="text-xs bg-slate-100 text-slate-700 px-3 py-1 rounded-full font-bold">
+                মোট {announcements.length}টি নোটিশ
+              </span>
+            </div>
+            {announcements.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-3xl border border-slate-200 text-slate-400">
+                <div className="text-4xl mb-3">📋</div>
+                <p className="text-sm font-medium">কোনো নোটিশ প্রকাশিত হয়নি</p>
+                <p className="text-xs mt-1">নতুন নোটিশ প্রকাশিত হলে এখানে দেখা যাবে।</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {[...announcements].sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime()).map(notice => (
+                  <div key={notice.id} className={`p-5 rounded-2xl border ${
+                    notice.important
+                      ? 'bg-red-50 border-red-200 shadow-sm'
+                      : 'bg-white border-slate-200 shadow-2xs'
+                  }`}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          {notice.important && (
+                            <span className="inline-flex items-center gap-1 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
+                              ⚠️ গুরুত্বপূর্ণ
+                            </span>
+                          )}
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${
+                            notice.category === 'election' ? 'bg-emerald-100 text-emerald-800' :
+                            notice.category === 'maintenance' ? 'bg-amber-100 text-amber-800' :
+                            notice.category === 'event' ? 'bg-purple-100 text-purple-800' :
+                            'bg-slate-100 text-slate-700'
+                          }`}>
+                            {notice.category === 'election' ? 'নির্বাচন' :
+                             notice.category === 'maintenance' ? 'রক্ষণাবেক্ষণ' :
+                             notice.category === 'event' ? 'অনুষ্ঠান' :
+                             notice.category === 'general' ? 'সাধারণ' : notice.category}
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-slate-900 text-sm leading-snug">{notice.title}</h3>
+                        <p className="text-xs text-slate-600 mt-1.5 leading-relaxed whitespace-pre-line">{notice.content}</p>
+                        {notice.attachment_url && (
+                          <a
+                            href={notice.attachment_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 mt-2.5 text-xs text-blue-700 hover:text-blue-900 font-semibold"
+                          >
+                            📎 সংযুক্তি দেখুন
+                          </a>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-slate-400 shrink-0 text-right">
+                        {new Date(notice.published_at).toLocaleDateString('bn-BD', {
+                          year: 'numeric', month: 'short', day: 'numeric'
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -924,7 +997,7 @@ export const VoterDashboard: React.FC = () => {
                   <span>ভেরিফাইড ডিজিটাল পরিচয়পত্র (Official Smart Card)</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
-                  সোসাইটি সদস্য ও ভোটার পরিচয়পত্র
+                  সোসাইটি সদস্য পরিচয়পত্র (Member ID Card)
                 </h3>
                 <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
                   এই কার্ডটি আপনার সোসাইটি সদস্যপদ ও নির্বাচনে ভোটাধিকারের আনুষ্ঠানিক পরিচয় বহন করে। সরাসরি প্রিন্ট বা PDF হিসেবে সংরক্ষণ করুন।
@@ -973,7 +1046,7 @@ export const VoterDashboard: React.FC = () => {
                   <div className="pt-3 border-t border-white/15 flex justify-between items-center text-[10px] text-slate-300 relative z-10">
                     <span>442 Dholaipar, Dhaka</span>
                     <span className="font-mono text-emerald-300 font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-700/50">
-                      ✓ ACTIVE VOTER
+                      ✓ ACTIVE MEMBER
                     </span>
                   </div>
                 </div>
@@ -1057,7 +1130,7 @@ export const VoterDashboard: React.FC = () => {
                                   <h4>Bikrampur Garden City</h4>
                                   <span>Residential Society • Dholaipar</span>
                                 </div>
-                                <span class="badge">ELECTION 2026</span>
+                                <span class="badge">MEMBER 2026</span>
                               </div>
                               <div class="body">
                                 <img class="photo" src="${currentVoter.bill_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}" />
@@ -1071,7 +1144,7 @@ export const VoterDashboard: React.FC = () => {
                               </div>
                               <div class="footer">
                                 <span>442 Dholaipar, Dhaka</span>
-                                <span style="color: #6ee7b7; font-weight: bold;">✓ ACTIVE VOTER</span>
+                                <span style="color: #6ee7b7; font-weight: bold;">✓ ACTIVE MEMBER</span>
                               </div>
                             </div>
 

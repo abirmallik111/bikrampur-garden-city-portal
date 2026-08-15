@@ -129,7 +129,7 @@ export const VoterRegisterPage: React.FC = () => {
               আবেদন সফলভাবে গৃহীত হয়েছে
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-              ভোটার নিবন্ধন আবেদন সম্পন্ন!
+              সদস্যপদ আবেদন সম্পন্ন!
             </h2>
             <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
               ধন্যবাদ, <span className="font-semibold text-slate-900">{nameEn}</span>। আপনার আবেদনটি সোসাইটি নির্বাচন ও যাচাই কমিটির তালিকায় যুক্ত হয়েছে।
@@ -167,8 +167,8 @@ export const VoterRegisterPage: React.FC = () => {
             </div>
             <ul className="list-disc list-inside space-y-1 text-slate-700 pl-1">
               <li>সোসাইটি এডমিন প্যানেল আপনার আপলোডকৃত বিল ও ঠিকানা যাচাই করবে।</li>
-              <li>অনুমোদন সম্পন্ন হওয়া মাত্রই স্বয়ংক্রিয়ভাবে একটি ইউনিক <strong>Voter ID</strong> আপনার ইমেইলে পাঠিয়ে দেওয়া হবে।</li>
-              <li>ইমেইলে পাঠানো OTP বা ভোটার আইডি দিয়ে আপনি ভোটার ড্যাশবোর্ডে লগইন করে ভোট প্রদান করতে পারবেন।</li>
+              <li>অনুমোদন সম্পন্ন হওয়া মাত্রই স্বয়ংক্রিয়ভাবে একটি ইউনিক <strong>Member ID (সদস্য আইডি)</strong> আপনার ইমেইলে পাঠিয়ে দেওয়া হবে।</li>
+              <li>ইমেইলে পাঠানো OTP বা সদস্য আইডি দিয়ে আপনি সদস্য ড্যাশবোর্ডে লগইন করে ভোট প্রদান করতে পারবেন।</li>
             </ul>
           </div>
 
@@ -207,10 +207,10 @@ export const VoterRegisterPage: React.FC = () => {
           <span>পাবলিক সিটিজেন পোর্টাল (No Login Required)</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-          সোসাইটি ভোটার নিবন্ধন ফরম ২০২৬
+          সোসাইটি সদস্যপদ নিবন্ধন ফরম ২০২৬
         </h1>
         <p className="text-sm text-slate-200 leading-relaxed">
-          বিক্রমপুর গার্ডেন সিটির প্লট মালিক, ভবন মালিক, ফ্ল্যাট মালিক ও ভাড়াটিয়াগণের জন্য ডিজিটাল ভোটার তালিকাভুক্তির আবেদন। সঠিক তথ্য ও বিদ্যুৎ/গ্যাস বিলের কপি সংযুক্ত করুন।
+          বিক্রমপুর গার্ডেন সিটির প্লট মালিক, ভবন মালিক, ফ্ল্যাট মালিক ও ভাড়াটিয়াগণের জন্য সোসাইটি সদস্যপদের জন্য আবেদন। সঠিক তথ্য ও বিদ্যুৎ/গ্যাস বিলের কপি সংযুক্ত করুন।
         </p>
       </div>
 
@@ -339,7 +339,7 @@ export const VoterRegisterPage: React.FC = () => {
                 placeholder="user@example.com"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-200"
               />
-              <p className="text-[10px] text-slate-500 mt-0.5">এই ইমেইলে অনুমোদন নিশ্চিতকরণ ও ভোটার আইডি যাবে</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">এই ইমেইলে অনুমোদন নিশ্চিতকরণ ও সদস্য আইডি (Member ID) যাবে</p>
             </div>
 
             <div>
@@ -565,7 +565,7 @@ export const VoterRegisterPage: React.FC = () => {
             ) : (
               <>
                 <FileCheck2 className="w-5 h-5 text-emerald-300" />
-                <span>ভোটার আবেদন জমা দিন (Submit Application)</span>
+                <span>সদস্যপদ আবেদন জমা দিন (Submit Application)</span>
               </>
             )}
           </button>

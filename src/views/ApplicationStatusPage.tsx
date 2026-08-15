@@ -60,10 +60,10 @@ export const ApplicationStatusPage: React.FC = () => {
       <div className="text-center space-y-2 max-w-xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
           <Search className="w-3.5 h-3.5" />
-          <span>রিয়েল-টাইম ভোটার স্ট্যাটাস ট্র্যাকার</span>
+          <span>রিয়েল-টাইম সদস্যপদ আবেদন ট্র্যাকার</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-          ভোটার আবেদন ট্র্যাকিং পোর্টাল
+          সদস্যপদ আবেদন ট্র্যাকিং পোর্টাল
         </h1>
         <p className="text-xs sm:text-sm text-slate-500">
           আপনার Application ID (যেমন: <span className="font-mono font-semibold">BGC-APP-2026-001</span>) অথবা নিবন্ধিত মোবাইল নম্বর দিয়ে অনুসন্ধানের ফলাফল দেখুন।
@@ -221,7 +221,7 @@ export const ApplicationStatusPage: React.FC = () => {
                       <Clock className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                     )}
                     <div>
-                      <div className="text-xs font-bold">৪. ভোটার আইডি ইস্যু</div>
+                      <div className="text-xs font-bold">৪. সদস্য আইডি ইস্যু</div>
                       <div className="text-[10px] font-mono font-bold text-emerald-800">
                         {matchedVoter ? matchedVoter.voter_id : 'অপেক্ষমাণ'}
                       </div>
@@ -235,13 +235,13 @@ export const ApplicationStatusPage: React.FC = () => {
                 <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-5 rounded-2xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="space-y-1 text-center sm:text-left">
                     <span className="text-xs font-semibold text-emerald-100">
-                      অভিনন্দন! আপনার স্থায়ী ভোটার আইডি ইস্যু করা হয়েছে:
+                      অভিনন্দন! আপনার স্থায়ী সদস্য আইডি ইস্যু করা হয়েছে:
                     </span>
                     <div className="text-2xl sm:text-3xl font-extrabold font-mono tracking-wider">
                       {matchedVoter.voter_id}
                     </div>
                     <p className="text-xs text-emerald-100">
-                      আপনি এখন ইমেইল বা ফোন ও OTP দিয়ে ভোটার ড্যাশবোর্ডে প্রবেশ করে ভোট দিতে পারবেন।
+                      আপনি এখন ইমেইল বা ফোন ও OTP দিয়ে সদস্য ড্যাশবোর্ডে প্রবেশ করে সকল সুবিধা ব্যবহার করতে পারবেন।
                     </p>
                   </div>
                   <button
@@ -294,7 +294,7 @@ export const ApplicationStatusPage: React.FC = () => {
               </div>
               <h3 className="text-base font-bold text-slate-800">কোনো আবেদন পাওয়া যায়নি</h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                অনুসন্ধানকৃত আইডি বা ফোন নম্বরের কোনো তথ্য আমাদের ডেটাবেজে নেই। দয়া করে সঠিক অ্যাপ্লিকেশন আইডি দিন অথবা নতুন ভোটার নিবন্ধন করুন।
+                অনুসন্ধানকৃত আইডি বা ফোন নম্বরের কোনো তথ্য আমাদের ডেটাবেজে নেই। দয়া করে সঠিক অ্যাপ্লিকেশন আইডি দিন অথবা নতুন সদস্যপদ আবেদন করুন।
               </p>
               <button
                 onClick={() => setCurrentView('register')}

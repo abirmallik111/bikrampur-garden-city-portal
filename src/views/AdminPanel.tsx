@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import {
   VoterApplication,
@@ -167,7 +167,7 @@ export const AdminPanel: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `BGC_Voter_Applications_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `BGC_Member_Applications_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -175,10 +175,10 @@ export const AdminPanel: React.FC = () => {
 
   const exportVotersCSV = () => {
     if (voters.length === 0) {
-      alert('কোনো অনুমোদিত ভোটার তথ্য পাওয়া যায়নি।');
+      alert('কোনো অনুমোদিত সদস্য তথ্য পাওয়া যায়নি।');
       return;
     }
-    const headers = ['Voter ID', 'Application ID', 'Name (EN)', 'Name (BN)', "Father's Name", 'NID', 'Phone', 'Email', 'Plot', 'Building', 'Floor', 'Apartment', 'Resident Type', 'Status', 'Approved At'];
+    const headers = ['Member ID', 'Application ID', 'Name (EN)', 'Name (BN)', "Father's Name", 'NID', 'Phone', 'Email', 'Plot', 'Building', 'Floor', 'Apartment', 'Resident Type', 'Status', 'Approved At'];
     const rows = voters.map(v => [
       `"${v.voter_id}"`,
       `"${v.application_id || ''}"`,
@@ -201,7 +201,7 @@ export const AdminPanel: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `BGC_Voter_List_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `BGC_Member_List_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -214,7 +214,7 @@ export const AdminPanel: React.FC = () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Bikrampur Garden City - Master Voter List</title>
+          <title>Bikrampur Garden City - Master Member List</title>
           <style>
             body { font-family: system-ui, -apple-system, sans-serif; padding: 25px; color: #0f172a; margin: 0; }
             .header { text-align: center; border-bottom: 2px solid #1e3a5f; padding-bottom: 15px; margin-bottom: 20px; }
@@ -232,14 +232,14 @@ export const AdminPanel: React.FC = () => {
         <body>
           <div class="header">
             <h1>বিক্রমপুর গার্ডেন সিটি সোসাইটি (Bikrampur Garden City)</h1>
-            <p>৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া মহাসড়ক, শ্যামপুর, ঢাকা • অনুমোদিত চূড়ান্ত ভোটার তালিকা ২০২৬</p>
-            <p style="font-size: 11px; color: #64748b; margin-top: 5px;">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} • মোট ভোটার: ${voters.length} জন</p>
+            <p>৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া মহাসড়ক, শ্যামপুর, ঢাকা • অনুমোদিত চূড়ান্ত সদস্য তালিকা ২০২৬</p>
+            <p style="font-size: 11px; color: #64748b; margin-top: 5px;">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} • মোট সদস্য: ${voters.length} জন</p>
           </div>
           <table>
             <thead>
               <tr>
                 <th>ক্রম</th>
-                <th>ভোটার আইডি</th>
+                <th>সদস্য আইডি</th>
                 <th>নাম (বাংলা)</th>
                 <th>Name (English)</th>
                 <th>পিতার নাম</th>
@@ -301,7 +301,7 @@ export const AdminPanel: React.FC = () => {
         <body>
           <div class="header">
             <h1>বিক্রমপুর গার্ডেন সিটি সোসাইটি (Bikrampur Garden City)</h1>
-            <p>৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া মহাসড়ক • ভোটার নিবন্ধন আবেদনপত্র মাস্টার তালিকা</p>
+            <p>৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া মহাসড়ক • সদস্যপদ নিবন্ধন আবেদনপত্র মাস্টার তালিকা</p>
             <p style="font-size: 11px; color: #64748b; margin-top: 5px;">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} • মোট আবেদন: ${filteredApps.length} টি</p>
           </div>
           <table>
@@ -387,7 +387,7 @@ export const AdminPanel: React.FC = () => {
   const handleApprove = (appId: string) => {
     const res = approveApplication(appId, reviewRemark || 'ডকুমেন্ট ও ঠিকানা সঠিক থাকায় অনুমোদন করা হলো');
     if (res.success) {
-      setReviewActionSuccess(`সফলভাবে অনুমোদিত! নতুন ভোটার আইডি: ${res.voterId}`);
+      setReviewActionSuccess(`সফলভাবে অনুমোদিত! নতুন সদস্য আইডি: ${res.voterId}`);
       setTimeout(() => {
         setReviewActionSuccess(null);
         setSelectedApp(null);
@@ -448,7 +448,7 @@ export const AdminPanel: React.FC = () => {
               বিক্রমপুর গার্ডেন সিটি — কেন্দ্রীয় অ্যাডমিন প্যানেল
             </h1>
             <p className="text-xs text-slate-300">
-              এডমিন: <strong className="text-white">{currentUser.name}</strong> ({currentUser.email}) • পূর্ণ নিয়ন্ত্রণ ও ভোটার অনুমোদন ক্ষমতা
+              এডমিন: <strong className="text-white">{currentUser.name}</strong> ({currentUser.email}) • পূর্ণ নিয়ন্ত্রণ ও সদস্য অনুমোদন ক্ষমতা
             </p>
           </div>
 
@@ -459,7 +459,7 @@ export const AdminPanel: React.FC = () => {
               <span className="font-mono text-xl font-bold text-amber-300">{pendingAppsCount}</span>
             </div>
             <div className="bg-white/10 backdrop-blur-xs p-3 rounded-2xl border border-white/20 text-center">
-              <span className="text-[10px] text-emerald-200 block uppercase font-bold">অনুমোদিত ভোটার</span>
+              <span className="text-[10px] text-emerald-200 block uppercase font-bold">অনুমোদিত সদস্য</span>
               <span className="font-mono text-xl font-bold text-emerald-300">{voters.length}</span>
             </div>
           </div>
@@ -469,8 +469,8 @@ export const AdminPanel: React.FC = () => {
       {/* Admin Tabs */}
       <div className="flex overflow-x-auto pb-2 gap-2 border-b border-slate-200 text-xs font-semibold">
         {[
-          { id: 'applications', label: `📋 ভোটার আবেদনপত্র (${pendingAppsCount} নতুন)`, icon: FileCheck2 },
-          { id: 'voters', label: `👥 অনুমোদিত ভোটার তালিকা (${voters.length})`, icon: Users },
+          { id: 'applications', label: `📋 সদস্যপদ আবেদনপত্র (${pendingAppsCount} নতুন)`, icon: FileCheck2 },
+          { id: 'voters', label: `👥 অনুমোদিত সদস্য তালিকা (${voters.length})`, icon: Users },
           { id: 'elections', label: `🗳️ নির্বাচন নিয়ন্ত্রণ ও ফলাফল`, icon: Vote },
           { id: 'complaints', label: `⚠️ নাগরিক অভিযোগ (${complaints.length})`, icon: MessageSquare },
           { id: 'rentals', label: `🏢 টু-লেট বিজ্ঞাপন মডারেশন (${rentals.length})`, icon: Building },
@@ -640,8 +640,8 @@ export const AdminPanel: React.FC = () => {
         <div className="bg-white rounded-3xl border border-slate-200 shadow-2xs p-6 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
-              <h3 className="text-base font-bold text-slate-900">অনুমোদিত ভোটারদের ডিজিটাল মাস্টার রোস্টার</h3>
-              <p className="text-xs text-slate-500">নির্বাচন ২০২৬ এর চূড়ান্ত বৈধ ভোটার তালিকা</p>
+              <h3 className="text-base font-bold text-slate-900">অনুমোদিত সদস্যদের ডিজিটাল মাস্টার রোস্টার</h3>
+              <p className="text-xs text-slate-500">নির্বাচন ২০২৬ এর চূড়ান্ত বৈধ সদস্য তালিকা</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -650,7 +650,7 @@ export const AdminPanel: React.FC = () => {
                 className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
               >
                 <Download className="w-4 h-4 text-emerald-700" />
-                <span>ভোটার তালিকা CSV</span>
+                <span>সদস্য তালিকা CSV</span>
               </button>
 
               <button
@@ -658,7 +658,7 @@ export const AdminPanel: React.FC = () => {
                 className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Printer className="w-4 h-4 text-slate-700" />
-                <span>প্রিন্ট ভোটার তালিকা</span>
+                <span>প্রিন্ট সদস্য তালিকা</span>
               </button>
             </div>
           </div>
@@ -781,7 +781,7 @@ export const AdminPanel: React.FC = () => {
                     <input placeholder="Symbol (e.g. নৌকা / Boat)" className="w-full p-2 border rounded" value={candidateForm.symbol} onChange={e => setCandidateForm({...candidateForm, symbol: e.target.value})} />
                     <input placeholder="Phone" className="w-full p-2 border rounded" value={candidateForm.phone} onChange={e => setCandidateForm({...candidateForm, phone: e.target.value})} />
                     <input placeholder="Photo URL (Optional)" className="w-full p-2 border rounded" value={candidateForm.photo_url} onChange={e => setCandidateForm({...candidateForm, photo_url: e.target.value})} />
-                    <input placeholder="Voter ID (Optional)" className="w-full p-2 border rounded" value={candidateForm.voter_id} onChange={e => setCandidateForm({...candidateForm, voter_id: e.target.value})} />
+                    <input placeholder="Member ID (Optional)" className="w-full p-2 border rounded" value={candidateForm.voter_id} onChange={e => setCandidateForm({...candidateForm, voter_id: e.target.value})} />
                     <button onClick={() => { addCandidateToElection(election.id, candidateForm); setCandidateFormOpenFor(null); }} className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold">যোগ করুন</button>
                   </div>
                 )}
@@ -1040,7 +1040,7 @@ export const AdminPanel: React.FC = () => {
                 <span className="text-xs font-mono font-bold text-[#1e3a5f]">
                   {selectedApp.application_id}
                 </span>
-                <h3 className="text-lg font-bold text-slate-900">ভোটার আবেদনপত্র পুঙ্খানুপুঙ্খ যাচাই</h3>
+                <h3 className="text-lg font-bold text-slate-900">সদস্যপদ আবেদনপত্র পুঙ্খানুপুঙ্খ যাচাই</h3>
               </div>
               <button
                 onClick={() => setSelectedApp(null)}
@@ -1131,7 +1131,7 @@ export const AdminPanel: React.FC = () => {
                   setTimeout(() => {
                     handleApprove(selectedApp.id);
                     setReviewActionLoading(null);
-                    showToast(`${selectedApp.name_en}-এর আবেদন অনুমোদিত এবং ভোটার আইডি ইস্যু করা হয়েছে!`, 'success');
+                    showToast(`${selectedApp.name_en}-এর আবেদন অনুমোদিত এবং সদস্য আইডি ইস্যু করা হয়েছে!`, 'success');
                   }, 500);
                 }}
                 disabled={!!reviewActionLoading}
@@ -1140,7 +1140,7 @@ export const AdminPanel: React.FC = () => {
                 {reviewActionLoading === 'approve' ? (
                   <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>অনুমোদন হচ্ছে...</span></>
                 ) : (
-                  <><CheckCircle2 className="w-4 h-4" /><span>অনুমোদন ও ভোটার আইডি ইস্যু (Approve)</span></>
+                  <><CheckCircle2 className="w-4 h-4" /><span>অনুমোদন ও সদস্য আইডি ইস্যু (Approve)</span></>
                 )}
               </button>
 

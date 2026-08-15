@@ -223,7 +223,7 @@ export const Navbar: React.FC = () => {
                 className="flex items-center space-x-1.5 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>ভোটার লগইন (Login)</span>
+                <span>সদস্য লগইন (Login)</span>
               </button>
             )}
           </div>

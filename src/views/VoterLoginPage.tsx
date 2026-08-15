@@ -93,10 +93,10 @@ export const VoterLoginPage: React.FC = () => {
             <Building2 className="w-7 h-7" />
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            সোসাইটি সদস্য ও ভোটার লগইন
+            সোসাইটি সদস্য লগইন (Member Login)
           </h1>
           <p className="text-xs text-slate-500">
-            বিক্রমপুর গার্ডেন সিটি পোর্টাল ও ডিজিটাল ব্যালট এক্সেস
+            সদস্য পোর্টাল — ভাড়া বিজ্ঞাপন, অভিযোগ, নোটিশ ও নির্বাচনী ব্যালট এক্সেস
           </p>
         </div>
 
@@ -111,7 +111,7 @@ export const VoterLoginPage: React.FC = () => {
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            ✉️ ভোটার লগইন (Email OTP)
+            ✉️ সদস্য লগইন (Email OTP)
           </button>
           <button
             type="button"
@@ -289,7 +289,7 @@ export const VoterLoginPage: React.FC = () => {
 
         {/* Footer Link */}
         <div className="text-center pt-2 text-xs text-slate-500">
-          এখনও ভোটার নিবন্ধন করেননি?{' '}
+          এখনও সদস্যপদ আবেদন করেননি?{' '}
           <button
             onClick={() => setCurrentView('register')}
             className="text-blue-700 font-bold hover:underline cursor-pointer"
