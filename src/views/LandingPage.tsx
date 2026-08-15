@@ -198,8 +198,8 @@ export const LandingPage: React.FC = () => {
             <div className="text-slate-500 text-xs sm:text-sm font-medium mb-1 uppercase tracking-tight">
               মোট আবাসিক ভবন (Households)
             </div>
-            <div className="text-3xl sm:text-4xl font-bold text-slate-900">450+</div>
-            <div className="mt-2 text-xs text-slate-400 font-medium">৪০+ ভবন ও কমপ্লেক্স</div>
+            <div className="text-3xl sm:text-4xl font-bold text-slate-900">20+</div>
+            <div className="mt-2 text-xs text-slate-400 font-medium">২০+ ভবন ও অ্যাপার্টমেন্ট</div>
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
