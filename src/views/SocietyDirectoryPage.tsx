@@ -26,7 +26,8 @@ import {
   Trash2,
   HelpCircle,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Gavel
 } from 'lucide-react';
 
 export const SocietyDirectoryPage: React.FC = () => {
