@@ -14,11 +14,11 @@ export const PagePreloader: React.FC<PagePreloaderProps> = ({
       <div className="flex flex-col items-center space-y-5 text-center max-w-sm">
         {/* Animated Brand Icon */}
         <div className="relative">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-emerald-500 p-0.5 shadow-2xl animate-pulse">
-            <div className="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-white">
-              <Building2 className="w-8 h-8 text-emerald-400" />
-            </div>
-          </div>
+          <img
+            src="/logo.png"
+            alt="Bikrampur Garden City"
+            className="w-20 h-20 rounded-full object-contain shadow-2xl animate-pulse bg-white/10 p-1"
+          />
           <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-slate-900 border-2 border-slate-900 flex items-center justify-center">
             <LoadingSpinner size="sm" className="text-emerald-400" />
           </div>

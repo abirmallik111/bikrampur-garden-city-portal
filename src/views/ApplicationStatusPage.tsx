@@ -58,6 +58,11 @@ export const ApplicationStatusPage: React.FC = () => {
     <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
       {/* Header */}
       <div className="text-center space-y-2 max-w-xl mx-auto">
+        <img
+          src="/logo-full.png"
+          alt="Bikrampur Garden City Society"
+          className="w-32 sm:w-40 mx-auto object-contain drop-shadow-sm mb-2"
+        />
         <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
           <Search className="w-3.5 h-3.5" />
           <span>রিয়েল-টাইম সদস্যপদ আবেদন ট্র্যাকার</span>

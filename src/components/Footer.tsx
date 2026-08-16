@@ -11,9 +11,11 @@ export const Footer: React.FC = () => {
       <div className="border-b border-slate-800/80 bg-[#0d1322] py-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#064e3b] text-[#64f9bc] rounded-xl border border-[#064e3b]/80">
-              <Building2 className="w-5 h-5" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="Bikrampur Garden City Logo"
+              className="w-12 h-12 rounded-full object-contain shrink-0 bg-white/10 p-0.5"
+            />
             <div>
               <h3 className="text-white font-bold text-sm sm:text-base">Bikrampur Garden City Society Portal</h3>
               <p className="text-xs text-slate-400">
@@ -148,9 +150,11 @@ export const Footer: React.FC = () => {
       <div className="bg-white text-slate-600 border-t border-slate-200 py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs gap-3">
           <div className="flex items-center gap-2 font-bold text-[#131b2e]">
-            <div className="w-5 h-5 rounded-md bg-[#064e3b] text-[#64f9bc] flex items-center justify-center text-[10px]">
-              <Building2 className="w-3 h-3 text-white" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="Bikrampur Garden City"
+              className="w-6 h-6 rounded-full object-contain shrink-0"
+            />
             <span>Bikrampur Garden City</span>
           </div>
 

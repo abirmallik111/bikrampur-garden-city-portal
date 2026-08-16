@@ -63,30 +63,37 @@ export const ElectionsPage: React.FC = () => {
       {/* Header Banner - Professional Polish */}
       <div className="bg-slate-900 border border-slate-800 text-white p-6 sm:p-10 rounded-2xl shadow-sm space-y-6 relative overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-3.5 py-1 rounded-full text-xs font-semibold">
-              <Vote className="w-4 h-4" />
-              <span>
-                {isVotingLive ? 'ভোটগ্রহণ চলমান (Voting is Live!)' : 'নির্বাচন কেন্দ্র'}
-              </span>
-            </div>
-
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
-              {currentElection?.title_bn || currentElection?.title}
-            </h1>
-
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
-              {currentElection?.description}
-            </p>
-
-            <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-1">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-slate-300" />
-                <span>ভোটের সময়কাল: ১ আগস্ট ২০২৬ - ২৫ আগস্ট ২০২৬</span>
+          <div className="flex items-start sm:items-center gap-4 flex-1">
+            <img
+              src="/logo.png"
+              alt="Bikrampur Garden City Election Logo"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-contain bg-white/10 p-1 shrink-0 drop-shadow-md hidden sm:block"
+            />
+            <div className="space-y-2.5">
+              <div className="inline-flex items-center gap-2 bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-3.5 py-1 rounded-full text-xs font-semibold">
+                <Vote className="w-4 h-4" />
+                <span>
+                  {isVotingLive ? 'ভোটগ্রহণ চলমান (Voting is Live!)' : 'নির্বাচন কেন্দ্র'}
+                </span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-emerald-400" />
-                <span>ভোট শেষ: প্রতিদিন সকাল ৮:০০ - বিকাল ৬:০০</span>
+
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                {currentElection?.title_bn || currentElection?.title}
+              </h1>
+
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
+                {currentElection?.description}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-1">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-slate-300" />
+                  <span>১ আগস্ট ২০২৬ - ২৫ আগস্ট ২০২৬</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-emerald-400" />
+                  <span>সকাল ৮:০০ - বিকাল ৬:০০</span>
+                </div>
               </div>
             </div>
           </div>

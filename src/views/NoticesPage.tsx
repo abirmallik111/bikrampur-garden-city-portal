@@ -45,12 +45,14 @@ export const NoticesPage: React.FC = () => {
             <ArrowLeft className="w-6 h-6 text-slate-600" />
           </button>
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-blue-100 text-blue-600 rounded-xl">
-              <Megaphone className="w-8 h-8" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="Bikrampur Garden City Logo"
+              className="w-12 h-12 rounded-full object-contain shrink-0 drop-shadow-xs"
+            />
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">নোটিশ বোর্ড (Notice Board)</h1>
-              <p className="text-slate-500 mt-1">সোসাইটির সকল গুরুত্বপূর্ণ ঘোষণা ও নোটিশসমূহ</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">নোটিশ বোর্ড (Notice Board)</h1>
+              <p className="text-slate-500 mt-0.5 text-xs sm:text-sm">সোসাইটির সকল গুরুত্বপূর্ণ ঘোষণা ও নোটিশসমূহ</p>
             </div>
           </div>
         </div>

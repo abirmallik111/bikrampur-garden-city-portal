@@ -41,6 +41,20 @@ export const LandingPage: React.FC = () => {
           {/* Subtle background glow */}
           <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#064e3b]/30 rounded-full blur-3xl pointer-events-none"></div>
 
+          {/* Official Society Emblem Badge */}
+          <div className="flex justify-center relative z-10">
+            <div className="relative group">
+              <div className="absolute inset-0 rounded-full bg-[#34d399]/25 blur-xl"></div>
+              <div className="relative p-2 bg-white/10 backdrop-blur-md rounded-full border-2 border-[#34d399]/40 shadow-2xl transition-transform duration-300 group-hover:scale-105">
+                <img
+                  src="/logo.png"
+                  alt="Bikrampur Garden City Official Seal"
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-contain bg-white p-1 shadow-inner"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Top Pill Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1 bg-[#34d399]/15 text-[#34d399] rounded-full border border-[#34d399]/30 text-xs font-semibold relative z-10">
             <span className="w-2 h-2 rounded-full bg-[#34d399] animate-pulse"></span>
@@ -95,7 +109,7 @@ export const LandingPage: React.FC = () => {
               <span>১০০% বিল ট্র্যাকিং ও অডিট</span>
             </div>
             <div className="flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-[#34d399] shrink-0" />
+              <img src="/logo.png" alt="Society Logo" className="w-4 h-4 rounded-full object-contain shrink-0" />
               <span>২০+ আবাসিক ভবন</span>
             </div>
           </div>

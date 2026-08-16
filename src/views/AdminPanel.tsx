@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import {
   VoterApplication,
@@ -439,17 +439,24 @@ export const AdminPanel: React.FC = () => {
       {/* Top Admin Banner */}
       <div className="bg-[#1e3a5f] text-white p-6 sm:p-8 rounded-3xl shadow-lg space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 bg-amber-400 text-slate-950 px-3 py-0.5 rounded-full text-xs font-bold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Society Administration & Election Commission Panel</span>
+          <div className="flex items-center gap-3.5">
+            <img
+              src="/logo.png"
+              alt="BGC Admin Seal"
+              className="w-14 h-14 rounded-full object-contain bg-white p-0.5 shrink-0 drop-shadow-md"
+            />
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 bg-amber-400 text-slate-950 px-3 py-0.5 rounded-full text-xs font-bold">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Society Administration & Election Commission Panel</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-white">
+                বিক্রমপুর গার্ডেন সিটি — কেন্দ্রীয় অ্যাডমিন প্যানেল
+              </h1>
+              <p className="text-xs text-slate-300">
+                এডমিন: <strong className="text-white">{currentUser.name}</strong> ({currentUser.email}) • পূর্ণ নিয়ন্ত্রণ ও সদস্য অনুমোদন ক্ষমতা
+              </p>
             </div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white">
-              বিক্রমপুর গার্ডেন সিটি — কেন্দ্রীয় অ্যাডমিন প্যানেল
-            </h1>
-            <p className="text-xs text-slate-300">
-              এডমিন: <strong className="text-white">{currentUser.name}</strong> ({currentUser.email}) • পূর্ণ নিয়ন্ত্রণ ও সদস্য অনুমোদন ক্ষমতা
-            </p>
           </div>
 
           {/* Quick Metrics Bar */}

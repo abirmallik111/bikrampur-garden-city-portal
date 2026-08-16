@@ -89,9 +89,11 @@ export const VoterLoginPage: React.FC = () => {
       <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-xl border border-slate-200 space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 bg-gradient-to-br from-[#1e3a5f] to-[#1976d2] rounded-2xl flex items-center justify-center mx-auto text-white shadow-md">
-            <Building2 className="w-7 h-7" />
-          </div>
+          <img
+            src="/logo-full.png"
+            alt="Bikrampur Garden City Society"
+            className="w-36 sm:w-44 mx-auto object-contain drop-shadow-md mb-2"
+          />
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
             সোসাইটি সদস্য লগইন (Member Login)
           </h1>

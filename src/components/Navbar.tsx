@@ -88,22 +88,31 @@ export const Navbar: React.FC = () => {
 
       {/* Main Brand & Nav Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo & Society Brand (Matching screenshot clean modern layout) */}
+        <div className="flex items-center justify-between h-20">
+          {/* Logo & Society Brand */}
           <div
             id="brand-logo-btn"
             onClick={() => navigateTo('landing')}
-            className="flex items-center gap-2.5 cursor-pointer group select-none"
+            className="flex items-center gap-3 cursor-pointer group select-none py-1"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#064e3b] text-[#64f9bc] flex items-center justify-center font-bold text-sm shadow-xs transition-colors shrink-0">
-              <Building2 className="w-4 h-4 text-white" />
+            <div className="relative">
+              <img
+                src="/logo.png"
+                alt="Bikrampur Garden City Logo"
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-full object-contain shrink-0 bg-white p-0.5 ring-2 ring-[#064e3b]/25 shadow-sm transition-transform duration-200 group-hover:scale-105"
+              />
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[#131b2e] font-extrabold text-base tracking-tight">
-                Bikrampur Garden City
-              </span>
-              <span className="hidden sm:inline-block text-[10px] bg-[#eaedff] text-[#064e3b] font-bold px-2 py-0.5 rounded-full">
-                Dholaipar
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[#131b2e] font-black text-base sm:text-lg tracking-tight leading-tight">
+                  Bikrampur Garden City
+                </span>
+                <span className="hidden md:inline-block text-[10px] bg-[#eaedff] text-[#064e3b] font-bold px-2 py-0.5 rounded-full">
+                  Dholaipar
+                </span>
+              </div>
+              <span className="text-[11px] font-medium text-[#064e3b] tracking-wide hidden sm:block">
+                বিক্রমপুর গার্ডেন সিটি সোসাইটি • ৪৪২ ঢোলাইপাড়
               </span>
             </div>
           </div>

@@ -154,17 +154,24 @@ export const ElectionVotingPage: React.FC = () => {
       {/* Top Banner */}
       <div className="bg-[#1e3a5f] text-white p-6 sm:p-8 rounded-3xl shadow-lg space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 px-3 py-0.5 rounded-full text-xs font-semibold">
-              <Vote className="w-3.5 h-3.5" />
-              <span>ডিজিটাল ব্যালট পেপার (Official Digital Ballot)</span>
+          <div className="flex items-center gap-3.5">
+            <img
+              src="/logo.png"
+              alt="Election Commission Seal"
+              className="w-12 h-12 rounded-full object-contain bg-white p-0.5 shrink-0 drop-shadow-sm"
+            />
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 px-3 py-0.5 rounded-full text-xs font-semibold">
+                <Vote className="w-3.5 h-3.5" />
+                <span>ডিজিটাল ব্যালট পেপার (Official Digital Ballot)</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-white">
+                {currentElection.title}
+              </h1>
+              <p className="text-xs text-slate-300">
+                ভোটার: <strong className="text-white">{currentVoter.name_en}</strong> • আইডি: <strong className="font-mono text-emerald-300">{currentVoter.voter_id}</strong>
+              </p>
             </div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white">
-              {currentElection.title}
-            </h1>
-            <p className="text-xs text-slate-300">
-              ভোটার: <strong className="text-white">{currentVoter.name_en}</strong> • আইডি: <strong className="font-mono text-emerald-300">{currentVoter.voter_id}</strong>
-            </p>
           </div>
 
           {/* Completion Meter */}

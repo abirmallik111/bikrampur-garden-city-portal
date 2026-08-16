@@ -416,9 +416,11 @@ export const VoterDashboard: React.FC = () => {
               <div className="bg-gradient-to-br from-slate-900 via-[#1e3a5f] to-slate-950 text-white rounded-3xl p-6 shadow-2xl border border-slate-700 space-y-5">
                 <div className="flex items-center justify-between pb-3 border-b border-white/20">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">
-                      BGC
-                    </div>
+                    <img
+                      src="/logo.png"
+                      alt="Bikrampur Garden City Seal"
+                      className="w-9 h-9 rounded-full object-contain shrink-0 bg-white p-0.5"
+                    />
                     <div>
                       <div className="text-xs font-bold tracking-wider uppercase">Bikrampur Garden City</div>
                       <div className="text-[10px] text-slate-400">Residential Society • Dholaipar</div>
@@ -1011,9 +1013,16 @@ export const VoterDashboard: React.FC = () => {
                   <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
                   <div className="flex justify-between items-start pb-3 border-b border-white/15 relative z-10">
-                    <div>
-                      <h4 className="font-extrabold text-sm text-white tracking-wide">Bikrampur Garden City</h4>
-                      <span className="text-[10px] text-blue-200">Residential Society • Dholaipar</span>
+                    <div className="flex items-center gap-2.5">
+                      <img
+                        src="/logo.png"
+                        alt="BGC Seal"
+                        className="w-8 h-8 rounded-full object-contain bg-white p-0.5 shrink-0"
+                      />
+                      <div>
+                        <h4 className="font-extrabold text-sm text-white tracking-wide">Bikrampur Garden City</h4>
+                        <span className="text-[10px] text-blue-200">Residential Society • Dholaipar</span>
+                      </div>
                     </div>
                     <span className="text-[9px] bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded uppercase tracking-wider shadow-2xs">
                       MEMBER 2026
@@ -1082,9 +1091,11 @@ export const VoterDashboard: React.FC = () => {
                       <div className="font-serif italic text-amber-300 text-[11px]">Chief Election Commissioner</div>
                       <div>অনুমোদিত কর্মকর্তা স্বাক্ষর</div>
                     </div>
-                    <div className="w-10 h-10 rounded-full border border-amber-400/40 flex items-center justify-center text-[7px] text-amber-300 font-bold text-center leading-tight">
-                      SEAL<br />BGC
-                    </div>
+                    <img
+                      src="/logo.png"
+                      alt="Official Seal"
+                      className="w-10 h-10 rounded-full object-contain bg-white/20 p-0.5 shrink-0 shadow-xs"
+                    />
                   </div>
                 </div>
               </div>
@@ -1117,7 +1128,7 @@ export const VoterDashboard: React.FC = () => {
                             .name-en { font-size: 12px; font-weight: bold; color: white; }
                             .name-bn { color: #cbd5e1; font-size: 10px; }
                             .footer { display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 6px; font-size: 8px; color: #94a3b8; }
-                            .seal { width: 36px; height: 36px; border: 1px solid #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 6px; color: #f59e0b; font-weight: bold; text-align: center; }
+                            .seal-img { width: 36px; height: 36px; border-radius: 50%; object-fit: contain; }
                             @media print { body { background: white; padding: 0; } }
                           </style>
                         </head>
@@ -1126,9 +1137,12 @@ export const VoterDashboard: React.FC = () => {
                             <!-- FRONT -->
                             <div class="card card-front">
                               <div class="header">
-                                <div>
-                                  <h4>Bikrampur Garden City</h4>
-                                  <span>Residential Society • Dholaipar</span>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                  <img src="/logo.png" style="width: 24px; height: 24px; border-radius: 50%; object-fit: contain; background: white; padding: 1px;" />
+                                  <div>
+                                    <h4>Bikrampur Garden City</h4>
+                                    <span>Residential Society • Dholaipar</span>
+                                  </div>
                                 </div>
                                 <span class="badge">MEMBER 2026</span>
                               </div>
@@ -1165,7 +1179,7 @@ export const VoterDashboard: React.FC = () => {
                                   <div style="font-style: italic; color: #fde047; font-size: 9px;">Chief Election Commissioner</div>
                                   <div>অনুমোদিত কর্মকর্তা স্বাক্ষর</div>
                                 </div>
-                                <div class="seal">SEAL<br/>BGC</div>
+                                <img src="/logo.png" class="seal-img" />
                               </div>
                             </div>
                           </div>
