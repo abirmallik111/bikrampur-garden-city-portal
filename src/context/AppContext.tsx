@@ -788,7 +788,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       html_body: `<div style="font-family: sans-serif; padding: 24px; color: #1e293b; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px;">
         <div style="text-align: center; margin-bottom: 20px;">
           <h2 style="color: #047857; margin: 0 0 6px 0;">বিক্রমপুর গার্ডেন সিটি কল্যাণ সমিতি</h2>
-          <p style="color: #64748b; font-size: 13px; margin: 0;">৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া মহাসড়ক, ঢাকা</p>
+          <p style="color: #64748b; font-size: 13px; margin: 0;">৪৪২ ধোলাইরপাড়, ঢাকা-মাওয়া মহাসড়ক, ঢাকা</p>
         </div>
         <h3 style="color: #0f172a; margin-bottom: 8px;">সম্মানিত ${targetApp.name_en} (${targetApp.name_bn}),</h3>
         <p style="font-size: 14px; line-height: 1.6;">আপনার দাখিলকৃত সদস্যপদ আবেদন ও ঠিকানা সন্তোষজনকভাবে যাচাই করা হয়েছে। পরিচালনা পর্ষদ আপনার সদস্যপদ অনুমোদন করেছে।</p>

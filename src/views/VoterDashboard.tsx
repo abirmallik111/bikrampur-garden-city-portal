@@ -425,7 +425,7 @@ export const VoterDashboard: React.FC = () => {
                     />
                     <div>
                       <div className="text-xs font-bold tracking-wider uppercase">Bikrampur Garden City</div>
-                      <div className="text-[10px] text-slate-400">কল্যাণ সমিতি • ঢোলাইপাড়</div>
+                      <div className="text-[10px] text-slate-400">কল্যাণ সমিতি • ধোলাইরপাড়</div>
                     </div>
                   </div>
                   <span className="text-[10px] bg-emerald-400 text-slate-950 font-bold px-2 py-0.5 rounded">
@@ -475,7 +475,7 @@ export const VoterDashboard: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between pt-2 border-t border-white/10 text-[10px] text-slate-400">
-                  <span>৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া মহাসড়ক</span>
+                  <span>৪৪২ ধোলাইরপাড়, ঢাকা-মাওয়া মহাসড়ক</span>
                   <span className="text-emerald-400 font-semibold">Digital Verified ✓</span>
                 </div>
               </div>
@@ -1001,7 +1001,7 @@ export const VoterDashboard: React.FC = () => {
                       />
                       <div>
                         <h4 className="font-extrabold text-sm text-white tracking-wide">Bikrampur Garden City</h4>
-                        <span className="text-[10px] text-blue-200">কল্যাণ সমিতি • ঢোলাইপাড়</span>
+                        <span className="text-[10px] text-blue-200">কল্যাণ সমিতি • ধোলাইরপাড়</span>
                       </div>
                     </div>
                     <span className="text-[9px] bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded uppercase tracking-wider shadow-2xs">
@@ -1042,7 +1042,7 @@ export const VoterDashboard: React.FC = () => {
                   </div>
 
                   <div className="pt-3 border-t border-white/15 flex justify-between items-center text-[10px] text-slate-300 relative z-10">
-                    <span>৪৪২ ঢোলাইপাড়, ঢাকা</span>
+                    <span>৪৪২ ধোলাইরপাড়, ঢাকা</span>
                     <span className="font-mono text-emerald-300 font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-700/50">
                       ✓ ACTIVE MEMBER
                     </span>

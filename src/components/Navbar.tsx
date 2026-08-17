@@ -63,7 +63,7 @@ export const Navbar: React.FC = () => {
               বিক্রমপুর গার্ডেন সিটি (আবাসিক সোসাইটি)
             </span>
             <span className="text-slate-500">•</span>
-            <span className="text-slate-400">৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া হাইওয়ে</span>
+            <span className="text-slate-400">৪৪২ ধোলাইরপাড়, ঢাকা-মাওয়া হাইওয়ে</span>
           </div>
           <span className="text-slate-700">|</span>
           <div className="flex items-center space-x-1.5 text-emerald-400">
@@ -112,7 +112,7 @@ export const Navbar: React.FC = () => {
                 </span>
               </div>
               <span className="text-[11px] font-medium text-[#064e3b] tracking-wide hidden sm:block">
-                বিক্রমপুর গার্ডেন সিটি সোসাইটি • ৪৪২ ঢোলাইপাড়
+                বিক্রমপুর গার্ডেন সিটি সোসাইটি • ৪৪২ ধোলাইরপাড়
               </span>
             </div>
           </div>

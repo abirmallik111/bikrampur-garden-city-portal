@@ -232,7 +232,7 @@ export const AdminPanel: React.FC = () => {
         <body>
           <div class="header">
             <h1>বিক্রমপুর গার্ডেন সিটি সোসাইটি (Bikrampur Garden City)</h1>
-            <p>৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া মহাসড়ক, শ্যামপুর, ঢাকা • অনুমোদিত চূড়ান্ত সদস্য তালিকা ২০২৬</p>
+            <p>৪৪২ ধোলাইরপাড়, ঢাকা-মাওয়া মহাসড়ক, শ্যামপুর, ঢাকা • অনুমোদিত চূড়ান্ত সদস্য তালিকা ২০২৬</p>
             <p style="font-size: 11px; color: #64748b; margin-top: 5px;">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} • মোট সদস্য: ${voters.length} জন</p>
           </div>
           <table>
@@ -301,7 +301,7 @@ export const AdminPanel: React.FC = () => {
         <body>
           <div class="header">
             <h1>বিক্রমপুর গার্ডেন সিটি সোসাইটি (Bikrampur Garden City)</h1>
-            <p>৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া মহাসড়ক • সদস্যপদ নিবন্ধন আবেদনপত্র মাস্টার তালিকা</p>
+            <p>৪৪২ ধোলাইরপাড়, ঢাকা-মাওয়া মহাসড়ক • সদস্যপদ নিবন্ধন আবেদনপত্র মাস্টার তালিকা</p>
             <p style="font-size: 11px; color: #64748b; margin-top: 5px;">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} • মোট আবেদন: ${filteredApps.length} টি</p>
           </div>
           <table>
@@ -2018,7 +2018,7 @@ export const AdminPanel: React.FC = () => {
                             designation_bn: enrollDesignation.designation_bn || 'নির্বাহী সদস্য',
                             phone: selectedCandidateForEnroll.phone,
                             email: '',
-                            plot_number: 'ঢোলাইপাড়',
+                            plot_number: 'ধোলাইরপাড়',
                             tenure: enrollDesignation.tenure,
                             since: '২০২৬',
                             photo_url: selectedCandidateForEnroll.photo_url,
