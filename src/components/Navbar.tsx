@@ -227,78 +227,165 @@ export const Navbar: React.FC = () => {
 
           {/* Mobile Menu Button */}
           <div className="flex lg:hidden items-center space-x-2">
-            {currentUser && (
+            {currentUser ? (
               <button
                 onClick={() => navigateTo(currentUser.role === 'admin' || currentUser.role === 'super_admin' ? 'admin' : 'dashboard')}
-                className="text-xs bg-slate-900 text-white font-semibold px-2.5 py-1.5 rounded-lg"
+                className="text-[11px] bg-[#064e3b] text-white font-bold px-3 py-1.5 rounded-lg shadow-xs flex items-center gap-1.5 cursor-pointer"
               >
-                {currentUser.role === 'admin' ? 'Admin' : 'Dashboard'}
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>{currentUser.role === 'admin' || currentUser.role === 'super_admin' ? 'এডমিন' : 'ড্যাশবোর্ড'}</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => navigateTo('login')}
+                className="text-[11px] bg-[#064e3b] text-white font-bold px-3 py-1.5 rounded-lg shadow-xs cursor-pointer"
+              >
+                লগইন
               </button>
             )}
             <button
               id="mobile-menu-btn"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100"
+              className="p-2 text-slate-700 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+              aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Dropdown */}
+      {/* Enhanced Mobile Dropdown Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top-2 duration-200">
+        <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-4 animate-in slide-in-from-top-2 duration-200 shadow-lg">
+          {/* Quick Hotline on Mobile */}
+          <div className="flex items-center justify-between p-2.5 bg-slate-900 text-slate-200 rounded-xl text-xs">
+            <div className="flex items-center gap-2">
+              <PhoneCall className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="font-mono font-semibold">হটলাইন: 01711-000001</span>
+            </div>
+            <span className="text-[10px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded font-bold">২৪/৭ সেবা</span>
+          </div>
+
           <div className="grid grid-cols-2 gap-2 text-xs">
             <button
               onClick={() => navigateTo('landing')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 text-slate-800 font-medium text-left"
+              className={`flex items-center gap-2 p-3 rounded-xl font-semibold text-left transition-colors cursor-pointer ${
+                currentView === 'landing' ? 'bg-[#064e3b] text-white font-bold' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'
+              }`}
             >
-              <span>হোম</span>
+              <Building2 className="w-4 h-4" />
+              <span>হোম (Home)</span>
             </button>
+
             <button
               onClick={() => navigateTo('elections')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-50 text-emerald-900 font-bold text-left col-span-2"
+              className={`flex items-center gap-2 p-3 rounded-xl font-semibold text-left transition-colors cursor-pointer ${
+                currentView === 'elections' || currentView === 'election-vote' ? 'bg-emerald-600 text-white font-bold' : 'bg-emerald-50 text-emerald-900 hover:bg-emerald-100'
+              }`}
             >
               <Vote className="w-4 h-4 text-emerald-600" />
-              <span>নির্বাচন ২০২৬ (ভোট কেন্দ্র)</span>
+              <span className="flex-1">নির্বাচন ২০২৬</span>
+              {activeElection && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>}
             </button>
+
             <button
               onClick={() => navigateTo('rentals')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 text-slate-800 font-medium text-left"
+              className={`flex items-center gap-2 p-3 rounded-xl font-semibold text-left transition-colors cursor-pointer ${
+                currentView === 'rentals' ? 'bg-[#064e3b] text-white font-bold' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'
+              }`}
             >
-              <span>ফ্ল্যাট ভাড়া</span>
+              <Building className="w-4 h-4" />
+              <span>ফ্ল্যাট ভাড়া (Rentals)</span>
             </button>
+
+            <button
+              onClick={() => navigateTo('notices')}
+              className={`flex items-center gap-2 p-3 rounded-xl font-semibold text-left transition-colors cursor-pointer ${
+                currentView === 'notices' ? 'bg-[#064e3b] text-white font-bold' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'
+              }`}
+            >
+              <FileCheck2 className="w-4 h-4" />
+              <span>নোটিশ বোর্ড (Notices)</span>
+            </button>
+
             <button
               onClick={() => navigateTo('directory')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 text-slate-800 font-medium text-left col-span-2"
+              className={`flex items-center gap-2 p-3 rounded-xl font-semibold text-left col-span-2 transition-colors cursor-pointer ${
+                currentView === 'directory' ? 'bg-[#064e3b] text-white font-bold' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'
+              }`}
             >
               <Users className="w-4 h-4 text-slate-600" />
-              <span>কার্যনির্বাহী পরিষদ ও ডিরেক্টরি</span>
+              <span>কমিটি ডিরেক্টরি ও ২০টি গঠনতান্ত্রিক ধারা</span>
+            </button>
+
+            <button
+              onClick={() => navigateTo('status')}
+              className={`flex items-center gap-2 p-2.5 rounded-xl text-[11px] font-semibold text-left transition-colors cursor-pointer ${
+                currentView === 'status' ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <Search className="w-3.5 h-3.5 text-slate-500" />
+              <span>আবেদন ট্র্যাকিং</span>
+            </button>
+
+            <button
+              onClick={() => navigateTo('register')}
+              className={`flex items-center gap-2 p-2.5 rounded-xl text-[11px] font-semibold text-left transition-colors cursor-pointer ${
+                currentView === 'register' ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              <span>সদস্যপদ আবেদন</span>
             </button>
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
             {currentUser ? (
-              <button
-                onClick={() => {
-                  if (currentUser.role === 'admin' || currentUser.role === 'super_admin') {
-                    navigateTo('admin');
-                  } else {
-                    navigateTo('dashboard');
-                  }
-                }}
-                className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold"
-              >
-                আমার ড্যাশবোর্ড
-              </button>
+              <div className="space-y-2">
+                <button
+                  onClick={() => {
+                    if (currentUser.role === 'admin' || currentUser.role === 'super_admin') {
+                      navigateTo('admin');
+                    } else {
+                      navigateTo('dashboard');
+                    }
+                  }}
+                  className="w-full py-3 bg-[#064e3b] hover:bg-[#003527] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-emerald-300" />
+                  <span>
+                    {currentUser.role === 'admin' || currentUser.role === 'super_admin' ? 'এডমিন ড্যাশবোর্ড' : 'আমার সদস্য ড্যাশবোর্ড'}
+                  </span>
+                </button>
+                <button
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>লগআউট করুন ({currentUser.name.split(' ')[0]})</span>
+                </button>
+              </div>
             ) : (
-              <button
-                onClick={() => navigateTo('login')}
-                className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold"
-              >
-                লগইন করুন (Phone + OTP)
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => navigateTo('login')}
+                  className="py-3 bg-[#064e3b] hover:bg-[#003527] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>সদস্য লগইন</span>
+                </button>
+                <button
+                  onClick={() => navigateTo('register')}
+                  className="py-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>নতুন সদস্য নিবন্ধন</span>
+                </button>
+              </div>
             )}
           </div>
         </div>

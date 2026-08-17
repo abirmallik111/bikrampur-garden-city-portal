@@ -77,11 +77,11 @@ export const LandingPage: React.FC = () => {
           </p>
 
           {/* Action Buttons Centered */}
-          <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2 relative z-10">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 pt-2 relative z-10 w-full max-w-md mx-auto sm:max-w-none">
             <button
               id="hero-register-cta"
               onClick={() => setCurrentView('register')}
-              className="flex items-center gap-2 bg-[#34d399] hover:bg-[#2ecc71] text-slate-950 font-bold px-6 py-3.5 rounded-full shadow-md transition-all text-xs sm:text-sm cursor-pointer"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#34d399] hover:bg-[#2ecc71] text-slate-950 font-bold px-6 py-3.5 rounded-full shadow-md transition-all text-xs sm:text-sm cursor-pointer"
             >
               <UserCheck className="w-4 h-4 text-slate-950" />
               <span>সদস্যপদ আবেদন করুন</span>
@@ -91,7 +91,7 @@ export const LandingPage: React.FC = () => {
             <button
               id="hero-election-cta"
               onClick={() => setCurrentView('elections')}
-              className="flex items-center gap-2 bg-[#1e293b]/90 hover:bg-[#334155] text-white font-semibold px-6 py-3.5 rounded-full border border-slate-700 transition-all text-xs sm:text-sm shadow-sm cursor-pointer"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#1e293b]/90 hover:bg-[#334155] text-white font-semibold px-6 py-3.5 rounded-full border border-slate-700 transition-all text-xs sm:text-sm shadow-sm cursor-pointer"
             >
               <Vote className="w-4 h-4 text-[#34d399]" />
               <span>নির্বাচন ২০২৬ ব্যালট কেন্দ্র</span>
@@ -99,7 +99,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Trust Badges Row Centered */}
-          <div className="pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs text-slate-400 relative z-10">
+          <div className="pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-4 sm:gap-10 text-[11px] sm:text-xs text-slate-400 relative z-10">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#34d399] shrink-0" />
               <span>১ সদস্য ১ ভোট নিশ্চিত</span>
@@ -118,41 +118,41 @@ export const LandingPage: React.FC = () => {
 
       {/* Society Metrics Grid - Matching screenshot cards */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200">
-            <div className="text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-slate-200">
+            <div className="text-slate-500 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
               মোট আবাসিক ভবন (HOUSEHOLDS)
             </div>
-            <div className="text-3xl sm:text-4xl font-extrabold text-[#131b2e] mt-2">20+</div>
-            <div className="mt-1 text-xs text-slate-400 font-medium">২০+ ভবন ও অ্যাপার্টমেন্ট</div>
+            <div className="text-2xl sm:text-4xl font-extrabold text-[#131b2e] mt-1.5 sm:mt-2">20+</div>
+            <div className="mt-1 text-[11px] sm:text-xs text-slate-400 font-medium">২০+ ভবন ও অ্যাপার্টমেন্ট</div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200">
-            <div className="text-slate-500 text-[11px] font-bold uppercase tracking-wider">
-              অনুমোদিত সদস্য (VERIFIED MEMBERS)
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-slate-200">
+            <div className="text-slate-500 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+              অনুমোদিত সদস্য (MEMBERS)
             </div>
-            <div className="text-3xl sm:text-4xl font-extrabold text-[#131b2e] mt-2">{voters.length}</div>
-            <div className="mt-1 text-xs text-slate-400 font-medium">নিবন্ধিত সদস্য সংখ্যা</div>
+            <div className="text-2xl sm:text-4xl font-extrabold text-[#131b2e] mt-1.5 sm:mt-2">{voters.length}</div>
+            <div className="mt-1 text-[11px] sm:text-xs text-slate-400 font-medium">নিবন্ধিত সদস্য সংখ্যা</div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200">
-            <div className="text-slate-500 text-[11px] font-bold uppercase tracking-wider">
-              নির্বাচন ভোটগ্রহণ (ELECTION STATUS)
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-slate-200">
+            <div className="text-slate-500 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+              নির্বাচন স্ট্যাটাস (STATUS)
             </div>
-            <div className="text-3xl sm:text-4xl font-extrabold text-[#131b2e] mt-2">
+            <div className="text-2xl sm:text-4xl font-extrabold text-[#131b2e] mt-1.5 sm:mt-2">
               {elections.some(e => e.status === 'voting') ? 'VOTING' : 'UPCOMING'}
             </div>
-            <div className="mt-1 text-xs text-slate-400 font-medium">
+            <div className="mt-1 text-[11px] sm:text-xs text-slate-400 font-medium">
               {elections.some(e => e.status === 'voting') ? 'ভোটগ্রহণ চলমান' : 'তফসিল অপেক্ষমাণ'}
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200">
-            <div className="text-slate-500 text-[11px] font-bold uppercase tracking-wider">
-              কার্যনির্বাহী কমিটি (EC COUNCIL)
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-slate-200">
+            <div className="text-slate-500 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+              কার্যনির্বাহী কমিটি (COUNCIL)
             </div>
-            <div className="text-3xl sm:text-4xl font-extrabold text-[#131b2e] mt-2">{committee.length}</div>
-            <div className="mt-1 text-xs text-slate-400 font-medium">পরিচালনা পরিষদ সদস্য</div>
+            <div className="text-2xl sm:text-4xl font-extrabold text-[#131b2e] mt-1.5 sm:mt-2">{committee.length}</div>
+            <div className="mt-1 text-[11px] sm:text-xs text-slate-400 font-medium">পরিচালনা পরিষদ সদস্য</div>
           </div>
         </div>
       </section>

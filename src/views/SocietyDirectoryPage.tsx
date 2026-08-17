@@ -81,42 +81,42 @@ export const SocietyDirectoryPage: React.FC = () => {
         />
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-slate-200 text-xs sm:text-sm font-semibold">
+      {/* Tabs with smooth horizontal touch scrolling */}
+      <div className="flex overflow-x-auto no-scrollbar touch-scroll pb-1 gap-2 border-b border-slate-200 text-xs sm:text-sm font-semibold">
         <button
           onClick={() => setActiveSubTab('committee')}
-          className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+          className={`pb-3 px-4 flex items-center gap-2 border-b-2 whitespace-nowrap transition-all cursor-pointer ${
             activeSubTab === 'committee'
               ? 'border-[#1e3a5f] text-[#1e3a5f] font-bold'
               : 'border-transparent text-slate-500 hover:text-slate-900'
           }`}
         >
           <Users className="w-4 h-4" />
-          <span>পরিচালনা পরিষদ ও কমিটি সদস্য</span>
+          <span>পরিচালনা পরিষদ ({committeeMembers.length})</span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('emergency')}
-          className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+          className={`pb-3 px-4 flex items-center gap-2 border-b-2 whitespace-nowrap transition-all cursor-pointer ${
             activeSubTab === 'emergency'
               ? 'border-rose-600 text-rose-700 font-bold'
               : 'border-transparent text-slate-500 hover:text-slate-900'
           }`}
         >
           <Phone className="w-4 h-4 text-rose-600" />
-          <span>জরুরি হটলাইন ও ইউটিলিটি</span>
+          <span>জরুরি হটলাইন ({emergencyContacts.length})</span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('rules')}
-          className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+          className={`pb-3 px-4 flex items-center gap-2 border-b-2 whitespace-nowrap transition-all cursor-pointer ${
             activeSubTab === 'rules'
-              ? 'border-blue-600 text-blue-800 font-bold'
+              ? 'border-[#064e3b] text-[#064e3b] font-bold'
               : 'border-transparent text-slate-500 hover:text-slate-900'
           }`}
         >
-          <FileText className="w-4 h-4 text-blue-600" />
-          <span>সোসাইটি গঠনতন্ত্র ও নিয়মাবলী</span>
+          <Scale className="w-4 h-4 text-[#064e3b]" />
+          <span>গঠনতন্ত্র ও নীতিমালা (২০টি ধারা)</span>
         </button>
       </div>
 
@@ -657,8 +657,8 @@ export const SocietyDirectoryPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Chapter Pills */}
-            <div className="flex flex-wrap gap-1.5 text-xs font-semibold pt-1">
+            {/* Chapter Pills with horizontal scrolling */}
+            <div className="flex overflow-x-auto no-scrollbar touch-scroll gap-1.5 text-xs font-semibold pt-1 pb-1">
               {[
                 { id: 'all', label: 'সকল ২০টি ধারা (All)' },
                 { id: 'admin', label: '🏛️ সংগঠন ও প্রশাসন (ধারা ১-৫)' },
@@ -670,7 +670,7 @@ export const SocietyDirectoryPage: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setBylawsChapter(tab.id as any)}
-                  className={`px-3 py-1.5 rounded-lg text-[11px] transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-[11px] whitespace-nowrap transition-all cursor-pointer ${
                     bylawsChapter === tab.id
                       ? 'bg-[#064e3b] text-white font-bold shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'

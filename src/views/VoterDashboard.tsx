@@ -325,8 +325,8 @@ export const VoterDashboard: React.FC = () => {
 
       {/* Main Dashboard Tabs Container */}
       <div className="space-y-6">
-        {/* Navigation Tabs */}
-        <div className="flex overflow-x-auto pb-2 gap-2 border-b border-slate-200 text-xs font-semibold">
+        {/* Navigation Tabs with smooth horizontal touch scroll */}
+        <div className="flex overflow-x-auto no-scrollbar touch-scroll pb-2 gap-2 border-b border-slate-200 text-xs font-semibold">
           {[
             { id: 'overview', label: '📊 সারসংক্ষেপ ও সদস্য কার্ড (Overview)', icon: Layers },
             { id: 'notices', label: '🔔 নোটিশ বোর্ড (Notices)', icon: FileText },

@@ -141,12 +141,12 @@ export const ElectionsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Tabs Switcher: Candidates vs Live Results */}
-      <div className="flex items-center justify-between border-b border-slate-200">
-        <div className="flex gap-2 text-xs sm:text-sm font-semibold">
+      {/* Tabs Switcher: Candidates vs Live Results with horizontal scroll */}
+      <div className="flex overflow-x-auto no-scrollbar touch-scroll border-b border-slate-200">
+        <div className="flex gap-2 text-xs sm:text-sm font-semibold pb-1">
           <button
             onClick={() => setActiveTab('candidates')}
-            className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+            className={`pb-3 px-4 flex items-center gap-2 border-b-2 whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'candidates'
                 ? 'border-[#1e3a5f] text-[#1e3a5f] font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-900'
@@ -158,14 +158,14 @@ export const ElectionsPage: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('results')}
-            className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+            className={`pb-3 px-4 flex items-center gap-2 border-b-2 whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'results'
                 ? 'border-emerald-600 text-emerald-800 font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-900'
             }`}
           >
             <BarChart3 className="w-4 h-4 text-emerald-600" />
-            <span>ফলাফল ও লাইভ ভোট পরিসংখ্যান (Results)</span>
+            <span>ফলাফল ও লাইভ ভোট পরিসংখ্যান</span>
           </button>
         </div>
       </div>

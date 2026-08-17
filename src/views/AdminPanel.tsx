@@ -473,8 +473,8 @@ export const AdminPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Admin Tabs */}
-      <div className="flex overflow-x-auto pb-2 gap-2 border-b border-slate-200 text-xs font-semibold">
+      {/* Admin Tabs with smooth touch scrolling */}
+      <div className="flex overflow-x-auto no-scrollbar touch-scroll pb-2 gap-2 border-b border-slate-200 text-xs font-semibold">
         {[
           { id: 'applications', label: `📋 সদস্যপদ আবেদনপত্র (${pendingAppsCount} নতুন)`, icon: FileCheck2 },
           { id: 'voters', label: `👥 অনুমোদিত সদস্য তালিকা (${voters.length})`, icon: Users },
