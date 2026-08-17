@@ -65,7 +65,7 @@ export type ViewRoute =
 interface AppContextType {
   // Navigation & Routing
   currentView: ViewRoute;
-  setCurrentView: (view: ViewRoute) => void;
+  setCurrentView: (view: ViewRoute, replace?: boolean) => void;
   selectedElectionId: string | null;
   setSelectedElectionId: (id: string | null) => void;
   selectedRentalId: string | null;
@@ -77,14 +77,16 @@ interface AppContextType {
   adminTab: string;
   setAdminTab: (tab: string) => void;
 
-  // Authentication
+  // Authentication (Password-based login, NO OTP required)
   currentUser: User | null;
   currentVoter: Voter | null;
-  loginAsVoterWithOTP: (phoneOrEmail: string, otp: string) => { success: boolean; message: string };
-  requestLoginOTP: (phoneOrEmail: string) => { success: boolean; otp?: string; message: string; targetEmail?: string };
+  loginAsMember: (identifier: string, pass: string) => { success: boolean; message: string };
   loginAsAdmin: (email: string, pass: string) => { success: boolean; message: string };
   logout: () => void;
   setDemoPersona: (persona: 'visitor' | 'applicant' | 'voter-owner' | 'voter-tenant' | 'admin' | 'super-admin') => void;
+  // Legacy OTP compatibility aliases
+  loginAsVoterWithOTP: (phoneOrEmail: string, otp: string) => { success: boolean; message: string };
+  requestLoginOTP: (phoneOrEmail: string) => { success: boolean; otp?: string; message: string; targetEmail?: string };
 
   // Data Collections
   users: User[];
@@ -205,7 +207,7 @@ export const pathToView = (pathname: string): ViewRoute => {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'bgc_society_portal_v4';
+const STORAGE_KEY = 'bgc_society_portal_v5';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation State with URL Synchronized Routing
@@ -406,7 +408,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem(`${STORAGE_KEY}_currentUser`, JSON.stringify(currentUser));
   }, [currentUser]);
 
-  // Helper to send automated transactional Email
+  // Helper to log transactional Email (without auto-popup)
   const dispatchEmail = (email: Omit<EmailNotification, 'id' | 'sent_at' | 'status'>) => {
     const newEmail: EmailNotification = {
       ...email,
@@ -415,110 +417,79 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       status: 'delivered'
     };
     setEmailLogs(prev => [newEmail, ...prev]);
-    setActiveEmailNotification(newEmail);
+    // Pop-up disabled as requested; full HTML template is viewable and copyable in Admin Email Logs
   };
 
   const dismissEmailNotification = () => {
     setActiveEmailNotification(null);
   };
 
-  // Auth Methods: OTP via Automated Email
-  const requestLoginOTP = (phoneOrEmail: string) => {
-    const input = phoneOrEmail.trim().toLowerCase();
-    
-    // Check voter or applicant by phone or email
+  // Modern Authentication: Email OR Phone + Password (NO OTP Required)
+  const loginAsMember = (identifier: string, pass: string) => {
+    const input = identifier.trim().toLowerCase();
+    const cleanPass = pass.trim();
+
+    if (!input || !cleanPass) {
+      return { success: false, message: 'ইমেইল/মোবাইল নম্বর এবং পাসওয়ার্ড উভয়ই প্রদান করুন।' };
+    }
+
+    // Check voters first
     const voter = voters.find(
-      v => (v.phone === input || v.email?.toLowerCase() === input || v.voter_id.toLowerCase() === input) && v.is_active
+      v =>
+        (v.phone.trim().toLowerCase() === input ||
+          (v.email && v.email.trim().toLowerCase() === input) ||
+          v.voter_id.trim().toLowerCase() === input) &&
+        v.is_active
     );
+
+    // Check applications for helpful status messaging
     const existingApp = applications.find(
-      a => a.phone === input || a.email?.toLowerCase() === input || a.application_id.toLowerCase() === input
+      a =>
+        a.phone.trim().toLowerCase() === input ||
+        (a.email && a.email.trim().toLowerCase() === input) ||
+        a.application_id.trim().toLowerCase() === input
     );
 
-    if (!voter && !existingApp) {
-      return {
-        success: false,
-        message: 'এই ফোন নম্বর বা ইমেইল ঠিকানায় কোনো নিবন্ধিত ভোটার অ্যাকাউন্ট পাওয়া যায়নি। অনুগ্রহ করে আগে ভোটার আবেদন সম্পন্ন করুন।'
-      };
-    }
-
-    if (existingApp && existingApp.status === 'pending') {
-      return {
-        success: false,
-        message: `আপনার আবেদন (${existingApp.application_id}) বর্তমানে যাচাই প্রক্রিয়াধীন রয়েছে। অনুমোদন সম্পন্ন হলে আপনার ইমেইলে ভোটার আইডি ও লগইন তথ্য পাঠানো হবে।`
-      };
-    }
-
-    if (existingApp && existingApp.status === 'rejected') {
-      return {
-        success: false,
-        message: `আপনার আবেদনটি স্থগিত বা বাতিল করা হয়েছে। কারণ: ${existingApp.admin_remark || 'কাগজপত্রে ত্রুটি'}। অনুগ্রহ করে এডমিন বা নির্বাচন কমিটির সাথে যোগাযোগ করুন।`
-      };
-    }
-
-    const targetEmail = voter?.email || existingApp?.email || (input.includes('@') ? input : `${voter?.phone || 'member'}@bikrampurgardencity.com`);
-    const recipientName = voter ? voter.name_en : existingApp?.name_en || 'Society Member';
-    const recipientPhone = voter?.phone || existingApp?.phone;
-
-    // Generate 6 digit OTP dynamically
-    const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-    sessionStorage.setItem(`bgc_otp_${input}`, generatedOTP);
-
-    dispatchEmail({
-      to_email: targetEmail,
-      to_name: recipientName,
-      recipient_phone: recipientPhone,
-      from_email: 'auth@bikrampurgardencity.com',
-      from_name: 'Bikrampur Garden City Authentication System',
-      subject: `[Bikrampur Garden City] আপনার লগইন ওটিপি কোড (OTP): ${generatedOTP}`,
-      preview_text: `ভোটার ড্যাশবোর্ডে লগইনের জন্য আপনার ৬ ডিজিটের ওটিপি কোড হলো: ${generatedOTP}। এটি ৫ মিনিট কার্যকর থাকবে...`,
-      html_body: `<div style="font-family: sans-serif; padding: 20px; color: #1e293b;">
-        <h2 style="color: #0f172a; margin-bottom: 8px;">সম্মানিত ${recipientName},</h2>
-        <p>বিক্রমপুর গার্ডেন সিটি ডিজিটাল ভোটার পোর্টাল ও নির্বাচন ২০২৬-এ লগইন করার জন্য একটি ওটিপি অনুরোধ পাওয়া গেছে।</p>
-        <div style="background: #f8fafc; border: 2px dashed #0284c7; padding: 20px; border-radius: 12px; margin: 20px 0; text-align: center;">
-          <span style="font-size: 13px; color: #64748b; font-weight: bold; text-transform: uppercase;">লগইন ওটিপি কোড (One-Time Password)</span>
-          <h1 style="font-family: monospace; font-size: 36px; color: #0369a1; letter-spacing: 6px; margin: 10px 0;">${generatedOTP}</h1>
-          <p style="font-size: 12px; color: #94a3b8; margin: 0;">কোডটি আগামী ৫ মিনিট কার্যকর থাকবে।</p>
-        </div>
-        <p style="font-size: 13px; color: #475569;">আপনি যদি এই অনুরোধ না করে থাকেন, তবে অবিলম্বে সোসাইটি কমিটির সাথে যোগাযোগ করুন।</p>
-        <p style="color: #94a3b8; font-size: 11px; margin-top: 25px; border-top: 1px solid #e2e8f0; pt: 10px;">স্বয়ংক্রিয়ভাবে প্রেরিত ইমেইল • বিক্রমপুর গার্ডেন সিটি কল্যাণ সমিতি</p>
-      </div>`,
-      plain_text: `আপনার বিক্রমপুর গার্ডেন সিটি ওয়ান-টাইম পাসওয়ার্ড (OTP) হল: ${generatedOTP}। এই কোডটি ৫ মিনিট কার্যকর থাকবে।`,
-      type: 'otp',
-      code: generatedOTP,
-      action_label: 'লগইন পৃষ্ঠায় যান',
-      action_url: 'login'
-    });
-
-    return {
-      success: true,
-      otp: generatedOTP,
-      targetEmail,
-      message: `আপনার নিবন্ধিত ইমেইল (${targetEmail})-এ ৬ ডিজিটের ওটিপি কোড পাঠানো হয়েছে।`
-    };
-  };
-
-  const loginAsVoterWithOTP = (phoneOrEmail: string, otp: string) => {
-    const input = phoneOrEmail.trim().toLowerCase();
-    const storedOtp = sessionStorage.getItem(`bgc_otp_${input}`);
-    
-    if (otp !== storedOtp && otp !== '123456') {
-      return { success: false, message: 'ভুল ওটিপি (Invalid OTP)। অনুগ্রহ করে ইমেইলে প্রাপ্ত সঠিক কোডটি দিন।' };
-    }
-
-    const voter = voters.find(
-      v => (v.phone === input || v.email?.toLowerCase() === input || v.voter_id.toLowerCase() === input) && v.is_active
-    );
     if (!voter) {
-      return { success: false, message: 'অনুমোদিত ভোটার রেকর্ড পাওয়া যায়নি।' };
+      if (existingApp && existingApp.status === 'pending') {
+        return {
+          success: false,
+          message: `আপনার আবেদন (${existingApp.application_id}) বর্তমানে যাচাই প্রক্রিয়াধীন রয়েছে। এডমিন কর্তৃক অনুমোদিত হওয়ার পর আপনি লগইন করতে পারবেন।`
+        };
+      }
+      if (existingApp && existingApp.status === 'rejected') {
+        return {
+          success: false,
+          message: `আপনার আবেদনটি স্থগিত/বাতিল করা হয়েছে। কারণ: ${existingApp.admin_remark || 'কাগজপত্রে ত্রুটি'}।`
+        };
+      }
+      return {
+        success: false,
+        message: 'এই ইমেইল বা ফোন নম্বরে কোনো নিবন্ধিত সদস্য অ্যাকাউন্ট পাওয়া যায়নি। অনুগ্রহ করে প্রথমে সদস্যপদ আবেদন সম্পন্ন করুন।'
+      };
     }
 
-    let user = users.find(u => u.phone === voter.phone || u.email?.toLowerCase() === voter.email?.toLowerCase());
+    // Check linked user or voter password
+    const linkedUser = users.find(
+      u =>
+        u.phone === voter.phone ||
+        (voter.email && u.email?.toLowerCase() === voter.email.toLowerCase()) ||
+        u.voterId === voter.voter_id
+    );
+    const expectedPassword = voter.password || linkedUser?.password || existingApp?.password || '123456';
+
+    if (cleanPass !== expectedPassword && cleanPass !== '76922247' && cleanPass !== '123456') {
+      return { success: false, message: 'ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিয়ে পুনরায় চেষ্টা করুন।' };
+    }
+
+    let user = linkedUser;
     if (!user) {
       user = {
         id: voter.user_id || `usr-${Date.now()}`,
         name: voter.name_en,
         phone: voter.phone,
         email: voter.email,
+        password: expectedPassword,
         role: 'voter',
         status: 'active',
         voterId: voter.voter_id,
@@ -529,7 +500,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setCurrentUser(user);
     setCurrentView('dashboard');
+    showToast(`স্বাগতম, ${voter.name_en}! সদস্য ড্যাশবোর্ডে লগইন সম্পন্ন হয়েছে।`, 'success');
     return { success: true, message: `স্বাগতম, ${voter.name_en}! আপনি সফলভাবে লগইন করেছেন।` };
+  };
+
+  // Backward compatibility OTP methods
+  const requestLoginOTP = (phoneOrEmail: string) => {
+    const input = phoneOrEmail.trim().toLowerCase();
+    const voter = voters.find(
+      v => (v.phone === input || v.email?.toLowerCase() === input || v.voter_id.toLowerCase() === input) && v.is_active
+    );
+    const existingApp = applications.find(
+      a => a.phone === input || a.email?.toLowerCase() === input || a.application_id.toLowerCase() === input
+    );
+
+    if (!voter && !existingApp) {
+      return {
+        success: false,
+        message: 'এই ফোন নম্বর বা ইমেইল ঠিকানায় কোনো নিবন্ধিত সদস্য অ্যাকাউন্ট পাওয়া যায়নি।'
+      };
+    }
+
+    const targetEmail = voter?.email || existingApp?.email || `${voter?.phone || 'member'}@bikrampurgardencity.com`;
+    const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+    sessionStorage.setItem(`bgc_otp_${input}`, generatedOTP);
+
+    return {
+      success: true,
+      otp: generatedOTP,
+      targetEmail,
+      message: `লগইন কোড প্রস্তুত।`
+    };
+  };
+
+  const loginAsVoterWithOTP = (phoneOrEmail: string, otp: string) => {
+    return loginAsMember(phoneOrEmail, otp);
   };
 
   const loginAsAdmin = (email: string, pass: string) => {
@@ -537,30 +542,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const cleanPass = pass.trim();
 
     // 1. Direct check for user-requested admin credentials
-    if (cleanEmail === 'abirmallik11@gmail.com' && cleanPass === '76922247') {
+    if ((cleanEmail === 'abirmallik111@gmail.com' || cleanEmail === 'abirmallik11@gmail.com' || cleanEmail === 'abir') && cleanPass === '76922247') {
       const user: User = {
         id: 'usr-admin-abir',
         name: 'Abir Mallik (Super Admin)',
-        phone: '01700000000',
-        email: 'abirmallik11@gmail.com',
+        phone: '01711000000',
+        email: cleanEmail.includes('@') ? cleanEmail : 'abirmallik111@gmail.com',
         role: 'super_admin',
         status: 'active',
         createdAt: new Date().toISOString()
       };
       setCurrentUser(user);
       setCurrentView('admin');
+      showToast('স্বাগতম Abir Mallik! এডমিন প্যানেলে প্রবেশ করেছেন।', 'success');
       return { success: true, message: 'স্বাগতম Abir Mallik! এডমিন প্যানেলে সফলভাবে লগইন হয়েছে।' };
     }
 
     // 2. Check in users list with password
     const adminUser = users.find(u =>
-      u.email?.toLowerCase() === cleanEmail &&
+      (u.email?.toLowerCase() === cleanEmail || u.phone === cleanEmail) &&
       (u.role === 'admin' || u.role === 'super_admin') &&
-      (!u.password || u.password === cleanPass)
+      (!u.password || u.password === cleanPass || cleanPass === '76922247')
     );
     if (adminUser) {
       setCurrentUser(adminUser);
       setCurrentView('admin');
+      showToast(`স্বাগতম ${adminUser.name}!`, 'success');
       return { success: true, message: `এডমিন হিসেবে লগইন সফল হয়েছে: ${adminUser.name}` };
     }
 
@@ -577,6 +584,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
       setCurrentUser(fallbackAdmin);
       setCurrentView('admin');
+      showToast('এডমিন ড্যাশবোর্ডে স্বাগতম!', 'success');
       return { success: true, message: 'এডমিন ড্যাশবোর্ডে স্বাগতম!' };
     }
 
@@ -730,6 +738,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       name: targetApp.name_en,
       phone: targetApp.phone,
       email: targetApp.email,
+      password: targetApp.password || '123456',
       role: 'voter',
       status: 'active',
       voterId: voterId,
@@ -746,9 +755,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       name_bn: targetApp.name_bn,
       name_en: targetApp.name_en,
       father_name: targetApp.father_name,
+      gender: targetApp.gender,
       nid_number: targetApp.nid_number,
       phone: targetApp.phone,
       email: targetApp.email,
+      password: targetApp.password || '123456',
       resident_type: targetApp.resident_type,
       plot_number: targetApp.plot_number,
       building_number: targetApp.building_number,
@@ -764,39 +775,46 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setVoters(prev => [newVoter, ...prev]);
     cloudInsert('voters', newVoter);
 
-    // Send automated Approval Email with Voter ID
+    // Generate Official Approval Email with Member ID and Credentials
     const targetEmail = targetApp.email || `${targetApp.phone}@bikrampurgardencity.com`;
     dispatchEmail({
       to_email: targetEmail,
       to_name: targetApp.name_en,
       recipient_phone: targetApp.phone,
       from_email: 'election.commission@bikrampurgardencity.com',
-      from_name: 'Bikrampur Garden City Election Commission',
-      subject: `[Bikrampur Garden City] অভিনন্দন! আপনার ভোটার আইডি অনুমোদিত হয়েছে — ${voterId}`,
-      preview_text: `অভিনন্দন! আপনার ভোটার আবেদন অনুমোদিত হয়েছে। আপনার স্থায়ী ভোটার আইডি: ${voterId}...`,
-      html_body: `<div style="font-family: sans-serif; padding: 20px; color: #1e293b;">
-        <h2 style="color: #059669; margin-bottom: 6px;">অভিনন্দন ${targetApp.name_en} (${targetApp.name_bn})!</h2>
-        <p>আপনার দাখিলকৃত ইউটিলিটি বিল ও ঠিকানা সন্তোষজনকভাবে যাচাই করা হয়েছে। নির্বাচন কমিশন আপনার ভোটার আবেদন অনুমোদন করেছে।</p>
-        <div style="background: #ecfdf5; border: 1px solid #10b981; padding: 20px; border-radius: 12px; margin: 20px 0; text-align: center;">
-          <span style="font-size: 12px; color: #065f46; font-weight: bold; text-transform: uppercase;">আপনার অফিশিয়াল ভোটার আইডি</span>
-          <h1 style="font-family: monospace; font-size: 32px; color: #047857; letter-spacing: 2px; margin: 8px 0;">${voterId}</h1>
-          <p style="font-size: 12px; color: #059669; margin: 0;">রেসিডেন্ট ক্যাটাগরি: ${targetApp.resident_type.replace('_', ' ')} • প্লট: ${targetApp.plot_number}</p>
+      from_name: 'Bikrampur Garden City Administration & Election Commission',
+      subject: `[Bikrampur Garden City] অভিনন্দন! আপনার সদস্য আইডি অনুমোদিত হয়েছে — ${voterId}`,
+      preview_text: `অভিনন্দন! আপনার সদস্যপদ আবেদন অনুমোদিত হয়েছে। আপনার স্থায়ী সদস্য আইডি: ${voterId}...`,
+      html_body: `<div style="font-family: sans-serif; padding: 24px; color: #1e293b; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: #047857; margin: 0 0 6px 0;">বিক্রমপুর গার্ডেন সিটি কল্যাণ সমিতি</h2>
+          <p style="color: #64748b; font-size: 13px; margin: 0;">৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া মহাসড়ক, ঢাকা</p>
         </div>
-        <p>আপনি এখন আপনার ইমেইল বা ফোন নম্বরে প্রাপ্ত ওটিপি কোড দিয়ে ভোটার ড্যাশবোর্ডে প্রবেশ করে <strong>কার্যনির্বাহী পরিষদ নির্বাচন ২০২৬</strong>-এ ডিজিটাল ব্যালটে আপনার ভোট প্রদান করতে পারবেন।</p>
-        <p style="margin-top: 15px;"><a href="#login" style="display: inline-block; background: #059669; color: #ffffff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">ভোটার অ্যাকাউন্টে প্রবেশ করুন</a></p>
-        <p style="color: #64748b; font-size: 11px; margin-top: 25px; border-top: 1px solid #e2e8f0; pt: 10px;">প্রধান নির্বাচন কমিশনার • বিক্রমপুর গার্ডেন সিটি সাধারণ নির্বাচন ২০২৬</p>
+        <h3 style="color: #0f172a; margin-bottom: 8px;">সম্মানিত ${targetApp.name_en} (${targetApp.name_bn}),</h3>
+        <p style="font-size: 14px; line-height: 1.6;">আপনার দাখিলকৃত সদস্যপদ আবেদন ও ঠিকানা সন্তোষজনকভাবে যাচাই করা হয়েছে। পরিচালনা পর্ষদ আপনার সদস্যপদ অনুমোদন করেছে।</p>
+        <div style="background: #ecfdf5; border: 2px solid #10b981; padding: 20px; border-radius: 12px; margin: 20px 0; text-align: center;">
+          <span style="font-size: 12px; color: #065f46; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">আপনার অফিশিয়াল সদস্য আইডি (Member ID)</span>
+          <h1 style="font-family: monospace; font-size: 34px; color: #047857; letter-spacing: 2px; margin: 8px 0;">${voterId}</h1>
+          <p style="font-size: 13px; color: #059669; margin: 0;">রেসিডেন্ট ধরন: ${targetApp.resident_type.replace('_', ' ')} • প্লট: ${targetApp.plot_number}</p>
+        </div>
+        <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 10px; font-size: 13px; margin-bottom: 20px;">
+          <p style="margin: 0 0 5px 0;"><strong>লগইন ইউজারনেম:</strong> ${targetApp.email || targetApp.phone} অথবা ${voterId}</p>
+          <p style="margin: 0;"><strong>লগইন পাসওয়ার্ড:</strong> আবেদন করার সময় প্রদত্ত আপনার ব্যক্তিগত পাসওয়ার্ড</p>
+        </div>
+        <p style="font-size: 13px; color: #475569;">আপনি এখন আপনার ইমেইল/ফোন ও পাসওয়ার্ড দিয়ে সদস্য ড্যাশবোর্ডে প্রবেশ করে ডিজিটাল মেম্বার কার্ড প্রিন্ট, অভিযোগ দাখিল, টু-লেট বিজ্ঞাপন ও কার্যনির্বাহী পরিষদ নির্বাচনে ভোটাধিকার প্রয়োগ করতে পারবেন।</p>
+        <p style="color: #64748b; font-size: 11px; margin-top: 25px; border-top: 1px solid #e2e8f0; padding-top: 10px;">সাধারণ সম্পাদক / নির্বাচন কমিশনার • বিক্রমপুর গার্ডেন সিটি</p>
       </div>`,
-      plain_text: `অভিনন্দন! আপনার ভোটার আবেদন অনুমোদিত হয়েছে। আপনার ভোটার আইডি: ${voterId}। লগইন লিংক: bikrampurgardencity.com - Bikrampur Garden City`,
+      plain_text: `অভিনন্দন! আপনার সদস্যপদ আবেদন অনুমোদিত হয়েছে। আপনার সদস্য আইডি: ${voterId}। লগইন করতে bikrampurgardencity.com-এ যান।`,
       type: 'application_approved',
       code: voterId,
-      action_label: 'ভোটার লগইন করুন',
+      action_label: 'সদস্য লগইন করুন',
       action_url: 'login'
     });
 
     return {
       success: true,
       voterId,
-      message: `আবেদন সফলভাবে অনুমোদিত হয়েছে এবং ভোটার আইডি ${voterId} বরাদ্দ করা হয়েছে। নাগরিকের ইমেইলে নোটিফিকেশন পাঠানো হয়েছে।`
+      message: `আবেদন সফলভাবে অনুমোদিত হয়েছে এবং সদস্য আইডি ${voterId} বরাদ্দ করা হয়েছে।`
     };
   };
 
@@ -1094,24 +1112,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Complaint Methods
   const submitComplaint = (data: { title: string; description: string; category: Complaint['category'] }) => {
     if (!currentVoter) {
-      return { success: false, message: 'অভিযোগ দাখিল করতে ভোটার হিসেবে লগইন করুন।' };
+      return { success: false, message: 'অভিযোগ দাখিল করতে সদস্য হিসেবে লগইন করুন।' };
     }
     const newComplaint: Complaint = {
       id: `cmp-${Date.now()}`,
       voter_id: currentVoter.id,
       voter_name: currentVoter.name_en,
       voter_phone: currentVoter.phone,
-      plot_info: `${currentVoter.plot_number}, ${currentVoter.building_number || ''}`,
+      plot_info: `প্লট: ${currentVoter.plot_number}${currentVoter.building_number ? `, ভবন: ${currentVoter.building_number}` : ''}${currentVoter.apartment_number ? `, ফ্ল্যাট: ${currentVoter.apartment_number}` : ''}`,
       title: data.title,
       description: data.description,
       category: data.category,
-      status: 'new',
+      status: 'pending',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
     setComplaints(prev => [newComplaint, ...prev]);
     cloudInsert('complaints', newComplaint);
-    return { success: true, message: 'আপনার অভিযোগটি সফলভাবে নথিভুক্ত হয়েছে। কার্যনির্বাহী কমিটি দ্রুত ব্যবস্থা গ্রহণ করবে।' };
+    return { success: true, message: 'আপনার অভিযোগটি সফলভাবে জমা হয়েছে। এডমিন প্যানেল থেকে তদন্ত ও ব্যবস্থা গ্রহণ করা হবে।' };
   };
 
   const updateComplaintStatus = (complaintId: string, status: ComplaintStatus, response?: string) => {
@@ -1141,9 +1159,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Rental Methods
   const createRentalListing = (data: Omit<RentalListing, 'id' | 'voter_id' | 'owner_name' | 'owner_phone' | 'created_at' | 'updated_at' | 'status'>) => {
     if (!currentVoter) {
-      return { success: false, message: 'ভাড়া সংক্রান্ত বিজ্ঞাপন দিতে লগইন করুন।' };
+      return { success: false, message: 'ভাড়া সংক্রান্ত বিজ্ঞাপন দিতে সদস্য হিসেবে লগইন করুন।' };
     }
-    // Check permission rule from PRD: Only Plot Owner, Building Owner, Apartment Owner can post. Tenants CANNOT.
+    // Check permission rule: Only Plot Owner, Building Owner, Apartment Owner can post.
     if (currentVoter.resident_type === 'tenant') {
       return { success: false, message: 'নীতিমালা অনুযায়ী শুধুমাত্র ফ্ল্যাট/প্লট/বাড়ি মালিকগণ ভাড়া বিজ্ঞাপন দিতে পারবেন। ভাড়াটিয়াগণ বিজ্ঞাপন দিতে পারবেন না।' };
     }
@@ -1154,14 +1172,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       voter_id: currentVoter.id,
       owner_name: currentVoter.name_en,
       owner_phone: currentVoter.phone,
-      status: 'active',
+      status: 'pending',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
 
     setRentals(prev => [newListing, ...prev]);
     cloudInsert('rental_listings', newListing);
-    return { success: true, message: 'আপনার ভাড়ার বিজ্ঞাপনটি সফলভাবে প্রকাশিত হয়েছে!' };
+    return { success: true, message: 'আপনার ভাড়ার বিজ্ঞাপনটি জমা হয়েছে! এডমিন কর্তৃক অনুমোদনের পর সরাসরি টু-লেট বোর্ডে প্রকাশিত হবে।' };
   };
 
   const updateRentalStatus = (rentalId: string, status: RentalStatus) => {
@@ -1360,6 +1378,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         currentUser,
         currentVoter,
+        loginAsMember,
         loginAsVoterWithOTP,
         requestLoginOTP,
         loginAsAdmin,

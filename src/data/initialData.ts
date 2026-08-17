@@ -20,6 +20,16 @@ import {
 
 export const INITIAL_USERS: User[] = [
   {
+    id: 'usr-admin-abir-111',
+    name: 'Abir Mallik',
+    phone: '01711000000',
+    email: 'abirmallik111@gmail.com',
+    password: '76922247',
+    role: 'super_admin',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+  },
+  {
     id: 'usr-admin-abir',
     name: 'Abir Mallik',
     phone: '01700000000',

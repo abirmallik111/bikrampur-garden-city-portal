@@ -25,9 +25,12 @@ export const VoterRegisterPage: React.FC = () => {
   const [nameBn, setNameBn] = useState('');
   const [nameEn, setNameEn] = useState('');
   const [fatherName, setFatherName] = useState('');
+  const [gender, setGender] = useState<'male' | 'female' | 'other'>('male');
   const [nidNumber, setNidNumber] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [residentType, setResidentType] = useState<ResidentType>('apartment_owner');
   const [plotNumber, setPlotNumber] = useState('');
   const [buildingNumber, setBuildingNumber] = useState('');
@@ -64,6 +67,12 @@ export const VoterRegisterPage: React.FC = () => {
     if (nidNumber.trim() && !/^\d{10}$|^\d{13}$|^\d{17}$/.test(nidNumber.trim())) {
       errs.nidNumber = 'এনআইডি নম্বর ১০, ১৩ অথবা ১৭ ডিজিটের হতে হবে';
     }
+    if (!password.trim() || password.length < 4) {
+      errs.password = 'লগইনের জন্য কমপক্ষে ৪ অক্ষরের পাসওয়ার্ড দিন';
+    }
+    if (password !== confirmPassword) {
+      errs.confirmPassword = 'পাসওয়ার্ড দুটি মিলছে না';
+    }
     if (!plotNumber.trim()) {
       errs.plotNumber = 'প্লট নম্বর আবশ্যক (যেমন: Plot-12)';
     }
@@ -81,19 +90,21 @@ export const VoterRegisterPage: React.FC = () => {
     setIsSubmitting(true);
     setTimeout(() => {
       const result = submitApplication({
-        name_bn: nameBn,
-        name_en: nameEn,
-        father_name: fatherName,
-        nid_number: nidNumber || undefined,
+        name_bn: nameBn.trim(),
+        name_en: nameEn.trim(),
+        father_name: fatherName.trim(),
+        gender: gender,
+        nid_number: nidNumber.trim() || undefined,
         phone: phone.trim(),
         email: email.trim() || undefined,
+        password: password.trim(),
         resident_type: residentType,
         plot_number: plotNumber.trim(),
         building_number: buildingNumber.trim() || undefined,
         floor: floor.trim() || undefined,
         apartment_number: apartmentNumber.trim() || undefined,
-        bill_photo_url: billPhotoUrl,
-        bill_type: billType,
+        bill_photo_url: billPhotoUrl || undefined,
+        bill_type: billType || undefined,
         note: note.trim() || undefined
       });
 
@@ -298,6 +309,22 @@ export const VoterRegisterPage: React.FC = () => {
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
+                লিঙ্গ (Gender) <span className="text-rose-500">*</span>
+              </label>
+              <select
+                id="gender-select"
+                value={gender}
+                onChange={e => setGender(e.target.value as any)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-200 font-medium"
+              >
+                <option value="male">পুরুষ (Male)</option>
+                <option value="female">মহিলা (Female)</option>
+                <option value="other">অন্যান্য (Other)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 জাতীয় পরিচয়পত্র নম্বর (NID Number)
               </label>
               <input
@@ -315,11 +342,11 @@ export const VoterRegisterPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Section 2: Contact & Resident Status */}
+        {/* Section 2: Contact, Password & Resident Status */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
             <Phone className="w-5 h-5 text-[#1e3a5f]" />
-            <h2 className="text-base font-bold text-slate-900">২. যোগাযোগ ও রেসিডেন্ট ধরন (Contact & Category)</h2>
+            <h2 className="text-base font-bold text-slate-900">২. যোগাযোগ, পাসওয়ার্ড ও রেসিডেন্ট ধরন (Contact & Account)</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -338,7 +365,7 @@ export const VoterRegisterPage: React.FC = () => {
                 }`}
               />
               {errors.phone && <p className="text-[11px] text-rose-600 mt-1">{errors.phone}</p>}
-              <p className="text-[10px] text-slate-500 mt-0.5">জরুরি প্রয়োজনে যোগাযোগের জন্য</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">লগইন ও যোগাযোগের জন্য</p>
             </div>
 
             <div>
@@ -353,7 +380,7 @@ export const VoterRegisterPage: React.FC = () => {
                 placeholder="user@example.com"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-200"
               />
-              <p className="text-[10px] text-slate-500 mt-0.5">এই ইমেইলে অনুমোদন নিশ্চিতকরণ ও সদস্য আইডি (Member ID) যাবে</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">লগইন ও সদস্য আইডি নিশ্চিতকরণের জন্য</p>
             </div>
 
             <div>
@@ -371,6 +398,40 @@ export const VoterRegisterPage: React.FC = () => {
                 <option value="plot_owner">প্লট মালিক (Plot Owner)</option>
                 <option value="tenant">অনুমোদিত ভাড়াটিয়া (Verified Tenant)</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                অ্যাকাউন্ট পাসওয়ার্ড (Set Password) <span className="text-rose-500">*</span>
+              </label>
+              <input
+                id="reg-password-input"
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="লগইনের পাসওয়ার্ড (কমপক্ষে ৪ অক্ষর)"
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-sm font-mono focus:outline-hidden focus:ring-2 ${
+                  errors.password ? 'border-rose-400 focus:ring-rose-200 bg-rose-50/20' : 'border-slate-300 focus:ring-blue-200'
+                }`}
+              />
+              {errors.password && <p className="text-[11px] text-rose-600 mt-1">{errors.password}</p>}
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                পাসওয়ার্ড নিশ্চিত করুন (Confirm Password) <span className="text-rose-500">*</span>
+              </label>
+              <input
+                id="reg-confirm-password-input"
+                type="password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                placeholder="একই পাসওয়ার্ড পুনরায় লিখুন"
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-sm font-mono focus:outline-hidden focus:ring-2 ${
+                  errors.confirmPassword ? 'border-rose-400 focus:ring-rose-200 bg-rose-50/20' : 'border-slate-300 focus:ring-blue-200'
+                }`}
+              />
+              {errors.confirmPassword && <p className="text-[11px] text-rose-600 mt-1">{errors.confirmPassword}</p>}
             </div>
           </div>
         </div>

@@ -381,11 +381,13 @@ export const VoterDashboard: React.FC = () => {
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold capitalize ${
                             cmp.status === 'resolved'
                               ? 'bg-emerald-100 text-emerald-800'
-                              : cmp.status === 'in_progress'
+                              : cmp.status === 'rejected'
+                              ? 'bg-rose-100 text-rose-800'
+                              : cmp.status === 'processing'
                               ? 'bg-blue-100 text-blue-800'
                               : 'bg-amber-100 text-amber-800'
                           }`}>
-                            {cmp.status.replace('_', ' ')}
+                            {cmp.status === 'pending' ? 'বিবেচনাধীন' : cmp.status === 'processing' ? 'প্রক্রিয়াধীন' : cmp.status === 'resolved' ? 'সমাধান হয়েছে' : cmp.status === 'rejected' ? 'প্রত্যাখ্যাত' : cmp.status}
                           </span>
                         </div>
                         <p className="text-slate-600 line-clamp-2">{cmp.description}</p>
@@ -423,7 +425,7 @@ export const VoterDashboard: React.FC = () => {
                     />
                     <div>
                       <div className="text-xs font-bold tracking-wider uppercase">Bikrampur Garden City</div>
-                      <div className="text-[10px] text-slate-400">Residential Society • Dholaipar</div>
+                      <div className="text-[10px] text-slate-400">কল্যাণ সমিতি • ঢোলাইপাড়</div>
                     </div>
                   </div>
                   <span className="text-[10px] bg-emerald-400 text-slate-950 font-bold px-2 py-0.5 rounded">
@@ -431,53 +433,49 @@ export const VoterDashboard: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="w-20 h-24 rounded-xl bg-slate-800 border border-white/20 overflow-hidden relative shrink-0">
-                    <img
-                      src={currentVoter.bill_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
-                      alt={currentVoter.name_en}
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-
-                  <div className="space-y-1 text-xs">
-                    <div className="text-[11px] text-slate-400 uppercase font-semibold">Member Name</div>
-                    <div className="font-bold text-base text-white">{currentVoter.name_en}</div>
+                {/* Member Info — No Profile Picture */}
+                <div className="space-y-3 text-xs">
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">সদস্যের নাম (Member Name)</div>
+                    <div className="font-bold text-lg text-white leading-tight">{currentVoter.name_en}</div>
                     <div className="text-slate-300 text-xs">{currentVoter.name_bn}</div>
-                    <div className="font-mono text-emerald-300 text-sm font-bold pt-1">
-                      {currentVoter.voter_id}
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">পিতার নাম (Father's Name)</div>
+                    <div className="font-semibold text-slate-200">{currentVoter.father_name || 'N/A'}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">ঠিকানা (Address)</div>
+                    <div className="font-semibold text-slate-200">
+                      প্লট: {currentVoter.plot_number}
+                      {currentVoter.building_number ? `, ভবন: ${currentVoter.building_number}` : ''}
+                      {currentVoter.floor ? `, ফ্লোর: ${currentVoter.floor}` : ''}
+                      {currentVoter.apartment_number ? `, ফ্ল্যাট: ${currentVoter.apartment_number}` : ''}
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-[11px] bg-white/5 p-3 rounded-xl border border-white/10">
+                <div className="grid grid-cols-2 gap-3 text-[11px] bg-white/5 p-3 rounded-xl border border-white/10">
                   <div>
-                    <span className="text-slate-400 block">Resident Type:</span>
-                    <span className="font-semibold capitalize text-slate-200">
-                      {currentVoter.resident_type.replace('_', ' ')}
-                    </span>
+                    <span className="text-slate-400 block text-[10px]">জাতীয় পরিচয়পত্র (NID):</span>
+                    <span className="font-mono font-semibold text-slate-200">{currentVoter.nid_number || 'যাচাইকৃত'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block">Plot & Unit:</span>
-                    <span className="font-semibold text-slate-200">
-                      {currentVoter.plot_number}, {currentVoter.apartment_number || 'N/A'}
-                    </span>
+                    <span className="text-slate-400 block text-[10px]">সদস্য আইডি (Member ID):</span>
+                    <span className="font-mono text-emerald-300 font-black text-sm">{currentVoter.voter_id}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block">Mobile:</span>
-                    <span className="font-semibold text-slate-200 font-mono">{currentVoter.phone}</span>
+                    <span className="text-slate-400 block text-[10px]">রেসিডেন্ট ধরন:</span>
+                    <span className="font-semibold capitalize text-slate-200">{currentVoter.resident_type.replace('_', ' ')}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block">Issue Date:</span>
-                    <span className="font-semibold text-slate-200">
-                      {new Date(currentVoter.created_at).toLocaleDateString('en-GB')}
-                    </span>
+                    <span className="text-slate-400 block text-[10px]">ইস্যু তারিখ:</span>
+                    <span className="font-semibold text-slate-200">{new Date(currentVoter.created_at).toLocaleDateString('bn-BD')}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-2 border-t border-white/10 text-[10px] text-slate-400">
-                  <span>442 Dholaipar, Dhaka-Mawa Highway</span>
+                  <span>৪৪২ ঢোলাইপাড়, ঢাকা-মাওয়া মহাসড়ক</span>
                   <span className="text-emerald-400 font-semibold">Digital Verified ✓</span>
                 </div>
               </div>
@@ -657,13 +655,6 @@ export const VoterDashboard: React.FC = () => {
                 <p className="text-xs text-slate-500">নিরাপত্তা, পানি, বিদ্যুৎ বা পরিচ্ছন্নতা সংক্রান্ত সমস্যা জানান</p>
               </div>
 
-              {complaintSuccess && (
-                <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>{complaintSuccess}</span>
-                </div>
-              )}
-
               <form onSubmit={handleComplaintSubmit} className="space-y-4 text-xs">
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">অভিযোগের বিভাগ (Category):</label>
@@ -735,11 +726,13 @@ export const VoterDashboard: React.FC = () => {
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize ${
                           cmp.status === 'resolved'
                             ? 'bg-emerald-100 text-emerald-900'
-                            : cmp.status === 'in_progress'
+                            : cmp.status === 'rejected'
+                            ? 'bg-rose-100 text-rose-900'
+                            : cmp.status === 'processing'
                             ? 'bg-blue-100 text-blue-900'
                             : 'bg-amber-100 text-amber-900'
                         }`}>
-                          {cmp.status.replace('_', ' ')}
+                          {cmp.status === 'pending' ? 'বিবেচনাধীন' : cmp.status === 'processing' ? 'প্রক্রিয়াধীন' : cmp.status === 'resolved' ? 'সমাধান হয়েছে' : cmp.status === 'rejected' ? 'প্রত্যাখ্যাত' : cmp.status}
                         </span>
                       </div>
                       <p className="text-slate-600 leading-relaxed">{cmp.description}</p>
@@ -792,19 +785,6 @@ export const VoterDashboard: React.FC = () => {
                     </h3>
                     <p className="text-xs text-slate-500">আপনার প্লট/ভবন: {currentVoter.plot_number} {currentVoter.building_number || ''}</p>
                   </div>
-
-                  {rentalSuccess && (
-                    <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 text-xs flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>{rentalSuccess}</span>
-                    </div>
-                  )}
-
-                  {rentalError && (
-                    <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-900 text-xs">
-                      {rentalError}
-                    </div>
-                  )}
 
                   <form onSubmit={handleRentalSubmit} className="space-y-4 text-xs">
                     <div className="grid grid-cols-2 gap-3">
@@ -1021,7 +1001,7 @@ export const VoterDashboard: React.FC = () => {
                       />
                       <div>
                         <h4 className="font-extrabold text-sm text-white tracking-wide">Bikrampur Garden City</h4>
-                        <span className="text-[10px] text-blue-200">Residential Society • Dholaipar</span>
+                        <span className="text-[10px] text-blue-200">কল্যাণ সমিতি • ঢোলাইপাড়</span>
                       </div>
                     </div>
                     <span className="text-[9px] bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded uppercase tracking-wider shadow-2xs">
@@ -1029,31 +1009,40 @@ export const VoterDashboard: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="flex gap-4 items-center relative z-10">
-                    <div className="w-20 h-24 rounded-2xl bg-slate-800 border-2 border-white/40 overflow-hidden shrink-0 shadow-md">
-                      <img
-                        src={currentVoter.bill_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
-                        alt="Voter Portrait"
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-
-                    <div className="space-y-1 text-xs">
-                      <div className="font-mono text-emerald-300 font-black text-sm tracking-wider">{currentVoter.voter_id}</div>
-                      <div className="font-bold text-sm text-white">{currentVoter.name_en}</div>
+                  {/* No photo — text-only member info */}
+                  <div className="space-y-2.5 text-xs relative z-10">
+                    <div>
+                      <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">সদস্যের নাম (Member Name)</div>
+                      <div className="font-bold text-base text-white leading-tight">{currentVoter.name_en}</div>
                       <div className="text-slate-200 text-xs font-medium">{currentVoter.name_bn}</div>
-                      <div className="text-[10px] text-slate-300 capitalize pt-0.5">
-                        {currentVoter.resident_type.replace('_', ' ')}
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">পিতার নাম (Father's Name)</div>
+                      <div className="font-semibold text-slate-200">{currentVoter.father_name || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">ঠিকানা (Address)</div>
+                      <div className="font-semibold text-slate-200">
+                        প্লট: {currentVoter.plot_number}
+                        {currentVoter.building_number ? `, ভবন: ${currentVoter.building_number}` : ''}
+                        {currentVoter.floor ? `, ফ্লোর: ${currentVoter.floor}` : ''}
+                        {currentVoter.apartment_number ? `, ফ্ল্যাট: ${currentVoter.apartment_number}` : ''}
                       </div>
-                      <div className="text-[11px] text-amber-300 font-bold">
-                        প্লট: {currentVoter.plot_number} {currentVoter.apartment_number ? `(${currentVoter.apartment_number})` : ''}
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <div>
+                        <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">NID নম্বর</div>
+                        <div className="font-mono font-semibold text-slate-200">{currentVoter.nid_number || 'যাচাইকৃত'}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">সদস্য আইডি (Member ID)</div>
+                        <div className="font-mono text-emerald-300 font-black text-sm tracking-wider">{currentVoter.voter_id}</div>
                       </div>
                     </div>
                   </div>
 
                   <div className="pt-3 border-t border-white/15 flex justify-between items-center text-[10px] text-slate-300 relative z-10">
-                    <span>442 Dholaipar, Dhaka</span>
+                    <span>৪৪২ ঢোলাইপাড়, ঢাকা</span>
                     <span className="font-mono text-emerald-300 font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-700/50">
                       ✓ ACTIVE MEMBER
                     </span>

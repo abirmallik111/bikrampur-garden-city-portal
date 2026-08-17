@@ -1,16 +1,18 @@
 export type ResidentType = 'plot_owner' | 'building_owner' | 'apartment_owner' | 'tenant';
 
+export type Gender = 'male' | 'female' | 'other';
+
 export type ApplicationStatus = 'pending' | 'approved' | 'rejected' | 'more_info';
 
 export type ElectionStatus = 'draft' | 'upcoming' | 'candidate_reg' | 'voting' | 'closed' | 'results_published';
 
-export type ComplaintCategory = 'security' | 'maintenance' | 'noise' | 'cleanliness' | 'other';
-export type ComplaintStatus = 'new' | 'in_progress' | 'resolved' | 'closed';
+export type ComplaintCategory = 'security' | 'maintenance' | 'noise' | 'cleanliness' | 'utility' | 'other';
+export type ComplaintStatus = 'pending' | 'processing' | 'resolved' | 'rejected' | 'new' | 'in_progress' | 'closed';
 
 export type PropertyType = 'apartment' | 'flat' | 'portion' | 'shop';
 export type FurnishedType = 'furnished' | 'semi_furnished' | 'unfurnished';
 export type ContactPreference = 'phone' | 'whatsapp' | 'email';
-export type RentalStatus = 'active' | 'inactive' | 'rented';
+export type RentalStatus = 'pending' | 'active' | 'rejected' | 'rented' | 'inactive';
 
 export type MosqueProjectStatus = 'active' | 'completed' | 'cancelled';
 export type DonationPaymentMethod = 'cash' | 'online';
@@ -36,15 +38,17 @@ export interface VoterApplication {
   name_bn: string;
   name_en: string;
   father_name: string;
+  gender?: Gender;
   nid_number?: string;
   phone: string;
   email?: string;
+  password?: string;
   resident_type: ResidentType;
   plot_number: string;
   building_number?: string;
   floor?: string;
   apartment_number?: string;
-  bill_photo_url: string;
+  bill_photo_url?: string;
   bill_type?: string;
   note?: string;
   status: ApplicationStatus;
@@ -63,15 +67,17 @@ export interface Voter {
   name_bn: string;
   name_en: string;
   father_name: string;
+  gender?: Gender;
   nid_number?: string;
   phone: string;
   email?: string;
+  password?: string;
   resident_type: ResidentType;
   plot_number: string;
   building_number?: string;
   floor?: string;
   apartment_number?: string;
-  bill_photo_url: string;
+  bill_photo_url?: string;
   is_active: boolean;
   approved_by: string;
   approved_at: string;
@@ -151,15 +157,20 @@ export interface RentalListing {
   voter_id: string;
   owner_name: string;
   owner_phone: string;
+  whatsapp?: string;
+  headline?: string;
   property_type: PropertyType;
   plot_number: string;
   building_number?: string;
   floor: string;
   apartment_number: string;
   rent_amount: number;
+  service_charge?: number;
   bedrooms: number;
   bathrooms: number;
+  balconies?: number;
   size_sqft?: number;
+  tenant_type?: 'family' | 'bachelor' | 'any' | 'commercial';
   furnished: FurnishedType;
   facilities: string[];
   description: string;
@@ -167,6 +178,7 @@ export interface RentalListing {
   photos: string[];
   available_from: string;
   status: RentalStatus;
+  admin_remark?: string;
   created_at: string;
   updated_at: string;
 }
