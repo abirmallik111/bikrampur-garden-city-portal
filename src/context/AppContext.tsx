@@ -169,18 +169,95 @@ interface AppContextType {
   resetDemoData: () => void;
 }
 
+export const VIEW_TO_PATH: Record<ViewRoute, string> = {
+  landing: '/',
+  register: '/register',
+  status: '/status',
+  login: '/login',
+  dashboard: '/dashboard',
+  admin: '/admin',
+  elections: '/elections',
+  'election-vote': '/election-vote',
+  'election-results': '/elections',
+  rentals: '/rentals',
+  'rental-detail': '/rentals',
+  committee: '/directory',
+  directory: '/directory',
+  notices: '/notices',
+  announcements: '/notices'
+};
+
+export const pathToView = (pathname: string): ViewRoute => {
+  const clean = pathname.toLowerCase().replace(/\/$/, '') || '/';
+  if (clean === '/' || clean === '') return 'landing';
+  if (clean === '/register' || clean === '/apply' || clean === '/member-register') return 'register';
+  if (clean === '/status' || clean === '/track' || clean === '/application-status') return 'status';
+  if (clean === '/login' || clean === '/signin' || clean === '/auth') return 'login';
+  if (clean === '/dashboard' || clean === '/member' || clean === '/voter' || clean === '/profile') return 'dashboard';
+  if (clean === '/admin' || clean === '/admin-panel' || clean === '/super-admin') return 'admin';
+  if (clean === '/elections' || clean === '/election') return 'elections';
+  if (clean === '/election-vote' || clean === '/vote' || clean === '/ballot') return 'election-vote';
+  if (clean === '/rentals' || clean === '/to-let' || clean === '/flats') return 'rentals';
+  if (clean === '/notices' || clean === '/notice' || clean === '/announcements') return 'notices';
+  if (clean === '/directory' || clean === '/committee' || clean === '/rules' || clean === '/constitution' || clean === '/bylaws') return 'directory';
+  return 'landing';
+};
+
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'bgc_society_portal_v4';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Navigation State
-  const [currentView, setCurrentViewRaw] = useState<ViewRoute>('landing');
+  // Navigation State with URL Synchronized Routing
+  const [currentView, setCurrentViewRaw] = useState<ViewRoute>(() => {
+    if (typeof window !== 'undefined') {
+      return pathToView(window.location.pathname);
+    }
+    return 'landing';
+  });
   const [selectedElectionId, setSelectedElectionId] = useState<string | null>(null);
   const [selectedRentalId, setSelectedRentalId] = useState<string | null>(null);
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
   const [dashboardTab, setDashboardTab] = useState<string>('overview');
   const [adminTab, setAdminTab] = useState<string>('dashboard');
+
+  // URL popstate & Initial query parameter synchronization
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Parse search parameters if available
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const appId = urlParams.get('id') || urlParams.get('app_id');
+      if (appId) setSelectedAppId(appId);
+
+      const electionId = urlParams.get('election_id');
+      if (electionId) setSelectedElectionId(electionId);
+
+      const tabParam = urlParams.get('tab');
+      if (tabParam) setDashboardTab(tabParam);
+    } catch (e) {
+      console.warn('URL params parsing failed', e);
+    }
+
+    // Sync initial pathname
+    const initialView = pathToView(window.location.pathname);
+    const targetPath = VIEW_TO_PATH[initialView] || '/';
+    
+    // Normalize clean URL if necessary without triggering full reload
+    if (window.location.pathname !== targetPath && !['/member', '/vote', '/rules', '/apply', '/track', '/to-let'].includes(window.location.pathname.toLowerCase())) {
+      window.history.replaceState({ view: initialView }, '', targetPath + window.location.search);
+    }
+
+    // Handle Browser Back and Forward buttons
+    const handlePopState = (event: PopStateEvent) => {
+      const targetView = (event.state && event.state.view) || pathToView(window.location.pathname);
+      setCurrentViewRaw(targetView);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Preloader & UX State
   const [isPageLoading, setIsPageLoading] = useState(false);
@@ -200,9 +277,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  const setCurrentView = (view: ViewRoute) => {
+  const setCurrentView = (view: ViewRoute, replace = false) => {
     setIsPageLoading(true);
     setCurrentViewRaw(view);
+    
+    // Update Browser Address Bar & History State
+    if (typeof window !== 'undefined') {
+      const targetPath = VIEW_TO_PATH[view] || '/';
+      if (window.location.pathname !== targetPath) {
+        if (replace) {
+          window.history.replaceState({ view }, '', targetPath);
+        } else {
+          window.history.pushState({ view }, '', targetPath);
+        }
+      }
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
       setIsPageLoading(false);
