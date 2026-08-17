@@ -353,7 +353,7 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Callout Registration Card & Notice Widget */}
+          {/* Right: Callout Registration Card & Notice Board */}
           <div className="lg:col-span-4 flex flex-col gap-5">
             <div className="bg-[#003527] rounded-2xl p-6 text-white shadow-md space-y-4">
               <span className="text-[10px] font-bold uppercase tracking-wider bg-[#0b513d] text-[#64f9bc] px-2.5 py-0.5 rounded">
@@ -371,37 +371,6 @@ export const LandingPage: React.FC = () => {
               >
                 <span>আবেদন ফরম পূরণ করুন</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Notice Board Widget */}
-            <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-xs space-y-4 flex flex-col justify-between">
-              <h3 className="font-bold text-[#131b2e] text-sm flex items-center gap-2">
-                <div className="w-1 h-4 bg-[#131b2e] rounded-full"></div>
-                <span>সাম্প্রতিক নোটিশ (Notice Board)</span>
-              </h3>
-              <div className="space-y-3 text-xs flex-1">
-                {topAnnouncements.length === 0 ? (
-                  <div className="text-slate-400 text-center py-3">কোনো নোটিশ নেই</div>
-                ) : (
-                  topAnnouncements.map(anc => (
-                    <div key={anc.id} className="flex gap-2.5 items-start">
-                      <div className="w-2 h-2 mt-1.5 rounded-full bg-amber-500 shrink-0"></div>
-                      <div>
-                        <div className="font-semibold text-[#131b2e] line-clamp-1">{anc.title}</div>
-                        <div className="text-[10px] text-slate-400">
-                          {new Date(anc.published_at).toLocaleDateString('bn-BD')}
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-              <button
-                onClick={() => setCurrentView('notices')}
-                className="w-full py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-colors cursor-pointer"
-              >
-                সকল নোটিশ দেখুন
               </button>
             </div>
           </div>
@@ -446,108 +415,44 @@ export const LandingPage: React.FC = () => {
                       referrerPolicy="no-referrer"
                     />
                     <div className="absolute top-3 right-3 bg-[#131b2e]/90 backdrop-blur-xs text-white text-xs font-bold px-3 py-1 rounded-lg shadow-sm font-mono">
-                      ৳{rental.rent_amount ? rental.rent_amount.toLocaleString('en-BD') : '20,000'}
+                      ৳{rental.rent_amount ? rental.rent_amount.toLocaleString('en-BD') : '0'} / মাস
                     </div>
                   </div>
 
                   <div className="p-5 space-y-2.5">
                     <div className="flex items-center gap-2 text-xs">
                       <span className="font-bold text-[#064e3b] bg-[#e6fcf5] px-2.5 py-0.5 rounded text-[11px]">
-                        {rental.bedrooms || 3} BHK
+                        {rental.size_sqft ? `${rental.size_sqft} Sq Ft` : `${rental.bedrooms || 3} Bed`}
                       </span>
                       <span className="text-[11px] text-slate-400">
-                        Posted 2d ago
+                        {new Date(rental.created_at).toLocaleDateString('bn-BD')}
                       </span>
                     </div>
                     <h3 className="font-bold text-sm text-[#131b2e] line-clamp-1">
-                      {rental.description || `Spacious Family Apartment in ${rental.plot_number}`}
+                      {rental.description || `ফ্ল্যাট ভাড়া — ${rental.plot_number}`}
                     </h3>
                     <p className="text-xs text-slate-500 flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span>{rental.plot_number}, {rental.floor || '2nd Floor'}</span>
+                      <span>{rental.plot_number}, {rental.floor || ''}</span>
                     </p>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <>
-              {/* Sample Showcase Card 1 */}
-              <div
+            <div className="col-span-full bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-3">
+              <Building className="w-10 h-10 text-slate-300 mx-auto" />
+              <h3 className="font-bold text-slate-800 text-base">বর্তমানে কোনো সক্রিয় ভাড়ার বিজ্ঞাপন নেই</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                সোসাইটির অনুমোদিত ফ্ল্যাট/প্লট মালিকগণ সদস্য ড্যাশবোর্ড থেকে বিজ্ঞাপন প্রকাশ করতে পারবেন। এডমিন অনুমোদনের পর সরাসরি এখানে প্রদর্শিত হবে।
+              </p>
+              <button
                 onClick={() => setCurrentView('rentals')}
-                className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden shadow-xs hover:shadow-md hover:border-slate-300 transition-all cursor-pointer flex flex-col justify-between"
+                className="px-5 py-2 bg-[#064e3b] text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs hover:bg-[#003527] transition-all"
               >
-                <div>
-                  <div className="relative h-52 bg-slate-100">
-                    <img
-                      src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80"
-                      alt="Apartment Block A"
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute top-3 right-3 bg-[#131b2e]/90 backdrop-blur-xs text-white text-xs font-bold px-3 py-1 rounded-lg shadow-sm font-mono">
-                      ৳25,000
-                    </div>
-                  </div>
-
-                  <div className="p-5 space-y-2.5">
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="font-bold text-[#064e3b] bg-[#e6fcf5] px-2.5 py-0.5 rounded text-[11px]">
-                        3 BHK
-                      </span>
-                      <span className="text-[11px] text-slate-400">
-                        Posted 2d ago
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-sm text-[#131b2e] line-clamp-1">
-                      Spacious Family Apartment in Block A
-                    </h3>
-                    <p className="text-xs text-slate-500 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span>Building A-4, 2nd Floor</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Sample Showcase Card 2 */}
-              <div
-                onClick={() => setCurrentView('rentals')}
-                className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden shadow-xs hover:shadow-md hover:border-slate-300 transition-all cursor-pointer flex flex-col justify-between"
-              >
-                <div>
-                  <div className="relative h-52 bg-slate-100">
-                    <img
-                      src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80"
-                      alt="Modern 2 Bed Unit"
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute top-3 right-3 bg-[#131b2e]/90 backdrop-blur-xs text-white text-xs font-bold px-3 py-1 rounded-lg shadow-sm font-mono">
-                      ৳18,500
-                    </div>
-                  </div>
-
-                  <div className="p-5 space-y-2.5">
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="font-bold text-[#064e3b] bg-[#e6fcf5] px-2.5 py-0.5 rounded text-[11px]">
-                        2 BHK
-                      </span>
-                      <span className="text-[11px] text-slate-400">
-                        Posted 1w ago
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-sm text-[#131b2e] line-clamp-1">
-                      Modern 2 Bed Unit with Balcony
-                    </h3>
-                    <p className="text-xs text-slate-500 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span>Building B-1, 5th Floor</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </>
+                টু-লেট পোর্টাল দেখুন →
+              </button>
+            </div>
           )}
         </div>
       </section>
