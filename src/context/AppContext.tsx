@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { sendRealEmailViaResend } from '../lib/resend';
 import {
   User,
   VoterApplication,
@@ -430,7 +431,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem(`${STORAGE_KEY}_currentUser`, JSON.stringify(currentUser));
   }, [currentUser]);
 
-  // Helper to log transactional Email (without auto-popup)
+  // Helper to log transactional Email & dispatch via Resend
   const dispatchEmail = (email: Omit<EmailNotification, 'id' | 'sent_at' | 'status'>) => {
     const newEmail: EmailNotification = {
       ...email,
@@ -439,7 +440,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       status: 'delivered'
     };
     setEmailLogs(prev => [newEmail, ...prev]);
-    // Pop-up disabled as requested; full HTML template is viewable and copyable in Admin Email Logs
+
+    // Dispatch real email via Resend API
+    if (email.to_email) {
+      sendRealEmailViaResend({
+        to: email.to_email,
+        subject: email.subject,
+        html: email.body_html
+      });
+    }
   };
 
   const dismissEmailNotification = () => {
