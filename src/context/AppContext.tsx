@@ -322,7 +322,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [users, setUsers] = useState<User[]>(() => safeGetItem(`${STORAGE_KEY}_users`, INITIAL_USERS));
   const [applications, setApplications] = useState<VoterApplication[]>(() => safeGetItem(`${STORAGE_KEY}_applications`, INITIAL_APPLICATIONS));
   const [voters, setVoters] = useState<Voter[]>(() => safeGetItem(`${STORAGE_KEY}_voters`, INITIAL_VOTERS));
-  const [elections, setElections] = useState<Election[]>(() => safeGetItem(`${STORAGE_KEY}_elections`, INITIAL_ELECTIONS));
+  const [elections, setElections] = useState<Election[]>(() => fixElectionPositions(safeGetItem(`${STORAGE_KEY}_elections`, INITIAL_ELECTIONS)));
   const [votes, setVotes] = useState<Vote[]>(() => safeGetItem(`${STORAGE_KEY}_votes`, INITIAL_VOTES));
   const [complaints, setComplaints] = useState<Complaint[]>(() => safeGetItem(`${STORAGE_KEY}_complaints`, INITIAL_COMPLAINTS));
   const [rentals, setRentals] = useState<RentalListing[]>(() => safeGetItem(`${STORAGE_KEY}_rentals`, INITIAL_RENTALS));
@@ -350,7 +350,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (cloud && isMounted) {
           if (cloud.applications && cloud.applications.length > 0) setApplications(cloud.applications);
           if (cloud.voters && cloud.voters.length > 0) setVoters(cloud.voters);
-          if (cloud.elections && cloud.elections.length > 0) setElections(cloud.elections);
+          if (cloud.elections && cloud.elections.length > 0) setElections(fixElectionPositions(cloud.elections));
           if (cloud.committee && cloud.committee.length > 0) setCommittee(cloud.committee);
           if (cloud.announcements && cloud.announcements.length > 0) setAnnouncements(cloud.announcements);
           if (cloud.complaints && cloud.complaints.length > 0) setComplaints(cloud.complaints);

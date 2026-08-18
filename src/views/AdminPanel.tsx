@@ -46,6 +46,7 @@ import {
   Printer
 } from 'lucide-react';
 import { CommitteeMember, Candidate } from '../types';
+import { DEFAULT_COMMITTEE_POSITIONS } from '../data/initialData';
 
 export const AdminPanel: React.FC = () => {
   const {
@@ -740,209 +741,221 @@ export const AdminPanel: React.FC = () => {
               কোনো নির্বাচন নেই। নতুন নির্বাচন তৈরি করুন।
             </div>
           )}
-          {elections.map(election => (
-            <div key={election.id} className="bg-white rounded-3xl border border-slate-200 shadow-2xs p-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs bg-[#1e3a5f] text-white font-bold px-2.5 py-0.5 rounded-full capitalize">
-                      স্ট্যাটাস: {election.status}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 mt-1">{election.title}</h3>
-                </div>
+          {elections.map(election => {
+            const activePositions = (election.positions && election.positions.length > 0)
+              ? election.positions
+              : DEFAULT_COMMITTEE_POSITIONS.map(p => ({
+                  id: `${election.id}-${p.id}`,
+                  election_id: election.id,
+                  position_name: p.position_name,
+                  position_name_bn: `${p.position_name_bn} (${p.total_seats} জন)`,
+                  sort_order: p.sort_order,
+                  max_votes: p.max_votes
+                }));
 
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="text-slate-500 font-semibold">স্ট্যাটাস পরিবর্তন:</span>
-                  <select
-                    value={election.status}
-                    onChange={e => updateElectionStatus(election.id, e.target.value as ElectionStatus)}
-                    className="p-2 border border-slate-300 rounded-xl bg-white font-bold"
-                  >
-                    <option value="draft">Draft (খসড়া)</option>
-                    <option value="nomination">Nomination (মনোনয়ন পর্ব)</option>
-                    <option value="voting">Voting (ভোটগ্রহণ চলমান)</option>
-                    <option value="ended">Ended (ভোটগ্রহণ সমাপ্ত)</option>
-                    <option value="published">Published (চূড়ান্ত ফলাফল প্রকাশিত)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    পদবী ও প্রার্থীর তালিকা
-                  </h4>
-                  <button onClick={() => setCandidateFormOpenFor(candidateFormOpenFor === election.id ? null : election.id)} className="text-xs font-bold text-blue-600">+ প্রার্থী যোগ করুন</button>
-                </div>
-                
-                {candidateFormOpenFor === election.id && (
-                  <div className="p-5 bg-[#f8fafc] rounded-2xl border border-slate-300 space-y-4 shadow-sm">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                      <h5 className="font-bold text-sm text-[#1e3a5f]">নতুন প্রার্থী মনোনয়ন ও তথ্য সংযোজন</h5>
-                      <span className="text-[11px] text-slate-500">সোসাইটি নিবন্ধিত সদস্য বা নতুন তথ্য</span>
+            return (
+              <div key={election.id} className="bg-white rounded-3xl border border-slate-200 shadow-2xs p-6 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-[#1e3a5f] text-white font-bold px-2.5 py-0.5 rounded-full capitalize">
+                        স্ট্যাটাস: {election.status}
+                      </span>
                     </div>
+                    <h3 className="text-lg font-bold text-slate-900 mt-1">{election.title}</h3>
+                  </div>
 
-                    {/* Member Quick-Select Dropdown */}
-                    {voters.length > 0 && (
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-slate-500 font-semibold">স্ট্যাটাস পরিবর্তন:</span>
+                    <select
+                      value={election.status}
+                      onChange={e => updateElectionStatus(election.id, e.target.value as ElectionStatus)}
+                      className="p-2 border border-slate-300 rounded-xl bg-white font-bold"
+                    >
+                      <option value="draft">Draft (খসড়া)</option>
+                      <option value="nomination">Nomination (মনোনয়ন পর্ব)</option>
+                      <option value="voting">Voting (ভোটগ্রহণ চলমান)</option>
+                      <option value="ended">Ended (ভোটগ্রহণ সমাপ্ত)</option>
+                      <option value="published">Published (চূড়ান্ত ফলাফল প্রকাশিত)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      পদবী ও প্রার্থীর তালিকা ({activePositions.length}টি পদ)
+                    </h4>
+                    <button onClick={() => setCandidateFormOpenFor(candidateFormOpenFor === election.id ? null : election.id)} className="text-xs font-bold text-blue-600">+ প্রার্থী যোগ করুন</button>
+                  </div>
+                  
+                  {candidateFormOpenFor === election.id && (
+                    <div className="p-5 bg-[#f8fafc] rounded-2xl border border-slate-300 space-y-4 shadow-sm">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                        <h5 className="font-bold text-sm text-[#1e3a5f]">নতুন প্রার্থী মনোনয়ন ও তথ্য সংযোজন</h5>
+                        <span className="text-[11px] text-slate-500">সোসাইটি নিবন্ধিত সদস্য বা নতুন তথ্য</span>
+                      </div>
+
+                      {/* Member Quick-Select Dropdown */}
+                      {voters.length > 0 && (
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            অনুমোদিত নিবন্ধিত সদস্য থেকে বাছাই করুন (Auto-Fill Member Data):
+                          </label>
+                          <select
+                            className="w-full p-2.5 border border-blue-300 rounded-xl bg-blue-50/50 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-300"
+                            onChange={e => {
+                              const selectedV = voters.find(v => v.id === e.target.value || v.voter_id === e.target.value);
+                              if (selectedV) {
+                                setCandidateForm({
+                                  ...candidateForm,
+                                  voter_id: selectedV.voter_id,
+                                  name: selectedV.name_en,
+                                  name_bn: selectedV.name_bn,
+                                  phone: selectedV.phone,
+                                  photo_url: selectedV.profile_photo_url || selectedV.bill_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+                                  bio: `${selectedV.name_bn}, প্লট নম্বর: ${selectedV.plot_number}, রেসিডেন্ট: ${selectedV.resident_type.replace('_', ' ')}`
+                                });
+                              }
+                            }}
+                          >
+                            <option value="">-- সদস্য তালিকায় নাম নির্বাচন করুন (ঐচ্ছিক) --</option>
+                            {voters.map(v => (
+                              <option key={v.id} value={v.id}>
+                                {v.name_bn} ({v.name_en}) — ID: {v.voter_id} (প্লট: {v.plot_number})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <label className="block font-semibold text-slate-700 mb-1">প্রার্থিতার পদ নির্বাচন করুন *</label>
+                          <select
+                            className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-semibold text-slate-900"
+                            value={candidateForm.position_id}
+                            onChange={e => setCandidateForm({...candidateForm, position_id: e.target.value})}
+                          >
+                            <option value="">-- নির্বাচনী পদ নির্বাচন করুন --</option>
+                            {activePositions.map(p => (
+                              <option key={p.id} value={p.id}>
+                                {p.position_name_bn}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block font-semibold text-slate-700 mb-1">নির্বাচনী প্রতীক (Symbol) *</label>
+                          <input
+                            placeholder="যেমন: নৌকা / আম / চেয়ার / চশমা"
+                            className="w-full p-2.5 border border-slate-300 rounded-xl bg-white"
+                            value={candidateForm.symbol}
+                            onChange={e => setCandidateForm({...candidateForm, symbol: e.target.value})}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-semibold text-slate-700 mb-1">প্রার্থীর নাম (English) *</label>
+                          <input
+                            placeholder="Candidate Name in English"
+                            className="w-full p-2.5 border border-slate-300 rounded-xl bg-white"
+                            value={candidateForm.name}
+                            onChange={e => setCandidateForm({...candidateForm, name: e.target.value})}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-semibold text-slate-700 mb-1">প্রার্থীর নাম (বাংলা)</label>
+                          <input
+                            placeholder="প্রার্থীর নাম বাংলায়"
+                            className="w-full p-2.5 border border-slate-300 rounded-xl bg-white"
+                            value={candidateForm.name_bn}
+                            onChange={e => setCandidateForm({...candidateForm, name_bn: e.target.value})}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-semibold text-slate-700 mb-1">মোবাইল নম্বর (Phone) *</label>
+                          <input
+                            placeholder="017xxxxxxxx"
+                            className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-mono"
+                            value={candidateForm.phone}
+                            onChange={e => setCandidateForm({...candidateForm, phone: e.target.value})}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-semibold text-slate-700 mb-1">সদস্য আইডি (Member ID)</label>
+                          <input
+                            placeholder="যেমন: BGC-2026-001"
+                            className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-mono"
+                            value={candidateForm.voter_id}
+                            onChange={e => setCandidateForm({...candidateForm, voter_id: e.target.value})}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Candidate Photo (PP) URL with Preview */}
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">
-                          অনুমোদিত নিবন্ধিত সদস্য থেকে বাছাই করুন (Auto-Fill Member Data):
+                          প্রার্থীর প্রোফাইল ছবি (PP Image URL):
                         </label>
-                        <select
-                          className="w-full p-2.5 border border-blue-300 rounded-xl bg-blue-50/50 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-300"
-                          onChange={e => {
-                            const selectedV = voters.find(v => v.id === e.target.value || v.voter_id === e.target.value);
-                            if (selectedV) {
-                              setCandidateForm({
-                                ...candidateForm,
-                                voter_id: selectedV.voter_id,
-                                name: selectedV.name_en,
-                                name_bn: selectedV.name_bn,
-                                phone: selectedV.phone,
-                                photo_url: selectedV.profile_photo_url || selectedV.bill_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-                                bio: `${selectedV.name_bn}, প্লট নম্বর: ${selectedV.plot_number}, রেসিডেন্ট: ${selectedV.resident_type.replace('_', ' ')}`
-                              });
-                            }
-                          }}
-                        >
-                          <option value="">-- সদস্য তালিকায় নাম নির্বাচন করুন (ঐচ্ছিক) --</option>
-                          {voters.map(v => (
-                            <option key={v.id} value={v.id}>
-                              {v.name_bn} ({v.name_en}) — ID: {v.voter_id} (প্লট: {v.plot_number})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div>
-                        <label className="block font-semibold text-slate-700 mb-1">প্রার্থিতার পদ নির্বাচন করুন *</label>
-                        <select
-                          className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-semibold text-slate-900"
-                          value={candidateForm.position_id}
-                          onChange={e => setCandidateForm({...candidateForm, position_id: e.target.value})}
-                        >
-                          <option value="">-- নির্বাচনী পদ নির্বাচন করুন --</option>
-                          {election.positions.map(p => (
-                            <option key={p.id} value={p.id}>
-                              {p.position_name_bn}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="flex gap-3 items-center">
+                          <img
+                            src={candidateForm.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                            alt="Candidate PP Preview"
+                            className="w-12 h-14 object-cover rounded-xl border border-slate-300 shrink-0 bg-slate-200"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+                            }}
+                          />
+                          <input
+                            placeholder="https://images.unsplash.com/... or profile image link"
+                            className="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"
+                            value={candidateForm.photo_url}
+                            onChange={e => setCandidateForm({...candidateForm, photo_url: e.target.value})}
+                          />
+                        </div>
                       </div>
 
                       <div>
-                        <label className="block font-semibold text-slate-700 mb-1">নির্বাচনী প্রতীক (Symbol) *</label>
-                        <input
-                          placeholder="যেমন: নৌকা / আম / চেয়ার / চশমা"
-                          className="w-full p-2.5 border border-slate-300 rounded-xl bg-white"
-                          value={candidateForm.symbol}
-                          onChange={e => setCandidateForm({...candidateForm, symbol: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block font-semibold text-slate-700 mb-1">প্রার্থীর নাম (English) *</label>
-                        <input
-                          placeholder="Candidate Name in English"
-                          className="w-full p-2.5 border border-slate-300 rounded-xl bg-white"
-                          value={candidateForm.name}
-                          onChange={e => setCandidateForm({...candidateForm, name: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block font-semibold text-slate-700 mb-1">প্রার্থীর নাম (বাংলা)</label>
-                        <input
-                          placeholder="প্রার্থীর নাম বাংলায়"
-                          className="w-full p-2.5 border border-slate-300 rounded-xl bg-white"
-                          value={candidateForm.name_bn}
-                          onChange={e => setCandidateForm({...candidateForm, name_bn: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block font-semibold text-slate-700 mb-1">মোবাইল নম্বর (Phone) *</label>
-                        <input
-                          placeholder="017xxxxxxxx"
-                          className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-mono"
-                          value={candidateForm.phone}
-                          onChange={e => setCandidateForm({...candidateForm, phone: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block font-semibold text-slate-700 mb-1">সদস্য আইডি (Member ID)</label>
-                        <input
-                          placeholder="যেমন: BGC-2026-001"
-                          className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-mono"
-                          value={candidateForm.voter_id}
-                          onChange={e => setCandidateForm({...candidateForm, voter_id: e.target.value})}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Candidate Photo (PP) URL with Preview */}
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        প্রার্থীর প্রোফাইল ছবি (PP Image URL):
-                      </label>
-                      <div className="flex gap-3 items-center">
-                        <img
-                          src={candidateForm.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
-                          alt="Candidate PP Preview"
-                          className="w-12 h-14 object-cover rounded-xl border border-slate-300 shrink-0 bg-slate-200"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
-                          }}
-                        />
-                        <input
-                          placeholder="https://images.unsplash.com/... or profile image link"
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">নির্বাচনী ইশতেহার ও সংক্ষিপ্ত পরিচয় (Manifesto & Bio)</label>
+                        <textarea
+                          rows={2}
+                          placeholder="সোসাইটির উন্নয়নে প্রার্থীর নির্বাচনী প্রতিশ্রুতি..."
                           className="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"
-                          value={candidateForm.photo_url}
-                          onChange={e => setCandidateForm({...candidateForm, photo_url: e.target.value})}
+                          value={candidateForm.bio}
+                          onChange={e => setCandidateForm({...candidateForm, bio: e.target.value})}
                         />
                       </div>
-                    </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">নির্বাচনী ইশতেহার ও সংক্ষিপ্ত পরিচয় (Manifesto & Bio)</label>
-                      <textarea
-                        rows={2}
-                        placeholder="সোসাইটির উন্নয়নে প্রার্থীর নির্বাচনী প্রতিশ্রুতি..."
-                        className="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"
-                        value={candidateForm.bio}
-                        onChange={e => setCandidateForm({...candidateForm, bio: e.target.value})}
-                      />
+                      <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
+                        <button
+                          type="button"
+                          onClick={() => setCandidateFormOpenFor(null)}
+                          className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs"
+                        >
+                          বাতিল
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const finalPhoto = candidateForm.photo_url.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+                            addCandidateToElection(election.id, { ...candidateForm, photo_url: finalPhoto });
+                            setCandidateFormOpenFor(null);
+                          }}
+                          className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-xs"
+                        >
+                          প্রার্থী নিশ্চিত করুন
+                        </button>
+                      </div>
                     </div>
+                  )}
 
-                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
-                      <button
-                        type="button"
-                        onClick={() => setCandidateFormOpenFor(null)}
-                        className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs"
-                      >
-                        বাতিল
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const finalPhoto = candidateForm.photo_url.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
-                          addCandidateToElection(election.id, { ...candidateForm, photo_url: finalPhoto });
-                          setCandidateFormOpenFor(null);
-                        }}
-                        className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-xs"
-                      >
-                        প্রার্থী নিশ্চিত করুন
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {election.positions.map(pos => {
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {activePositions.map(pos => {
                     const posCandidates = election.candidates.filter(c => c.position_id === pos.id);
                     return (
                       <div key={pos.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-2">
@@ -967,7 +980,8 @@ export const AdminPanel: React.FC = () => {
                 </div>
               </div>
             </div>
-          ))}
+          );
+        })}
         </div>
       )}
 
