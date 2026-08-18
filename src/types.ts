@@ -50,6 +50,7 @@ export interface VoterApplication {
   apartment_number?: string;
   bill_photo_url?: string;
   bill_type?: string;
+  profile_photo_url?: string;
   note?: string;
   status: ApplicationStatus;
   admin_remark?: string;
@@ -78,6 +79,7 @@ export interface Voter {
   floor?: string;
   apartment_number?: string;
   bill_photo_url?: string;
+  profile_photo_url?: string;
   is_active: boolean;
   approved_by: string;
   approved_at: string;

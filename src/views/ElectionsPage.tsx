@@ -28,6 +28,7 @@ export const ElectionsPage: React.FC = () => {
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'candidates' | 'results' | 'schedule'>('candidates');
+  const [selectedCandidateModal, setSelectedCandidateModal] = useState<Candidate | null>(null);
 
   const currentElection = elections.find(e => e.id === selectedElectionId) || elections[0];
   const isVotingLive = currentElection?.status === 'voting';
@@ -228,8 +229,17 @@ export const ElectionsPage: React.FC = () => {
                       {/* Bio / Manifesto */}
                       <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs text-slate-700 leading-relaxed">
                         <strong className="block text-slate-900 mb-1 font-semibold">নির্বাচনী ইশতেহার ও অঙ্গীকার:</strong>
-                        <span>{cand.bio}</span>
+                        <span className="line-clamp-2">{cand.bio}</span>
                       </div>
+
+                      {/* View Details CTA Button */}
+                      <button
+                        onClick={() => setSelectedCandidateModal(cand)}
+                        className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold rounded-xl border border-blue-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <span>প্রার্থীর প্রোফাইল ও বিস্তারিত দেখুন (PP Photo)</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -337,6 +347,98 @@ export const ElectionsPage: React.FC = () => {
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Candidate Details Overlay Modal */}
+      {selectedCandidateModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-200">
+            {/* Header & Close */}
+            <div className="flex justify-between items-start pb-4 border-b border-slate-100">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                  প্রার্থী প্রোফাইল (Candidate Profile)
+                </span>
+                <h3 className="text-xl font-extrabold text-slate-900 mt-1">
+                  {selectedCandidateModal.name_bn || selectedCandidateModal.name}
+                </h3>
+                <p className="text-xs text-slate-500 font-medium">{selectedCandidateModal.name}</p>
+              </div>
+              <button
+                onClick={() => setSelectedCandidateModal(null)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Photo & Key Metadata */}
+            <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-start bg-slate-50 p-4 rounded-2xl border border-slate-200">
+              <div className="w-28 h-36 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md shrink-0 bg-slate-200">
+                <img
+                  src={selectedCandidateModal.photo_url}
+                  alt={selectedCandidateModal.name}
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+
+              <div className="space-y-2 text-xs text-slate-700 w-full">
+                <div className="bg-amber-100 text-amber-900 border border-amber-300 font-extrabold px-3 py-1 rounded-xl inline-block text-xs">
+                  প্রতীক (Symbol): {selectedCandidateModal.symbol}
+                </div>
+
+                {selectedCandidateModal.voter_id && (
+                  <div className="flex justify-between py-1 border-b border-slate-200">
+                    <span className="text-slate-500">সদস্য আইডি:</span>
+                    <span className="font-mono font-bold text-slate-900">{selectedCandidateModal.voter_id}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between py-1 border-b border-slate-200">
+                  <span className="text-slate-500">যোগাযোগ নম্বর:</span>
+                  <span className="font-mono font-semibold text-slate-900">{selectedCandidateModal.phone}</span>
+                </div>
+
+                <div className="flex justify-between py-1">
+                  <span className="text-slate-500">স্ট্যাটাস:</span>
+                  <span className="text-emerald-700 font-bold">✓ অনুমোদিত প্রার্থী</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Manifesto / Bio */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">নির্বাচনী ইশতেহার ও প্রতিশ্রুতি:</h4>
+              <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-xs text-slate-700 leading-relaxed max-h-40 overflow-y-auto">
+                {selectedCandidateModal.bio || 'সোসাইটির সামগ্রিক উন্নয়ন ও নিরাপত্তার লক্ষ্যে নিবেদিত।'}
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setSelectedCandidateModal(null)}
+                className="flex-1 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs"
+              >
+                বন্ধ করুন
+              </button>
+              {isVotingLive && (
+                <button
+                  onClick={() => {
+                    setSelectedCandidateModal(null);
+                    setSelectedElectionId(currentElection.id);
+                    setCurrentView('election-vote');
+                  }}
+                  className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-xs"
+                >
+                  <Vote className="w-4 h-4" />
+                  <span>ভোট দিতে যান</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -46,7 +46,8 @@ export const VoterDashboard: React.FC = () => {
     donations,
     makeDonation,
     announcements,
-    showToast
+    showToast,
+    updateMemberProfilePhoto
   } = useApp();
 
   // Redirect if not logged in

@@ -34,7 +34,8 @@ import {
   INITIAL_COMMITTEE,
   INITIAL_ANNOUNCEMENTS,
   INITIAL_EMAIL_LOGS,
-  INITIAL_SMS_LOGS
+  INITIAL_SMS_LOGS,
+  DEFAULT_COMMITTEE_POSITIONS
 } from '../data/initialData';
 import {
   fetchAllFromCloud,
@@ -130,6 +131,7 @@ interface AppContextType {
   addCandidateToElection: (electionId: string, candidateData: Omit<Candidate, 'id' | 'election_id' | 'vote_count' | 'created_at'>) => void;
   removeCandidate: (electionId: string, candidateId: string) => void;
   publishResults: (electionId: string) => void;
+  updateMemberProfilePhoto: (voterId: string, photoUrl: string) => void;
 
   // Complaints Actions
   submitComplaint: (data: { title: string; description: string; category: Complaint['category'] }) => { success: boolean; message: string };
@@ -207,7 +209,7 @@ export const pathToView = (pathname: string): ViewRoute => {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'bgc_society_portal_v5';
+const STORAGE_KEY = 'bgc_society_portal_v6';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation State with URL Synchronized Routing
@@ -1038,23 +1040,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const createElection = (electionData: Partial<Election>) => {
+    const newId = `el-${Date.now()}`;
+    const defaultPositions = DEFAULT_COMMITTEE_POSITIONS.map(p => ({
+      id: `${newId}-${p.id}`,
+      election_id: newId,
+      position_name: p.position_name,
+      position_name_bn: `${p.position_name_bn} (${p.total_seats} জন)`,
+      sort_order: p.sort_order,
+      max_votes: p.max_votes
+    }));
+
     const newElection: Election = {
-      id: `el-${Date.now()}`,
-      title: electionData.title || 'Bikrampur Garden City Election',
-      title_bn: electionData.title_bn || 'বিক্রমপুর গার্ডেন সিটি নির্বাচন',
-      description: electionData.description || '',
+      id: newId,
+      title: electionData.title || 'BIKRAMPUR GARDEN CITY SOCIETY COMMITTEE ELECTION',
+      title_bn: electionData.title_bn || 'বিক্রমপুর গার্ডেন সিটি সোসাইটি কার্যনির্বাহী পরিষদ নির্বাচন ২০২৬',
+      description: electionData.description || 'সোসাইটির নিবাসী ও প্লট মালিকদের দ্বারা ১৯-সদস্য বিশিষ্ট কার্যনির্বাহী পরিষদ গঠনের জন্য ডিজিটাল নির্বাচন।',
       candidate_reg_start: electionData.candidate_reg_start || new Date().toISOString(),
       candidate_reg_end: electionData.candidate_reg_end || new Date().toISOString(),
       voting_start: electionData.voting_start || new Date().toISOString(),
       voting_end: electionData.voting_end || new Date().toISOString(),
-      status: electionData.status || 'upcoming',
+      status: electionData.status || 'nomination',
       created_by: currentUser?.id || 'admin',
       created_at: new Date().toISOString(),
-      positions: electionData.positions || [],
+      positions: electionData.positions && electionData.positions.length > 0 ? electionData.positions : defaultPositions,
       candidates: electionData.candidates || []
     };
     setElections(prev => [newElection, ...prev]);
     cloudUpsert('elections', newElection);
+  };
+
+  const updateMemberProfilePhoto = (voterId: string, photoUrl: string) => {
+    setVoters(prev =>
+      prev.map(v => (v.voter_id === voterId || v.id === voterId ? { ...v, profile_photo_url: photoUrl } : v))
+    );
+    showToast('প্রোফাইল ছবি সফলভাবে আপডেট করা হয়েছে।', 'success');
   };
 
   const updateElectionStatus = (electionId: string, status: ElectionStatus) => {
@@ -1419,6 +1438,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addCandidateToElection,
         removeCandidate,
         publishResults,
+        updateMemberProfilePhoto,
 
         submitComplaint,
         updateComplaintStatus,

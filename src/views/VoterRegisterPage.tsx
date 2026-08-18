@@ -38,6 +38,7 @@ export const VoterRegisterPage: React.FC = () => {
   const [apartmentNumber, setApartmentNumber] = useState('');
   const [billType, setBillType] = useState('');
   const [billPhotoUrl, setBillPhotoUrl] = useState('');
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
   const [note, setNote] = useState('');
   const [declaration, setDeclaration] = useState(false);
 
@@ -58,27 +59,22 @@ export const VoterRegisterPage: React.FC = () => {
     if (!fatherName.trim() || fatherName.trim().length < 3) {
       errs.fatherName = 'পিতা বা স্বামীর নাম পূরণ আবশ্যক';
     }
-    const cleanPhone = phone.trim();
-    if (!cleanPhone) {
-      errs.phone = 'মোবাইল নম্বর আবশ্যক';
-    } else if (!/^01[3-9]\d{8}$/.test(cleanPhone)) {
-      errs.phone = 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 01712345678)';
+    if (!phone.trim() || !/^01[3-9]\d{8}$/.test(phone.trim())) {
+      errs.phone = 'সঠিক ১১ ডিজিটের মোবাইল নম্বর প্রদান করুন (যেমন: 01711000000)';
     }
-    if (nidNumber.trim() && !/^\d{10}$|^\d{13}$|^\d{17}$/.test(nidNumber.trim())) {
-      errs.nidNumber = 'এনআইডি নম্বর ১০, ১৩ অথবা ১৭ ডিজিটের হতে হবে';
-    }
-    if (!password.trim() || password.length < 4) {
-      errs.password = 'লগইনের জন্য কমপক্ষে ৪ অক্ষরের পাসওয়ার্ড দিন';
+    if (!password || password.length < 4) {
+      errs.password = 'পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে';
     }
     if (password !== confirmPassword) {
       errs.confirmPassword = 'পাসওয়ার্ড দুটি মিলছে না';
     }
     if (!plotNumber.trim()) {
-      errs.plotNumber = 'প্লট নম্বর আবশ্যক (যেমন: Plot-12)';
+      errs.plotNumber = 'প্লট নম্বর পূরণ বাধ্যতামূলক';
     }
     if (!declaration) {
-      errs.declaration = 'ঘোষণাপত্রটিতে টিক চিহ্ন প্রদান করতে হবে';
+      errs.declaration = 'শর্তাবলী ও গঠনতন্ত্র মেনে চলার অঙ্গীকারে সম্মত দিন';
     }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -104,6 +100,7 @@ export const VoterRegisterPage: React.FC = () => {
         floor: floor.trim() || undefined,
         apartment_number: apartmentNumber.trim() || undefined,
         bill_photo_url: billPhotoUrl || undefined,
+        profile_photo_url: profilePhotoUrl || undefined,
         bill_type: billType || undefined,
         note: note.trim() || undefined
       });
@@ -323,21 +320,37 @@ export const VoterRegisterPage: React.FC = () => {
               </select>
             </div>
 
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                জাতীয় পরিচয়পত্র নম্বর (NID Number)
+                প্রোফাইল ছবি / পাসপোর্ট ছবি (Profile Picture PP) <span className="text-slate-400 font-normal">(ঐচ্ছিক)</span>
               </label>
-              <input
-                id="nid-input"
-                type="text"
-                value={nidNumber}
-                onChange={e => setNidNumber(e.target.value)}
-                placeholder="১০, ১৩ অথবা ১৭ সংখ্যার NID"
-                className={`w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-hidden focus:ring-2 ${
-                  errors.nidNumber ? 'border-rose-400 focus:ring-rose-200 bg-rose-50/20' : 'border-slate-300 focus:ring-blue-200'
-                }`}
-              />
-              {errors.nidNumber && <p className="text-[11px] text-rose-600 mt-1">{errors.nidNumber}</p>}
+              <div className="flex gap-3 items-center">
+                {profilePhotoUrl ? (
+                  <img
+                    src={profilePhotoUrl}
+                    alt="PP Preview"
+                    className="w-12 h-14 object-cover rounded-xl border border-slate-300 shadow-2xs shrink-0"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+                    }}
+                  />
+                ) : (
+                  <div className="w-12 h-14 bg-slate-100 rounded-xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 text-[10px] font-bold shrink-0">
+                    <span>PP</span>
+                    <span>Photo</span>
+                  </div>
+                )}
+                <div className="flex-1 space-y-1">
+                  <input
+                    type="url"
+                    value={profilePhotoUrl}
+                    onChange={e => setProfilePhotoUrl(e.target.value)}
+                    placeholder="ছবি লিংক (যেমন: https://images.unsplash.com/...)"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-blue-200"
+                  />
+                  <p className="text-[10px] text-slate-500">প্রার্থীতা ও সদস্য পরিচয়পত্রে প্রদর্শনের জন্য প্রার্থীর পাসপোর্ট ছবি (PP)</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
