@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { getMemberPhoto } from '../utils/avatar';
 import {
   Vote,
   Trophy,
@@ -203,7 +204,7 @@ export const ElectionsPage: React.FC = () => {
                         {/* Photo */}
                         <div className="w-20 h-24 sm:w-24 sm:h-28 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 shadow-2xs">
                           <img
-                            src={cand.photo_url}
+                            src={getMemberPhoto(cand.photo_url)}
                             alt={cand.name}
                             className="w-full h-full object-cover"
                             referrerPolicy="no-referrer"
@@ -378,7 +379,7 @@ export const ElectionsPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-start bg-slate-50 p-4 rounded-2xl border border-slate-200">
               <div className="w-28 h-36 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md shrink-0 bg-slate-200">
                 <img
-                  src={selectedCandidateModal.photo_url}
+                  src={getMemberPhoto(selectedCandidateModal.photo_url)}
                   alt={selectedCandidateModal.name}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"

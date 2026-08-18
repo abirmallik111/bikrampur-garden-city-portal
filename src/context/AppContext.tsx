@@ -788,6 +788,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       floor: targetApp.floor,
       apartment_number: targetApp.apartment_number,
       bill_photo_url: targetApp.bill_photo_url,
+      profile_photo_url: targetApp.profile_photo_url,
       is_active: true,
       approved_by: currentUser?.name || 'Admin',
       approved_at: new Date().toISOString(),

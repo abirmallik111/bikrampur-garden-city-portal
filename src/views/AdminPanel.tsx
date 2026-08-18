@@ -47,6 +47,7 @@ import {
 } from 'lucide-react';
 import { CommitteeMember, Candidate } from '../types';
 import { DEFAULT_COMMITTEE_POSITIONS } from '../data/initialData';
+import { getDefaultAvatar, MALE_DEFAULT_AVATAR } from '../utils/avatar';
 
 export const AdminPanel: React.FC = () => {
   const {
@@ -813,7 +814,7 @@ export const AdminPanel: React.FC = () => {
                                   name: selectedV.name_en,
                                   name_bn: selectedV.name_bn,
                                   phone: selectedV.phone,
-                                  photo_url: selectedV.profile_photo_url || selectedV.bill_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+                                  photo_url: selectedV.profile_photo_url || getDefaultAvatar(selectedV.gender),
                                   bio: `${selectedV.name_bn}, প্লট নম্বর: ${selectedV.plot_number}, রেসিডেন্ট: ${selectedV.resident_type.replace('_', ' ')}`
                                 });
                               }
@@ -897,26 +898,41 @@ export const AdminPanel: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Candidate Photo (PP) URL with Preview */}
+                      {/* Candidate Photo (PP) Upload Box */}
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">
-                          প্রার্থীর প্রোফাইল ছবি (PP Image URL):
+                          প্রার্থীর প্রোফাইল ছবি আপলোড করুন (Candidate PP Photo Upload):
                         </label>
-                        <div className="flex gap-3 items-center">
+                        <div className="flex gap-3 items-center p-3 bg-white border border-slate-300 rounded-xl">
                           <img
-                            src={candidateForm.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                            src={candidateForm.photo_url || MALE_DEFAULT_AVATAR}
                             alt="Candidate PP Preview"
                             className="w-12 h-14 object-cover rounded-xl border border-slate-300 shrink-0 bg-slate-200"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
-                            }}
                           />
-                          <input
-                            placeholder="https://images.unsplash.com/... or profile image link"
-                            className="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"
-                            value={candidateForm.photo_url}
-                            onChange={e => setCandidateForm({...candidateForm, photo_url: e.target.value})}
-                          />
+                          <div className="flex-1 space-y-1">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => {
+                                    setCandidateForm(prev => ({ ...prev, photo_url: reader.result as string }));
+                                  };
+                                  reader.readAsDataURL(file);
+
+                                  import('../lib/supabase').then(({ uploadFileToStorage }) => {
+                                    uploadFileToStorage(file, 'profiles').then(({ url }) => {
+                                      if (url) setCandidateForm(prev => ({ ...prev, photo_url: url }));
+                                    });
+                                  });
+                                }
+                              }}
+                              className="text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#1e3a5f] file:text-white hover:file:bg-[#152943] cursor-pointer"
+                            />
+                            <span className="text-[10px] text-slate-500 block">সরাসরি ডিভাইস থেকে প্রার্থীর পাসপোর্ট সাইজের ছবি আপলোড করুন</span>
+                          </div>
                         </div>
                       </div>
 

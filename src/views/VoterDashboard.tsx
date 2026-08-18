@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { getMemberPhoto, getDefaultAvatar } from '../utils/avatar';
 import {
   Vote,
   FileText,
@@ -191,17 +192,24 @@ export const VoterDashboard: React.FC = () => {
       {/* Welcome Banner - Professional Polish Slate Canvas */}
       <div className="bg-slate-900 border border-slate-800 text-white p-6 sm:p-8 rounded-2xl shadow-sm relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-3 py-1 rounded-full text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>অনুমোদিত সোসাইটি সদস্য (Verified Member)</span>
+          <div className="flex items-center gap-4">
+            <img
+              src={getMemberPhoto(currentVoter.profile_photo_url, currentVoter.gender)}
+              alt={currentVoter.name_en}
+              className="w-16 h-18 sm:w-20 sm:h-24 rounded-2xl object-cover border-2 border-emerald-400 shadow-md shrink-0 bg-slate-800"
+            />
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-2 bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-3 py-1 rounded-full text-xs font-semibold">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>অনুমোদিত সোসাইটি সদস্য (Verified Member)</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                Welcome, {currentVoter.name_en}!
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-300">
+                {currentVoter.name_bn} — বিক্রমপুর গার্ডেন সিটির সম্মানিত সদস্য ড্যাশবোর্ডে আপনাকে স্বাগতম।
+              </p>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Welcome, {currentVoter.name_en}!
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300">
-              {currentVoter.name_bn} — বিক্রমপুর গার্ডেন সিটির সম্মানিত সদস্য ড্যাশবোর্ডে আপনাকে স্বাগতম।
-            </p>
           </div>
 
           {/* Quick Member ID Badge */}
@@ -1137,7 +1145,7 @@ export const VoterDashboard: React.FC = () => {
                                 <span class="badge">MEMBER 2026</span>
                               </div>
                               <div class="body">
-                                <img class="photo" src="${currentVoter.bill_photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}" />
+                                <img class="photo" src="${getMemberPhoto(currentVoter.profile_photo_url, currentVoter.gender)}" />
                                 <div class="info">
                                   <div class="voter-id">${currentVoter.voter_id}</div>
                                   <div class="name-en">${currentVoter.name_en}</div>
@@ -1187,6 +1195,52 @@ export const VoterDashboard: React.FC = () => {
                   <Printer className="w-4 h-4" />
                   <span>আইডি কার্ড প্রিন্ট / PDF সংরক্ষণ করুন</span>
                 </button>
+              </div>
+
+              {/* Profile Photo Upload / Update Box */}
+              <div className="pt-6 border-t border-slate-200 text-left space-y-3">
+                <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                  <User className="w-4 h-4 text-[#1e3a5f]" />
+                  <span>প্রোফাইল ছবি (PP Photo) সংযোজন ও পরিবর্তন</span>
+                </h4>
+                <p className="text-xs text-slate-500">
+                  নির্বাচনী প্রার্থীতা ও সদস্য পরিচিতির জন্য আপনার পাসপোর্ট সাইজের ছবি আপলোড করুন। ফাইল আপলোড না করলে লিঙ্গ অনুযায়ী ডিফল্ট অবয়ব প্রদর্শিত হবে।
+                </p>
+
+                <div className="flex gap-4 items-center p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                  <img
+                    src={getMemberPhoto(currentVoter.profile_photo_url, currentVoter.gender)}
+                    alt={currentVoter.name_en}
+                    className="w-16 h-20 object-cover rounded-xl border border-slate-300 shadow-xs shrink-0 bg-slate-100"
+                  />
+                  <div className="flex-1 space-y-2">
+                    <label className="block text-xs font-semibold text-slate-700">
+                      নতুন ছবি আপলোড করুন (File Upload):
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            updateMemberProfilePhoto(currentVoter.voter_id, reader.result as string);
+                          };
+                          reader.readAsDataURL(file);
+
+                          import('../lib/supabase').then(({ uploadFileToStorage }) => {
+                            uploadFileToStorage(file, 'profiles').then(({ url }) => {
+                              if (url) updateMemberProfilePhoto(currentVoter.voter_id, url);
+                            });
+                          });
+                        }
+                      }}
+                      className="text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#1e3a5f] file:text-white hover:file:bg-[#152943] cursor-pointer"
+                    />
+                    <span className="text-[11px] text-slate-500 block">কম্পিউটার বা ফোন থেকে সরাসরি আপনার ছবি ফাইল সিলেক্ট করুন</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

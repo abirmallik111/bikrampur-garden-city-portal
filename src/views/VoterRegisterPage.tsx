@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { getDefaultAvatar } from '../utils/avatar';
 import { ResidentType } from '../types';
 import {
   FileCheck2,
@@ -320,35 +321,41 @@ export const VoterRegisterPage: React.FC = () => {
               </select>
             </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                প্রোফাইল ছবি / পাসপোর্ট ছবি (Profile Picture PP) <span className="text-slate-400 font-normal">(ঐচ্ছিক)</span>
+            <div className="sm:col-span-2 space-y-1.5">
+              <label className="block text-xs font-semibold text-slate-700">
+                প্রোফাইল ছবি আপলোড করুন (Upload PP Photo) <span className="text-slate-400 font-normal">(ঐচ্ছিক)</span>
               </label>
-              <div className="flex gap-3 items-center">
-                {profilePhotoUrl ? (
-                  <img
-                    src={profilePhotoUrl}
-                    alt="PP Preview"
-                    className="w-12 h-14 object-cover rounded-xl border border-slate-300 shadow-2xs shrink-0"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
-                    }}
-                  />
-                ) : (
-                  <div className="w-12 h-14 bg-slate-100 rounded-xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 text-[10px] font-bold shrink-0">
-                    <span>PP</span>
-                    <span>Photo</span>
-                  </div>
-                )}
-                <div className="flex-1 space-y-1">
+              <div className="flex gap-4 items-center p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+                <img
+                  src={profilePhotoUrl || getDefaultAvatar(gender)}
+                  alt="Profile Picture Preview"
+                  className="w-14 h-16 object-cover rounded-xl border border-slate-300 shadow-2xs shrink-0 bg-slate-200"
+                />
+                <div className="flex-1 space-y-1.5">
                   <input
-                    type="url"
-                    value={profilePhotoUrl}
-                    onChange={e => setProfilePhotoUrl(e.target.value)}
-                    placeholder="ছবি লিংক (যেমন: https://images.unsplash.com/...)"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-blue-200"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setProfilePhotoUrl(reader.result as string);
+                        };
+                        reader.readAsDataURL(file);
+
+                        import('../lib/supabase').then(({ uploadFileToStorage }) => {
+                          uploadFileToStorage(file, 'profiles').then(({ url }) => {
+                            if (url) setProfilePhotoUrl(url);
+                          });
+                        });
+                      }
+                    }}
+                    className="text-xs file:mr-3 file:py-1.5 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#1e3a5f] file:text-white hover:file:bg-[#152943] cursor-pointer"
                   />
-                  <p className="text-[10px] text-slate-500">প্রার্থীতা ও সদস্য পরিচয়পত্রে প্রদর্শনের জন্য প্রার্থীর পাসপোর্ট ছবি (PP)</p>
+                  <p className="text-[10px] text-slate-500">
+                    ছবি আপলোড না করলে লিঙ্গ ({gender === 'female' ? 'মহিলা' : 'পুরুষ'}) অনুযায়ী ডিফল্ট অবয়ব প্রফাইলে থাকবে। ইউটিলিটি বিলের ছবি এর থেকে সম্পূর্ণ আলাদা রাখা হবে।
+                  </p>
                 </div>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { getMemberPhoto } from '../utils/avatar';
 import {
   Vote,
   ShieldCheck,
@@ -249,7 +250,7 @@ export const ElectionVotingPage: React.FC = () => {
                       {/* Photo */}
                       <div className="w-14 h-16 rounded-xl bg-slate-200 overflow-hidden relative shrink-0 border border-slate-300">
                         <img
-                          src={cand.photo_url}
+                          src={getMemberPhoto(cand.photo_url)}
                           alt={cand.name}
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
