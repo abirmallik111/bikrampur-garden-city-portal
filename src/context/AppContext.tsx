@@ -211,6 +211,26 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'bgc_society_portal_v6';
 
+const fixElectionPositions = (list: Election[]): Election[] => {
+  if (!list || list.length === 0) return INITIAL_ELECTIONS;
+  return list.map(e => {
+    if (!e.positions || e.positions.length === 0) {
+      return {
+        ...e,
+        positions: DEFAULT_COMMITTEE_POSITIONS.map(p => ({
+          id: `${e.id}-${p.id}`,
+          election_id: e.id,
+          position_name: p.position_name,
+          position_name_bn: `${p.position_name_bn} (${p.total_seats} জন)`,
+          sort_order: p.sort_order,
+          max_votes: p.max_votes
+        }))
+      };
+    }
+    return e;
+  });
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation State with URL Synchronized Routing
   const [currentView, setCurrentViewRaw] = useState<ViewRoute>(() => {
