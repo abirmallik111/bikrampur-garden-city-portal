@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 export default async function handler(req: any, res: any) {
   // CORS Headers
@@ -14,19 +14,19 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.RESEND_API_KEY || process.env.VITE_RESEND_API_KEY;
-  if (!apiKey) {
+  const smtpEmail = process.env.SMTP_EMAIL || process.env.GMAIL_USER;
+  const smtpPass = process.env.SMTP_PASSWORD || process.env.GMAIL_APP_PASSWORD;
+
+  if (!smtpEmail || !smtpPass) {
     return res.status(400).json({
       success: false,
-      error: 'RESEND_API_KEY environment variable is missing on Vercel.'
+      error: 'SMTP_EMAIL and SMTP_PASSWORD are not configured in environment variables.'
     });
   }
 
-  const resend = new Resend(apiKey);
-
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const { to, subject, html, html_body, body_html, text, plain_text, preview_text, from } = body || {};
+    const { to, subject, html, html_body, body_html, text, plain_text, preview_text } = body || {};
 
     const finalHtml = html || html_body || body_html || (text || plain_text || preview_text ? `<p>${text || plain_text || preview_text}</p>` : '');
     const finalText = text || plain_text || preview_text;
@@ -34,31 +34,29 @@ export default async function handler(req: any, res: any) {
     if (!to || !subject || !finalHtml) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required parameters: to, subject, and html are required.'
+        error: 'Missing required parameters (to, subject, html)'
       });
     }
 
-    // Force sender to onboarding@resend.dev unless custom verified domain is explicitly configured
-    const sender = (from && from.includes('resend.dev')) 
-      ? from 
-      : (process.env.RESEND_FROM_EMAIL || 'Bikrampur Garden City <onboarding@resend.dev>');
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: smtpEmail,
+        pass: smtpPass
+      }
+    });
 
-    const response = await resend.emails.send({
-      from: sender,
-      to: Array.isArray(to) ? to : [to],
+    const info = await transporter.sendMail({
+      from: `"Bikrampur Garden City" <${smtpEmail}>`,
+      to: Array.isArray(to) ? to.join(', ') : to,
       subject: subject,
       html: finalHtml,
       text: finalText
     });
 
-    if (response.error) {
-      console.error('Resend API response error:', response.error);
-      return res.status(400).json({ success: false, error: response.error.message || response.error });
-    }
-
-    return res.status(200).json({ success: true, data: response.data });
+    return res.status(200).json({ success: true, messageId: info.messageId });
   } catch (error: any) {
-    console.error('Server error in /api/send-email:', error);
+    console.error('Server error sending email via SMTP:', error);
     return res.status(500).json({
       success: false,
       error: error?.message || 'Server error sending email'

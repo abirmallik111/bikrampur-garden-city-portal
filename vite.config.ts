@@ -3,13 +3,13 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig, Plugin } from 'vite';
 import dotenv from 'dotenv';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
-function resendDevPlugin(): Plugin {
+function smtpDevPlugin(): Plugin {
   return {
-    name: 'resend-dev-plugin',
+    name: 'smtp-dev-plugin',
     configureServer(server) {
       server.middlewares.use('/api/send-email', async (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', '*');
@@ -33,19 +33,21 @@ function resendDevPlugin(): Plugin {
         req.on('data', chunk => { bodyStr += chunk; });
         req.on('end', async () => {
           try {
-            const apiKey = process.env.RESEND_API_KEY || process.env.VITE_RESEND_API_KEY;
-            if (!apiKey) {
+            const smtpEmail = process.env.SMTP_EMAIL || process.env.GMAIL_USER;
+            const smtpPass = process.env.SMTP_PASSWORD || process.env.GMAIL_APP_PASSWORD;
+
+            if (!smtpEmail || !smtpPass) {
               res.statusCode = 400;
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({
                 success: false,
-                error: 'RESEND_API_KEY is missing in your .env file or environment variables.'
+                error: 'SMTP_EMAIL and SMTP_PASSWORD are not configured in .env file.'
               }));
               return;
             }
 
             const body = JSON.parse(bodyStr || '{}');
-            const { to, subject, html, html_body, body_html, text, plain_text, preview_text, from } = body;
+            const { to, subject, html, html_body, body_html, text, plain_text, preview_text } = body;
 
             const finalHtml = html || html_body || body_html || (text || plain_text || preview_text ? `<p>${text || plain_text || preview_text}</p>` : '');
             const finalText = text || plain_text || preview_text;
@@ -57,33 +59,28 @@ function resendDevPlugin(): Plugin {
               return;
             }
 
-            const resend = new Resend(apiKey);
-            const sender = (from && from.includes('resend.dev'))
-              ? from
-              : (process.env.RESEND_FROM_EMAIL || 'Bikrampur Garden City <onboarding@resend.dev>');
+            const transporter = nodemailer.createTransport({
+              service: 'gmail',
+              auth: {
+                user: smtpEmail,
+                pass: smtpPass
+              }
+            });
 
-            const response = await resend.emails.send({
-              from: sender,
-              to: Array.isArray(to) ? to : [to],
+            const info = await transporter.sendMail({
+              from: `"Bikrampur Garden City" <${smtpEmail}>`,
+              to: Array.isArray(to) ? to.join(', ') : to,
               subject: subject,
               html: finalHtml,
               text: finalText
             });
 
-            if (response.error) {
-              console.error('[Resend Dev Plugin] Resend Error:', response.error);
-              res.statusCode = 400;
-              res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({ success: false, error: response.error.message || response.error }));
-              return;
-            }
-
-            console.log('[Resend Dev Plugin] ✅ Real email sent via Resend:', response.data);
+            console.log('[SMTP Dev Plugin] ✅ Email delivered successfully via Gmail SMTP:', info.messageId);
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ success: true, data: response.data }));
+            res.end(JSON.stringify({ success: true, messageId: info.messageId }));
           } catch (err: any) {
-            console.error('[Resend Dev Plugin] Server Error:', err);
+            console.error('[SMTP Dev Plugin] Server Error:', err);
             res.statusCode = 500;
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({ success: false, error: err.message || 'Server error' }));
@@ -96,7 +93,7 @@ function resendDevPlugin(): Plugin {
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss(), resendDevPlugin()],
+    plugins: [react(), tailwindcss(), smtpDevPlugin()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
