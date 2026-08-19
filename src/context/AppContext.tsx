@@ -210,7 +210,7 @@ export const pathToView = (pathname: string): ViewRoute => {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'bgc_society_portal_v6';
+const STORAGE_KEY = 'bgc_society_portal_v7';
 
 const fixElectionPositions = (list: Election[]): Election[] => {
   if (!list || list.length === 0) return INITIAL_ELECTIONS;
