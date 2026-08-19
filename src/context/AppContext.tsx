@@ -446,7 +446,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       sendRealEmailViaResend({
         to: email.to_email,
         subject: email.subject,
-        html: email.body_html
+        html: email.html_body || (email as any).body_html || email.preview_text || '<p>Notification from Bikrampur Garden City</p>',
+        text: email.plain_text || email.preview_text
       });
     }
   };

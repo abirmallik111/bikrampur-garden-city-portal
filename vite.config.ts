@@ -45,9 +45,12 @@ function resendDevPlugin(): Plugin {
             }
 
             const body = JSON.parse(bodyStr || '{}');
-            const { to, subject, html, text, from } = body;
+            const { to, subject, html, html_body, body_html, text, plain_text, preview_text, from } = body;
 
-            if (!to || !subject || (!html && !text)) {
+            const finalHtml = html || html_body || body_html || (text || plain_text || preview_text ? `<p>${text || plain_text || preview_text}</p>` : '');
+            const finalText = text || plain_text || preview_text;
+
+            if (!to || !subject || !finalHtml) {
               res.statusCode = 400;
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({ success: false, error: 'Missing required parameters (to, subject, html)' }));
@@ -63,8 +66,8 @@ function resendDevPlugin(): Plugin {
               from: sender,
               to: Array.isArray(to) ? to : [to],
               subject: subject,
-              html: html || `<p>${text}</p>`,
-              text: text
+              html: finalHtml,
+              text: finalText
             });
 
             if (response.error) {

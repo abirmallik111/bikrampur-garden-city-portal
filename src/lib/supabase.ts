@@ -99,7 +99,19 @@ export async function fetchAllFromCloud() {
 export async function cloudInsert(table: string, record: any) {
   try {
     const { error } = await supabase.from(table).insert([record]);
-    if (error) console.warn(`Supabase insert error on ${table}:`, error.message);
+    if (error) {
+      console.warn(`Supabase insert error on ${table}:`, error.message);
+      // If error is about a missing column, retry without the optional extra fields
+      if (error.message.includes('column') || error.message.includes('schema cache')) {
+        const fallbackRecord = { ...record };
+        delete fallbackRecord.gender;
+        delete fallbackRecord.profile_photo_url;
+        const retry = await supabase.from(table).insert([fallbackRecord]);
+        if (!retry.error) {
+          console.log(`Supabase fallback insert succeeded for ${table}`);
+        }
+      }
+    }
   } catch (e) {
     console.warn(`Supabase insert catch on ${table}:`, e);
   }

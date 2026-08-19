@@ -26,9 +26,12 @@ export default async function handler(req: any, res: any) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const { to, subject, html, text, from } = body || {};
+    const { to, subject, html, html_body, body_html, text, plain_text, preview_text, from } = body || {};
 
-    if (!to || !subject || (!html && !text)) {
+    const finalHtml = html || html_body || body_html || (text || plain_text || preview_text ? `<p>${text || plain_text || preview_text}</p>` : '');
+    const finalText = text || plain_text || preview_text;
+
+    if (!to || !subject || !finalHtml) {
       return res.status(400).json({
         success: false,
         error: 'Missing required parameters: to, subject, and html are required.'
@@ -44,8 +47,8 @@ export default async function handler(req: any, res: any) {
       from: sender,
       to: Array.isArray(to) ? to : [to],
       subject: subject,
-      html: html || `<p>${text}</p>`,
-      text: text
+      html: finalHtml,
+      text: finalText
     });
 
     if (response.error) {
