@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { sendRealEmailViaResend } from '../lib/resend';
+import { sendEmail } from '../lib/emailService';
 import {
   User,
   VoterApplication,
@@ -431,7 +431,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem(`${STORAGE_KEY}_currentUser`, JSON.stringify(currentUser));
   }, [currentUser]);
 
-  // Helper to log transactional Email & dispatch via Resend
+  // Helper to log transactional Email & dispatch via SMTP
   const dispatchEmail = (email: Omit<EmailNotification, 'id' | 'sent_at' | 'status'>) => {
     const newEmail: EmailNotification = {
       ...email,
@@ -441,9 +441,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setEmailLogs(prev => [newEmail, ...prev]);
 
-    // Dispatch real email via Resend API
+    // Dispatch real email via SMTP API
     if (email.to_email) {
-      sendRealEmailViaResend({
+      sendEmail({
         to: email.to_email,
         subject: email.subject,
         html: email.html_body || (email as any).body_html || email.preview_text || '<p>Notification from Bikrampur Garden City</p>',
