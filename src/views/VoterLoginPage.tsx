@@ -256,7 +256,7 @@ export const VoterLoginPage: React.FC = () => {
                   type="text"
                   value={adminEmail}
                   onChange={e => setAdminEmail(e.target.value)}
-                  placeholder="abirmallik111@gmail.com"
+                  placeholder="Enter your email"
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl border border-slate-300 text-sm focus:outline-hidden focus:ring-2 focus:ring-slate-900 focus:bg-white"
                   required
                 />
