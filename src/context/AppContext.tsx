@@ -125,10 +125,13 @@ interface AppContextType {
   bulkApproveApplications: (appIds: string[]) => { success: boolean; count: number };
 
   // Election Actions
-  castVote: (electionId: string, candidateSelections: Record<string, string>) => { success: boolean; message: string };
+  castVote: (electionId: string | any, candidateSelections?: Record<string, string | string[]>) => { success: boolean; message: string };
   hasVoterVotedInElection: (electionId: string, voterId?: string) => boolean;
   createElection: (electionData: Partial<Election>) => void;
   updateElectionStatus: (electionId: string, status: ElectionStatus) => void;
+  deleteElection: (electionId: string) => void;
+  addPositionToElection: (electionId: string, position: ElectionPosition) => void;
+  removePositionFromElection: (electionId: string, positionId: string) => void;
   addCandidateToElection: (electionId: string, candidateData: Omit<Candidate, 'id' | 'election_id' | 'vote_count' | 'created_at'>) => void;
   removeCandidate: (electionId: string, candidateId: string) => void;
   publishResults: (electionId: string) => void;
@@ -210,7 +213,7 @@ export const pathToView = (pathname: string): ViewRoute => {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'bgc_society_portal_v8';
+const STORAGE_KEY = 'bgc_society_portal_v9';
 
 const fixElectionPositions = (list: Election[]): Election[] => {
   if (!list || list.length === 0) return INITIAL_ELECTIONS;
@@ -978,10 +981,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return votes.some(v => v.election_id === electionId && v.voter_id === vid);
   };
 
-  const castVote = (electionId: string, candidateSelections: Record<string, string>) => {
+  const castVote = (electionIdOrData: any, candidateSelections?: Record<string, string | string[]>) => {
     if (!currentVoter) {
-      return { success: false, message: 'ভোট প্রদান করতে ভোটার হিসেবে লগইন করুন।' };
+      return { success: false, message: 'ভোট প্রদান করতে সদস্য হিসেবে লগইন করুন।' };
     }
+
+    let electionId: string;
+    let selections: Record<string, string | string[]> = {};
+
+    if (typeof electionIdOrData === 'string') {
+      electionId = electionIdOrData;
+      selections = candidateSelections || {};
+    } else if (electionIdOrData && typeof electionIdOrData === 'object') {
+      electionId = electionIdOrData.election_id;
+      if (electionIdOrData.position_id && electionIdOrData.candidate_id) {
+        selections = { [electionIdOrData.position_id]: electionIdOrData.candidate_id };
+      } else if (candidateSelections) {
+        selections = candidateSelections;
+      }
+    } else {
+      return { success: false, message: 'ভোটের তথ্য সঠিক নয়।' };
+    }
+
     const election = elections.find(e => e.id === electionId);
     if (!election) {
       return { success: false, message: 'নির্বাচন পাওয়া যায়নি।' };
@@ -993,19 +1014,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { success: false, message: 'আপনি ইতোমধ্যে এই নির্বাচনে আপনার মূল্যবান ভোট প্রদান করেছেন। এক নির্বাচনে একবারই ভোট দেওয়া যায়।' };
     }
 
+    // Flatten all selected candidate IDs
+    const selectedCandidateIds = new Set<string>();
+    for (const [_, val] of Object.entries(selections)) {
+      if (Array.isArray(val)) {
+        val.forEach(id => selectedCandidateIds.add(id));
+      } else if (val) {
+        selectedCandidateIds.add(val);
+      }
+    }
+
     // Create vote records
     const newVotes: Vote[] = [];
+    for (const [posId, val] of Object.entries(selections)) {
+      const candIds = Array.isArray(val) ? val : [val];
+      candIds.forEach(candId => {
+        if (candId) {
+          const vRecord: Vote = {
+            id: `vt-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+            election_id: electionId,
+            voter_id: currentVoter.id,
+            position_id: posId,
+            candidate_id: candId,
+            voted_at: new Date().toISOString()
+          };
+          newVotes.push(vRecord);
+          cloudInsert('votes', vRecord);
+        }
+      });
+    }
+
     const updatedCandidates = election.candidates.map(c => {
-      const selectedForPos = candidateSelections[c.position_id];
-      if (selectedForPos === c.id) {
-        newVotes.push({
-          id: `vt-${Date.now()}-${Math.random()}`,
-          election_id: electionId,
-          voter_id: currentVoter.id,
-          position_id: c.position_id,
-          candidate_id: c.id,
-          voted_at: new Date().toISOString()
-        });
+      if (selectedCandidateIds.has(c.id)) {
         return {
           ...c,
           vote_count: (c.vote_count || 0) + 1
@@ -1016,10 +1056,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setVotes(prev => [...prev, ...newVotes]);
 
-    // Update candidate count in election
+    // Update election with new candidate vote counts
+    const updatedElection = { ...election, candidates: updatedCandidates };
     setElections(prev =>
-      prev.map(e => (e.id === electionId ? { ...e, candidates: updatedCandidates } : e))
+      prev.map(e => (e.id === electionId ? updatedElection : e))
     );
+    cloudUpsert('elections', updatedElection);
 
     // Trigger celebration event
     if (typeof window !== 'undefined' && (window as any).confetti) {
@@ -1043,25 +1085,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       from_email: 'election.commission@bikrampurgardencity.com',
       from_name: 'Bikrampur Garden City Election Commission',
       subject: `[Bikrampur Garden City] আপনার ভোট সফলভাবে সংরক্ষিত হয়েছে — ${election.title_bn || election.title}`,
-      preview_text: `আপনার ভোটার আইডি ${currentVoter.voter_id} দ্বারা সাধারণ নির্বাচনে ভোট সফলভাবে গৃহীত ও ব্লকচেইন-সদৃশ টাইমস্ট্যাম্পসহ সংরক্ষিত হয়েছে...`,
-      html_body: `<div style="font-family: sans-serif; padding: 20px; color: #1e293b;">
+      preview_text: `আপনার সদস্য আইডি ${currentVoter.voter_id} দ্বারা নির্বাচনে ভোট সফলভাবে গৃহীত ও সংরক্ষিত হয়েছে...`,
+      html_body: `<div style="font-family: sans-serif; padding: 20px; color: #1e293b; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px;">
         <h2 style="color: #047857; margin-bottom: 6px;">ভোট নিশ্চিতকরণ সনদ (Official Vote Confirmation)</h2>
         <p>সম্মানিত ${currentVoter.name_en} (${currentVoter.name_bn}),</p>
         <p><strong>${election.title_bn || election.title}</strong>-এ আপনার ডিজিটাল ভোটাধিকার সফলভাবে প্রয়োগ করা হয়েছে।</p>
         <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 18px; border-radius: 10px; margin: 15px 0;">
-          <p style="margin: 0 0 6px 0;"><strong>ভোটার আইডি:</strong> <span style="font-family: monospace; font-weight: bold; color: #065f46;">${currentVoter.voter_id}</span></p>
+          <p style="margin: 0 0 6px 0;"><strong>সদস্য আইডি:</strong> <span style="font-family: monospace; font-weight: bold; color: #065f46;">${currentVoter.voter_id}</span></p>
           <p style="margin: 0 0 6px 0;"><strong>ভোটগ্রহণের সময়:</strong> ${new Date().toLocaleString('bn-BD')}</p>
           <p style="margin: 0 0 6px 0;"><strong>ভেরিফিকেশন টোকেন:</strong> <code style="background: #dcfce7; padding: 2px 6px; border-radius: 4px; font-family: monospace;">VTK-${Date.now().toString(36).toUpperCase()}</code></p>
           <p style="margin: 0; color: #15803d; font-size: 13px;">✓ আপনার ব্যালটটি এনক্রিপ্টেড পদ্ধতিতে গণনা বাক্সে যুক্ত হয়েছে।</p>
         </div>
-        <p style="font-size: 13px; color: #475569;">ভোট গণনা ও ফলাফল ঘোষণার নির্দিষ্ট সময়ে পোর্টালের "নির্বাচনী ফলাফল" ট্যাবে পূর্ণাঙ্গ ফলাফল সরাসরি দেখতে পারবেন।</p>
-        <p style="color: #64748b; font-size: 11px; margin-top: 25px; border-top: 1px solid #e2e8f0; pt: 10px;">রিটার্নিং অফিসার • বিক্রমপুর গার্ডেন সিটি নির্বাচন পরিচালনা কমিটি</p>
+        <p style="font-size: 13px; color: #475569;">ভোট গণনা ও ফলাফল ঘোষণার নির্দিষ্ট সময়ে পোর্টালের "নির্বাচন ও ফলাফল" পেজে পূর্ণাঙ্গ ফলাফল লাইভ দেখতে পারবেন।</p>
+        <p style="color: #64748b; font-size: 11px; margin-top: 25px; border-top: 1px solid #e2e8f0; padding-top: 10px;">রিটার্নিং অফিসার • বিক্রমপুর গার্ডেন সিটি নির্বাচন পরিচালনা কমিটি</p>
       </div>`,
       plain_text: `আপনার ভোট সফলভাবে সংরক্ষিত হয়েছে। ধন্যবাদ! - ${election.title}`,
       type: 'vote_confirmation',
       code: `VTK-${Date.now().toString(36).toUpperCase()}`,
       action_label: 'নির্বাচনী ফলাফল দেখুন',
-      action_url: 'election'
+      action_url: 'elections'
     });
 
     return {
@@ -1085,12 +1127,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: newId,
       title: electionData.title || 'BIKRAMPUR GARDEN CITY SOCIETY COMMITTEE ELECTION',
       title_bn: electionData.title_bn || 'বিক্রমপুর গার্ডেন সিটি সোসাইটি কার্যনির্বাহী পরিষদ নির্বাচন ২০২৬',
-      description: electionData.description || 'সোসাইটির নিবাসী ও প্লট মালিকদের দ্বারা ১৯-সদস্য বিশিষ্ট কার্যনির্বাহী পরিষদ গঠনের জন্য ডিজিটাল নির্বাচন।',
+      description: electionData.description || 'সোসাইটির নিবাসী ও ফ্ল্যাট মালিকদের দ্বারা কার্যনির্বাহী পরিষদ গঠনের জন্য ডিজিটাল নির্বাচন।',
       candidate_reg_start: electionData.candidate_reg_start || new Date().toISOString(),
       candidate_reg_end: electionData.candidate_reg_end || new Date().toISOString(),
       voting_start: electionData.voting_start || new Date().toISOString(),
       voting_end: electionData.voting_end || new Date().toISOString(),
-      status: electionData.status || 'nomination',
+      status: electionData.status || 'voting',
       created_by: currentUser?.id || 'admin',
       created_at: new Date().toISOString(),
       positions: electionData.positions && electionData.positions.length > 0 ? electionData.positions : defaultPositions,
@@ -1098,6 +1140,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setElections(prev => [newElection, ...prev]);
     cloudUpsert('elections', newElection);
+    showToast('নতুন নির্বাচন সফলভাবে তৈরি করা হয়েছে।', 'success');
+  };
+
+  const deleteElection = (electionId: string) => {
+    setElections(prev => prev.filter(e => e.id !== electionId));
+    cloudDelete('elections', electionId);
+    showToast('নির্বাচনটি মুছে ফেলা হয়েছে।', 'info');
+  };
+
+  const addPositionToElection = (electionId: string, position: ElectionPosition) => {
+    setElections(prev =>
+      prev.map(e => {
+        if (e.id === electionId) {
+          const updated = {
+            ...e,
+            positions: [...(e.positions || []), position]
+          };
+          cloudUpsert('elections', updated);
+          return updated;
+        }
+        return e;
+      })
+    );
+    showToast('নতুন পদ সফলভাবে যুক্ত করা হয়েছে।', 'success');
+  };
+
+  const removePositionFromElection = (electionId: string, positionId: string) => {
+    setElections(prev =>
+      prev.map(e => {
+        if (e.id === electionId) {
+          const updated = {
+            ...e,
+            positions: (e.positions || []).filter(p => p.id !== positionId),
+            candidates: (e.candidates || []).filter(c => c.position_id !== positionId)
+          };
+          cloudUpsert('elections', updated);
+          return updated;
+        }
+        return e;
+      })
+    );
+    showToast('পদটি নির্বাচন থেকে বাদ দেওয়া হয়েছে।', 'info');
   };
 
   const updateMemberProfilePhoto = (voterId: string, photoUrl: string) => {
@@ -1466,6 +1550,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         hasVoterVotedInElection,
         createElection,
         updateElectionStatus,
+        deleteElection,
+        addPositionToElection,
+        removePositionFromElection,
         addCandidateToElection,
         removeCandidate,
         publishResults,

@@ -133,21 +133,17 @@ export const ElectionVotingPage: React.FC = () => {
   const handleFinalSubmitVote = () => {
     setIsSubmitting(true);
     setTimeout(() => {
-      // Cast vote for all selected positions
-      for (const [posId, candId] of Object.entries(selections)) {
-        castVote({
-          election_id: currentElection.id,
-          voter_id: currentVoter.id,
-          position_id: posId,
-          candidate_id: candId
-        });
-      }
-
+      const res = castVote(currentElection.id, selections);
       setIsSubmitting(false);
       setShowConfirmModal(false);
-      setVoteSuccess(true);
-      showToast('ভোট সফলভাবে গৃহীত হয়েছে। ধন্যবাদ!', 'success');
-    }, 600);
+      if (res.success) {
+        setVoteSuccess(true);
+        showToast('ভোট সফলভাবে গৃহীত হয়েছে। ধন্যবাদ!', 'success');
+      } else {
+        setError(res.message);
+        showToast(res.message, 'error');
+      }
+    }, 400);
   };
 
   return (

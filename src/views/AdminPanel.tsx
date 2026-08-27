@@ -77,6 +77,9 @@ export const AdminPanel: React.FC = () => {
     updateCommitteeMember,
     deleteCommitteeMember,
     createElection,
+    deleteElection,
+    addPositionToElection,
+    removePositionFromElection,
     addCandidateToElection,
     removeCandidate,
     showToast
@@ -110,7 +113,19 @@ export const AdminPanel: React.FC = () => {
   
   // Elections state
   const [showElectionForm, setShowElectionForm] = useState(false);
-  const [electionForm, setElectionForm] = useState({ title: '', title_bn: '', description: '', voting_start: '', voting_end: '', status: 'upcoming' as ElectionStatus });
+  const [electionForm, setElectionForm] = useState({ title: '', title_bn: '', description: '', voting_start: '', voting_end: '', status: 'voting' as ElectionStatus });
+  const [selectedPresetPosIds, setSelectedPresetPosIds] = useState<string[]>(DEFAULT_COMMITTEE_POSITIONS.map(p => p.id));
+  const [customPositionsList, setCustomPositionsList] = useState<Array<{ name: string; name_bn: string; seats: number; max_votes: number }>>([]);
+  const [newCustomPosNameBn, setNewCustomPosNameBn] = useState('');
+  const [newCustomPosNameEn, setNewCustomPosNameEn] = useState('');
+  const [newCustomPosSeats, setNewCustomPosSeats] = useState(1);
+
+  // Inline Add Position to existing election
+  const [addPosToElectionId, setAddPosToElectionId] = useState<string | null>(null);
+  const [inlinePosNameBn, setInlinePosNameBn] = useState('');
+  const [inlinePosNameEn, setInlinePosNameEn] = useState('');
+  const [inlinePosSeats, setInlinePosSeats] = useState(1);
+
   const [candidateFormOpenFor, setCandidateFormOpenFor] = useState<string | null>(null);
   const [candidateForm, setCandidateForm] = useState({ position_id: '', name: '', name_bn: '', bio: '', symbol: '', phone: '', photo_url: '', voter_id: '' });
 
@@ -712,47 +727,280 @@ export const AdminPanel: React.FC = () => {
       {adminTab === 'elections' && (
         <div className="space-y-6">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xs p-6 space-y-6">
-            <button onClick={() => setShowElectionForm(!showElectionForm)} className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold w-full text-left">+ নতুন নির্বাচন তৈরি করুন</button>
+            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+              <div>
+                <h3 className="text-base font-bold text-slate-900">নির্বাচন ও ব্যালট পরিচালনা</h3>
+                <p className="text-xs text-slate-500">প্রয়োজন অনুযায়ী ১টি, ২টি, ৪টি বা ১২টি পদের জন্য কাস্টমাইজড নির্বাচন তৈরি করুন</p>
+              </div>
+              <button
+                onClick={() => setShowElectionForm(!showElectionForm)}
+                className="px-4 py-2 bg-[#1e3a5f] hover:bg-[#152943] text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              >
+                {showElectionForm ? '✕ ফরম বন্ধ করুন' : '+ নতুন নির্বাচন তৈরি করুন'}
+              </button>
+            </div>
+
             {showElectionForm && (
-              <div className="space-y-4 p-4 border rounded-xl bg-slate-50">
-                <input placeholder="Title in English" className="w-full p-2 border rounded" value={electionForm.title} onChange={e => setElectionForm({...electionForm, title: e.target.value})} />
-                <input placeholder="Title in Bangla" className="w-full p-2 border rounded" value={electionForm.title_bn} onChange={e => setElectionForm({...electionForm, title_bn: e.target.value})} />
-                <textarea placeholder="Description" className="w-full p-2 border rounded" value={electionForm.description} onChange={e => setElectionForm({...electionForm, description: e.target.value})} />
-                <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-5 p-5 border border-blue-200 rounded-2xl bg-blue-50/30 text-xs">
+                <div className="font-bold text-sm text-[#1e3a5f]">নতুন নির্বাচন তৈরি ও পদের সংখ্যা নির্ধারণ</div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs">Voting Start Date</label>
-                    <input type="datetime-local" className="w-full p-2 border rounded" value={electionForm.voting_start} onChange={e => setElectionForm({...electionForm, voting_start: e.target.value})} />
+                    <label className="block font-semibold text-slate-700 mb-1">নির্বাচনের নাম (English) *</label>
+                    <input
+                      placeholder="e.g. EXECUTIVE COMMITTEE ELECTION 2026"
+                      className="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"
+                      value={electionForm.title}
+                      onChange={e => setElectionForm({...electionForm, title: e.target.value})}
+                    />
                   </div>
                   <div>
-                    <label className="block text-xs">Voting End Date</label>
-                    <input type="datetime-local" className="w-full p-2 border rounded" value={electionForm.voting_end} onChange={e => setElectionForm({...electionForm, voting_end: e.target.value})} />
+                    <label className="block font-semibold text-slate-700 mb-1">নির্বাচনের নাম (বাংলা) *</label>
+                    <input
+                      placeholder="যেমন: কার্যনির্বাহী পরিষদ নির্বাচন ২০২৬"
+                      className="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs font-medium"
+                      value={electionForm.title_bn}
+                      onChange={e => setElectionForm({...electionForm, title_bn: e.target.value})}
+                    />
                   </div>
                 </div>
-                <select className="w-full p-2 border rounded" value={electionForm.status} onChange={e => setElectionForm({...electionForm, status: e.target.value as ElectionStatus})}>
-                  <option value="draft">Draft</option>
-                  <option value="upcoming">Upcoming</option>
-                  <option value="voting">Voting</option>
-                </select>
-                <button onClick={() => { createElection(electionForm); setShowElectionForm(false); }} className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold">তৈরি করুন</button>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">বিবরণ (Description)</label>
+                  <textarea
+                    rows={2}
+                    placeholder="নির্বাচনের বিস্তারিত বিবরণ..."
+                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"
+                    value={electionForm.description}
+                    onChange={e => setElectionForm({...electionForm, description: e.target.value})}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">ভোটগ্রহণ শুরু</label>
+                    <input
+                      type="datetime-local"
+                      className="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"
+                      value={electionForm.voting_start}
+                      onChange={e => setElectionForm({...electionForm, voting_start: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">ভোটগ্রহণ সমাপ্তি</label>
+                    <input
+                      type="datetime-local"
+                      className="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"
+                      value={electionForm.voting_end}
+                      onChange={e => setElectionForm({...electionForm, voting_end: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">প্রাথমিক স্ট্যাটাস</label>
+                    <select
+                      className="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs font-bold"
+                      value={electionForm.status}
+                      onChange={e => setElectionForm({...electionForm, status: e.target.value as ElectionStatus})}
+                    >
+                      <option value="voting">Voting (ভোটগ্রহণ চলমান)</option>
+                      <option value="nomination">Nomination (মনোনয়ন পর্ব)</option>
+                      <option value="draft">Draft (খসড়া)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Positions Configuration (Checkboxes & Custom Add) */}
+                <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <span className="font-bold text-slate-900 block">এই নির্বাচনে কোন কোন পদে ভোট হবে?</span>
+                      <span className="text-[11px] text-slate-500">প্রয়োজনমতো পদ বাছাই করুন (যেমন: ১টি, ২টি, ৪টি বা ১২টি)</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPresetPosIds(DEFAULT_COMMITTEE_POSITIONS.map(p => p.id))}
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-semibold"
+                      >
+                        সব বাছাই করুন
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPresetPosIds([])}
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-semibold"
+                      >
+                        সব বাতিল
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pt-2">
+                    {DEFAULT_COMMITTEE_POSITIONS.map(p => {
+                      const isChecked = selectedPresetPosIds.includes(p.id);
+                      return (
+                        <label
+                          key={p.id}
+                          className={`flex items-center gap-2 p-2 rounded-xl border cursor-pointer transition-all ${
+                            isChecked
+                              ? 'bg-emerald-50 border-emerald-300 text-emerald-950 font-semibold'
+                              : 'bg-slate-50 border-slate-200 text-slate-600'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={e => {
+                              if (e.target.checked) {
+                                setSelectedPresetPosIds(prev => [...prev, p.id]);
+                              } else {
+                                setSelectedPresetPosIds(prev => prev.filter(id => id !== p.id));
+                              }
+                            }}
+                            className="w-4 h-4 text-emerald-600 rounded"
+                          />
+                          <span className="text-xs">{p.position_name_bn} ({p.total_seats} জন)</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+
+                  {/* Add Custom Position to New Election */}
+                  <div className="pt-3 border-t border-slate-100 space-y-2">
+                    <span className="font-semibold text-slate-700 block text-[11px]">+ অতিরিক্ত কাস্টম পদ যোগ করুন (ঐচ্ছিক):</span>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <input
+                        placeholder="পদের নাম বাংলায় (যেমন: বিশেষ উপদেষ্টা)"
+                        value={newCustomPosNameBn}
+                        onChange={e => setNewCustomPosNameBn(e.target.value)}
+                        className="flex-1 p-2 border border-slate-300 rounded-lg text-xs bg-white"
+                      />
+                      <input
+                        placeholder="English Name (e.g. Special Advisor)"
+                        value={newCustomPosNameEn}
+                        onChange={e => setNewCustomPosNameEn(e.target.value)}
+                        className="flex-1 p-2 border border-slate-300 rounded-lg text-xs bg-white"
+                      />
+                      <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        placeholder="আসন সংখ্যা"
+                        value={newCustomPosSeats}
+                        onChange={e => setNewCustomPosSeats(Number(e.target.value) || 1)}
+                        className="w-24 p-2 border border-slate-300 rounded-lg text-xs bg-white font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!newCustomPosNameBn.trim()) return;
+                          setCustomPositionsList(prev => [
+                            ...prev,
+                            {
+                              name: newCustomPosNameEn || newCustomPosNameBn,
+                              name_bn: `${newCustomPosNameBn} (${newCustomPosSeats} জন)`,
+                              seats: newCustomPosSeats,
+                              max_votes: newCustomPosSeats
+                            }
+                          ]);
+                          setNewCustomPosNameBn('');
+                          setNewCustomPosNameEn('');
+                          setNewCustomPosSeats(1);
+                        }}
+                        className="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold"
+                      >
+                        যোগ করুন
+                      </button>
+                    </div>
+
+                    {customPositionsList.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {customPositionsList.map((cp, i) => (
+                          <span key={i} className="inline-flex items-center gap-1.5 bg-blue-100 text-blue-900 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                            <span>{cp.name_bn}</span>
+                            <button
+                              type="button"
+                              onClick={() => setCustomPositionsList(prev => prev.filter((_, idx) => idx !== i))}
+                              className="text-red-500 font-bold hover:text-red-700"
+                            >
+                              ✕
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowElectionForm(false)}
+                    className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs"
+                  >
+                    বাতিল
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!electionForm.title_bn.trim() && !electionForm.title.trim()) {
+                        showToast('নির্বাচনের নাম প্রদান করুন', 'error');
+                        return;
+                      }
+
+                      const selectedPresets = DEFAULT_COMMITTEE_POSITIONS.filter(p => selectedPresetPosIds.includes(p.id));
+                      const finalPositions = [
+                        ...selectedPresets.map(p => ({
+                          id: `pos-${Date.now()}-${p.id}`,
+                          election_id: '',
+                          position_name: p.position_name,
+                          position_name_bn: `${p.position_name_bn} (${p.total_seats} জন)`,
+                          sort_order: p.sort_order,
+                          max_votes: p.max_votes
+                        })),
+                        ...customPositionsList.map((cp, idx) => ({
+                          id: `pos-custom-${Date.now()}-${idx}`,
+                          election_id: '',
+                          position_name: cp.name,
+                          position_name_bn: cp.name_bn,
+                          sort_order: 50 + idx,
+                          max_votes: cp.max_votes
+                        }))
+                      ];
+
+                      if (finalPositions.length === 0) {
+                        showToast('কমপক্ষে ১টি নির্বাচনী পদ নির্বাচন করুন', 'error');
+                        return;
+                      }
+
+                      createElection({
+                        ...electionForm,
+                        title: electionForm.title || electionForm.title_bn,
+                        positions: finalPositions
+                      });
+                      setShowElectionForm(false);
+                      setCustomPositionsList([]);
+                    }}
+                    className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-xs"
+                  >
+                    নির্বাচন নিশ্চিত করুন
+                  </button>
+                </div>
               </div>
             )}
           </div>
+
           {elections.length === 0 && (
-            <div className="bg-white p-6 rounded-3xl border text-center">
-              কোনো নির্বাচন নেই। নতুন নির্বাচন তৈরি করুন।
+            <div className="bg-white p-8 rounded-3xl border border-slate-200 text-center space-y-3">
+              <div className="text-3xl">🗳️</div>
+              <h4 className="font-bold text-slate-800">বর্তমানে কোনো সক্রিয় নির্বাচন নেই</h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                উপরে "+ নতুন নির্বাচন তৈরি করুন" বাটনে ক্লিক করে পছন্দমতো পদ সংখ্যা দিয়ে নির্বাচন তৈরি করুন।
+              </p>
             </div>
           )}
+
           {elections.map(election => {
-            const activePositions = (election.positions && election.positions.length > 0)
-              ? election.positions
-              : DEFAULT_COMMITTEE_POSITIONS.map(p => ({
-                  id: `${election.id}-${p.id}`,
-                  election_id: election.id,
-                  position_name: p.position_name,
-                  position_name_bn: `${p.position_name_bn} (${p.total_seats} জন)`,
-                  sort_order: p.sort_order,
-                  max_votes: p.max_votes
-                }));
+            const activePositions = election.positions || [];
 
             return (
               <div key={election.id} className="bg-white rounded-3xl border border-slate-200 shadow-2xs p-6 space-y-6">
@@ -762,34 +1010,122 @@ export const AdminPanel: React.FC = () => {
                       <span className="text-xs bg-[#1e3a5f] text-white font-bold px-2.5 py-0.5 rounded-full capitalize">
                         স্ট্যাটাস: {election.status}
                       </span>
+                      <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full">
+                        {activePositions.length}টি পদ • {election.candidates.length} জন প্রার্থী
+                      </span>
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900 mt-1">{election.title}</h3>
+                    <h3 className="text-lg font-bold text-slate-900 mt-1">{election.title_bn || election.title}</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">{election.description}</p>
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-slate-500 font-semibold">স্ট্যাটাস পরিবর্তন:</span>
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    <span className="text-slate-500 font-semibold">স্ট্যাটাস:</span>
                     <select
                       value={election.status}
                       onChange={e => updateElectionStatus(election.id, e.target.value as ElectionStatus)}
-                      className="p-2 border border-slate-300 rounded-xl bg-white font-bold"
+                      className="p-2 border border-slate-300 rounded-xl bg-white font-bold text-xs"
                     >
-                      <option value="draft">Draft (খসড়া)</option>
-                      <option value="nomination">Nomination (মনোনয়ন পর্ব)</option>
                       <option value="voting">Voting (ভোটগ্রহণ চলমান)</option>
-                      <option value="ended">Ended (ভোটগ্রহণ সমাপ্ত)</option>
-                      <option value="published">Published (চূড়ান্ত ফলাফল প্রকাশিত)</option>
+                      <option value="nomination">Nomination (মনোনয়ন পর্ব)</option>
+                      <option value="draft">Draft (খসড়া)</option>
+                      <option value="ended">Ended (ভোট সমাপ্ত)</option>
+                      <option value="results_published">Published (ফলাফল প্রকাশিত)</option>
                     </select>
+
+                    <button
+                      onClick={() => {
+                        if (window.confirm('আপনি কি নিশ্চিত এই নির্বাচনটি সম্পূর্ণ মুছে ফেলতে চান?')) {
+                          deleteElection(election.id);
+                        }
+                      }}
+                      className="p-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl font-bold transition-colors cursor-pointer"
+                      title="Delete Election"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <div className="flex flex-wrap justify-between items-center gap-2">
+                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                       পদবী ও প্রার্থীর তালিকা ({activePositions.length}টি পদ)
                     </h4>
-                    <button onClick={() => setCandidateFormOpenFor(candidateFormOpenFor === election.id ? null : election.id)} className="text-xs font-bold text-blue-600">+ প্রার্থী যোগ করুন</button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setAddPosToElectionId(addPosToElectionId === election.id ? null : election.id)}
+                        className="text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+                      >
+                        + পদ যোগ করুন
+                      </button>
+                      <button
+                        onClick={() => setCandidateFormOpenFor(candidateFormOpenFor === election.id ? null : election.id)}
+                        className="text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer"
+                      >
+                        + প্রার্থী যোগ করুন
+                      </button>
+                    </div>
                   </div>
-                  
+
+                  {/* Inline Add Position to Existing Election */}
+                  {addPosToElectionId === election.id && (
+                    <div className="p-4 bg-amber-50/50 rounded-2xl border border-amber-200 space-y-3 text-xs">
+                      <span className="font-bold text-amber-900 block">এই নির্বাচনে নতুন পদ যোগ করুন:</span>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          placeholder="পদের নাম বাংলায় (যেমন: সহ-সম্পাদক)"
+                          value={inlinePosNameBn}
+                          onChange={e => setInlinePosNameBn(e.target.value)}
+                          className="flex-1 p-2 border border-slate-300 rounded-lg text-xs bg-white"
+                        />
+                        <input
+                          placeholder="English Name (e.g. Asst Secretary)"
+                          value={inlinePosNameEn}
+                          onChange={e => setInlinePosNameEn(e.target.value)}
+                          className="flex-1 p-2 border border-slate-300 rounded-lg text-xs bg-white"
+                        />
+                        <input
+                          type="number"
+                          min="1"
+                          max="10"
+                          placeholder="আসন সংখ্যা"
+                          value={inlinePosSeats}
+                          onChange={e => setInlinePosSeats(Number(e.target.value) || 1)}
+                          className="w-24 p-2 border border-slate-300 rounded-lg text-xs bg-white font-mono"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!inlinePosNameBn.trim()) return;
+                            addPositionToElection(election.id, {
+                              id: `pos-${Date.now()}`,
+                              election_id: election.id,
+                              position_name: inlinePosNameEn || inlinePosNameBn,
+                              position_name_bn: `${inlinePosNameBn} (${inlinePosSeats} জন)`,
+                              sort_order: (activePositions.length + 1) * 5,
+                              max_votes: inlinePosSeats
+                            });
+                            setInlinePosNameBn('');
+                            setInlinePosNameEn('');
+                            setInlinePosSeats(1);
+                            setAddPosToElectionId(null);
+                          }}
+                          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold"
+                        >
+                          সংরক্ষণ করুন
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAddPosToElectionId(null)}
+                          className="px-3 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-bold"
+                        >
+                          বাতিল
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Add Candidate Form */}
                   {candidateFormOpenFor === election.id && (
                     <div className="p-5 bg-[#f8fafc] rounded-2xl border border-slate-300 space-y-4 shadow-sm">
                       <div className="flex items-center justify-between pb-2 border-b border-slate-200">
@@ -958,9 +1294,15 @@ export const AdminPanel: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => {
+                            if (!candidateForm.name.trim() || !candidateForm.position_id) {
+                              showToast('প্রার্থীর নাম ও পদ নির্বাচন করুন', 'error');
+                              return;
+                            }
                             const finalPhoto = candidateForm.photo_url.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
                             addCandidateToElection(election.id, { ...candidateForm, photo_url: finalPhoto });
                             setCandidateFormOpenFor(null);
+                            setCandidateForm({ position_id: '', name: '', name_bn: '', bio: '', symbol: '', phone: '', photo_url: '', voter_id: '' });
+                            showToast('প্রার্থী সফলভাবে যুক্ত করা হয়েছে।', 'success');
                           }}
                           className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-xs"
                         >
@@ -972,32 +1314,59 @@ export const AdminPanel: React.FC = () => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {activePositions.map(pos => {
-                    const posCandidates = election.candidates.filter(c => c.position_id === pos.id);
-                    return (
-                      <div key={pos.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-2">
-                        <div className="flex justify-between font-bold">
-                          <span className="text-slate-900">{pos.position_name_bn}</span>
-                          <span className="text-emerald-700">{posCandidates.length} জন প্রার্থী</span>
-                        </div>
-                        <div className="space-y-1 text-slate-600">
-                          {posCandidates.map(c => (
-                            <div key={c.id} className="flex justify-between items-center text-[11px] bg-white p-1.5 rounded border border-slate-100">
-                              <span>{c.name_bn || c.name} ({c.symbol})</span>
-                              <div className="flex items-center gap-2">
-                                <span className="font-mono font-bold text-emerald-800">{c.vote_count} ভোট</span>
-                                <button onClick={() => removeCandidate(election.id, c.id)} className="text-red-500 font-bold">X</button>
-                              </div>
+                      const posCandidates = election.candidates.filter(c => c.position_id === pos.id);
+                      return (
+                        <div key={pos.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-3">
+                          <div className="flex justify-between items-center font-bold">
+                            <span className="text-slate-900 text-sm">{pos.position_name_bn}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-emerald-700 font-semibold">{posCandidates.length} জন প্রার্থী</span>
+                              <button
+                                onClick={() => {
+                                  if (window.confirm(`আপনি কি এই পদটি (${pos.position_name_bn}) নির্বাচন থেকে মুছে ফেলতে চান?`)) {
+                                    removePositionFromElection(election.id, pos.id);
+                                  }
+                                }}
+                                className="text-red-500 hover:text-red-700 text-[11px] font-semibold"
+                                title="Delete position"
+                              >
+                                মুছে ফেলুন
+                              </button>
                             </div>
-                          ))}
+                          </div>
+
+                          <div className="space-y-1.5 text-slate-600">
+                            {posCandidates.length === 0 ? (
+                              <div className="text-slate-400 text-[11px] italic py-1">কোনো প্রার্থী যুক্ত করা হয়নি</div>
+                            ) : (
+                              posCandidates.map(c => (
+                                <div key={c.id} className="flex justify-between items-center text-[11px] bg-white p-2 rounded-xl border border-slate-100">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-semibold text-slate-800">{c.name_bn || c.name}</span>
+                                    <span className="text-slate-500">({c.symbol})</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-mono font-bold text-emerald-800">{c.vote_count || 0} ভোট</span>
+                                    <button
+                                      onClick={() => removeCandidate(election.id, c.id)}
+                                      className="text-red-500 hover:text-red-700 font-bold px-1.5 py-0.5 rounded"
+                                      title="Remove candidate"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         </div>
       )}
 

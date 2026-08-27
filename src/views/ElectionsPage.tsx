@@ -25,6 +25,8 @@ export const ElectionsPage: React.FC = () => {
     setCurrentView,
     currentUser,
     currentVoter,
+    voters,
+    votes,
     hasVoterVotedInElection
   } = useApp();
 
@@ -35,9 +37,20 @@ export const ElectionsPage: React.FC = () => {
   const isVotingLive = currentElection?.status === 'voting';
   const hasVoted = currentElection && currentVoter ? hasVoterVotedInElection(currentElection.id, currentVoter.id) : false;
 
+  // Real-time dynamic stats
+  const totalEligibleMembers = voters.filter(v => v.is_active).length;
+  const votedMembersCount = currentElection 
+    ? new Set(votes.filter(v => v.election_id === currentElection.id).map(v => v.voter_id)).size 
+    : 0;
+  const turnoutPercent = totalEligibleMembers > 0 
+    ? ((votedMembersCount / totalEligibleMembers) * 100).toFixed(1) 
+    : '0.0';
+  const pendingMembersCount = Math.max(0, totalEligibleMembers - votedMembersCount);
+
   // Calculate total votes cast in this election
   const totalVotesAcrossCandidates = currentElection
-    ? currentElection.candidates.reduce((sum, c) => sum + (c.vote_count || 0), 0)
+    ? votes.filter(v => v.election_id === currentElection.id).length ||
+      currentElection.candidates.reduce((sum, c) => sum + (c.vote_count || 0), 0)
     : 0;
 
   if (!currentElection) {
@@ -254,30 +267,41 @@ export const ElectionsPage: React.FC = () => {
       {activeTab === 'results' && (
         <div className="space-y-8">
           {/* Turnout Stats Card */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gradient-to-br from-slate-900 to-[#1e3a5f] text-white p-6 rounded-3xl shadow-lg">
-            <div className="p-3 border-r border-white/10 space-y-1">
-              <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">সর্বমোট গৃহীত ভোট</div>
-              <div className="text-3xl font-extrabold text-emerald-300 font-mono">
-                {totalVotesAcrossCandidates}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-gradient-to-br from-slate-900 to-[#1e3a5f] text-white p-6 rounded-3xl shadow-lg">
+            <div className="p-3 border-b sm:border-b-0 sm:border-r border-white/10 space-y-1">
+              <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">মোট অনুমোদিত সদস্য</div>
+              <div className="text-3xl font-extrabold text-white font-mono">
+                {totalEligibleMembers}
               </div>
-              <div className="text-[11px] text-slate-400">সকল পদ মিলে মোট কাস্ট</div>
+              <div className="text-[11px] text-slate-400">সোসাইটির নিবন্ধিত ভোটার সংখ্যা</div>
             </div>
 
-            <div className="p-3 border-r border-white/10 space-y-1">
+            <div className="p-3 border-b sm:border-b-0 sm:border-r border-white/10 space-y-1">
+              <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">ভোট প্রদান করেছেন</div>
+              <div className="text-3xl font-extrabold text-emerald-300 font-mono">
+                {votedMembersCount} <span className="text-xs text-slate-400 font-normal">/ {totalEligibleMembers} জন</span>
+              </div>
+              <div className="text-[11px] text-emerald-400 font-medium">বাকি আছেন: {pendingMembersCount} জন</div>
+            </div>
+
+            <div className="p-3 border-b sm:border-b-0 sm:border-r border-white/10 space-y-1">
               <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">ভোটার টার্নআউট</div>
               <div className="text-3xl font-extrabold text-blue-300 font-mono">
-                ৭৮.৪%
+                {turnoutPercent}%
               </div>
-              <div className="text-[11px] text-slate-400">সক্রিয় ভোটারদের সক্রিয় অংশগ্রহণ</div>
+              <div className="text-[11px] text-slate-400">সক্রিয় সদস্যদের অংশগ্রহণের হার</div>
             </div>
 
             <div className="p-3 space-y-1">
-              <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">ফলাফলের স্ট্যাটাস</div>
-              <div className="text-lg font-bold text-amber-300 flex items-center gap-1.5 pt-1">
-                <Sparkles className="w-5 h-5 text-amber-400" />
-                <span>রিয়েল-টাইম লাইভ কাউন্ট</span>
+              <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">লাইভ ভোট ফিড</div>
+              <div className="text-sm font-bold text-emerald-300 flex items-center gap-2 pt-1">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+                <span>লাইভ গণনা সক্রিয়</span>
               </div>
-              <div className="text-[11px] text-slate-400">ব্যালট দাখিল হওয়া মাত্রই স্বয়ংক্রিয় গণনা</div>
+              <div className="text-[11px] text-slate-400">ব্যালট জমা হওয়ামাত্র স্বয়ংক্রিয় আপডেট</div>
             </div>
           </div>
 
