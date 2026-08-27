@@ -146,6 +146,38 @@ export const Footer: React.FC = () => {
         </div>
       </div>
 
+      {/* Google Map Location Preview Box */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="bg-[#1a233a] border border-slate-700/80 rounded-2xl p-4 sm:p-5 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="font-bold text-white text-xs sm:text-sm">সোসাইটির অবস্থান ও গুগল ম্যাপ (Location Map)</span>
+              <span className="text-[11px] text-slate-400 hidden sm:inline">— ৪৪২ ধোলাইরপাড়, ঢাকা-মাওয়া মহাসড়ক, ঢাকা-১২০৪</span>
+            </div>
+            <span className="text-[11px] text-emerald-400 bg-emerald-950/80 border border-emerald-800/80 px-2.5 py-0.5 rounded-full font-semibold inline-flex items-center gap-1 w-fit">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              লাইভ লোকেশন ম্যাপ
+            </span>
+          </div>
+
+          {/* Map iframe Container */}
+          <div className="w-full h-48 sm:h-64 rounded-xl overflow-hidden border border-slate-700 bg-slate-900 relative shadow-inner">
+            <iframe
+              title="Bikrampur Garden City Google Map"
+              src="https://maps.google.com/maps?q=PC2P%2B4R+Dhaka&t=&z=17&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen={false}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-full filter brightness-95 contrast-105"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Bottom Clean Bar - Matching Screenshot */}
       <div className="bg-white text-slate-600 border-t border-slate-200 py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs gap-3">
